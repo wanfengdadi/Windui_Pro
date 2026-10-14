@@ -13980,7 +13980,6 @@ end)
 
 aw.SideBarMode="Full"
 aw.SideBarCollapsed=false
-aw.SidebarAction="None"
 
 local initialIcon=an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
 local sidebarIcon=an.Image(initialIcon,"sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
@@ -14062,13 +14061,9 @@ if aw.TabModule and aw.TabModule.Tabs then
 for _,tab in next,aw.TabModule.Tabs do
 if tab.UIElements and tab.UIElements.Main and tab.UIElements.Main.Frame then
 local txt=tab.UIElements.Main.Frame:FindFirstChildOfClass"TextLabel"
-if txt then
-txt.Visible=not isCompact
-end
+if txt then txt.Visible=not isCompact end
 local layout=tab.UIElements.Main.Frame:FindFirstChildOfClass"UIListLayout"
-if layout then
-layout.HorizontalAlignment=isCompact and "Center" or "Left"
-end
+if layout then layout.HorizontalAlignment=isCompact and "Center" or "Left" end
 end
 end
 end
@@ -14098,9 +14093,6 @@ if userText then userText.Visible=true end
 end
 end
 
-local nextIcon=isNone and "panel-left-open" or "panel-left-close"
-switchSidebarIcon(nextIcon)
-
 local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
 ap(iconScale,0.12,{Scale=0.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
 if img then
@@ -14108,6 +14100,8 @@ ap(img,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
 end
 
 task.delay(0.12,function()
+local nextIcon=isNone and "panel-left-open" or "panel-left-close"
+switchSidebarIcon(nextIcon)
 iconScale.Scale=0.35
 if img then img.ImageTransparency=1 end
 
@@ -14118,15 +14112,11 @@ end
 end)
 end
 
-function aw.ToggleSidebar(self,state)
-if state~=nil then
-aw:SetSidebarMode(state and "None" or "Full")
-else
-if aw.SideBarMode=="Full" then
-aw:SetSidebarMode(aw.SidebarAction)
-else
+function aw.ToggleSidebar(self)
+if aw.SideBarMode=="None" or aw.SideBarMode=="Compact" then
 aw:SetSidebarMode("Full")
-end
+else
+aw:SetSidebarMode("None")
 end
 end
 
