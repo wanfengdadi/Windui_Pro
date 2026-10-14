@@ -13956,6 +13956,12 @@ local A=aw.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
 /av.WindUI.UIScale
 
 z=aw.UIElements.Main.Main.Topbar.Left.AbsoluteSize.X/av.WindUI.UIScale
+an.AddSignal(aw.UIElements.Main.Main.Topbar.Left:GetPropertyChangedSignal"AbsoluteSize",function()
+local z=0
+local A=aw.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
+/av.WindUI.UIScale
+
+z=aw.UIElements.Main.Main.Topbar.Left.AbsoluteSize.X/av.WindUI.UIScale
 if aw.Topbar.ButtonsType~="Default"then
 z=z+A+aw.UIPadding-4
 end
@@ -13974,6 +13980,7 @@ end)
 
 aw.SideBarMode="Full"
 aw.SideBarCollapsed=false
+aw.SidebarAction="None"
 
 local initialIcon=an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
 local sidebarIcon=an.Image(initialIcon,"sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
@@ -14027,14 +14034,15 @@ true
 function aw.SetSidebarMode(self,mode)
 aw.SideBarMode=mode
 local isNone=(mode=="None")
+local isCompact=(mode=="Compact")
 aw.SideBarCollapsed=isNone
 
-local targetW=isNone and 0 or aw.SideBarWidth
+local targetW=isNone and 0 or(isCompact and 52 or aw.SideBarWidth)
 local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
 
 if isNone then
 task.delay(0.28,function()
-if aw.SideBarCollapsed then
+if aw.SideBarMode=="None" then
 aw.UIElements.SideBarContainer.Visible=false
 end
 end)
@@ -14054,9 +14062,13 @@ if aw.TabModule and aw.TabModule.Tabs then
 for _,tab in next,aw.TabModule.Tabs do
 if tab.UIElements and tab.UIElements.Main and tab.UIElements.Main.Frame then
 local txt=tab.UIElements.Main.Frame:FindFirstChildOfClass"TextLabel"
-if txt then txt.Visible=true end
+if txt then
+txt.Visible=not isCompact
+end
 local layout=tab.UIElements.Main.Frame:FindFirstChildOfClass"UIListLayout"
-if layout then layout.HorizontalAlignment="Left" end
+if layout then
+layout.HorizontalAlignment=isCompact and "Center" or "Left"
+end
 end
 end
 end
@@ -14065,8 +14077,16 @@ if d then
 if isNone then
 ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 task.delay(0.2,function()
-if aw.SideBarCollapsed then d.Visible=false end
+if aw.SideBarMode=="None" then d.Visible=false end
 end)
+elseif isCompact then
+d.Visible=aw.User.Enabled or false
+ap(d,0.28,{
+Position=UDim2.new(0,6,1,-(aw.UIPadding/2)),
+Size=UDim2.new(0,40,0,40),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local userText=d:FindFirstChild("Frame",true)
+if userText then userText.Visible=false end
 else
 d.Visible=aw.User.Enabled or false
 ap(d,0.28,{
@@ -14090,6 +14110,7 @@ end
 task.delay(0.12,function()
 iconScale.Scale=0.35
 if img then img.ImageTransparency=1 end
+
 ap(iconScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 if img then
 ap(img,0.18,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -14102,7 +14123,7 @@ if state~=nil then
 aw:SetSidebarMode(state and "None" or "Full")
 else
 if aw.SideBarMode=="Full" then
-aw:SetSidebarMode("None")
+aw:SetSidebarMode(aw.SidebarAction)
 else
 aw:SetSidebarMode("Full")
 end
