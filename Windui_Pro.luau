@@ -13340,6 +13340,7 @@ aw.User.Enabled and-aw.Topbar.Height-42-(aw.UIPadding*2)or-aw.Topbar.Height
 ),
 Position=UDim2.new(0,0,0,aw.Topbar.Height),
 BackgroundTransparency=1,
+ClipsDescendants=true,
 Visible=true,
 },{
 ao("Frame",{
@@ -13969,6 +13970,84 @@ aw.UIElements.Main.Main.Topbar.Center.Size=UDim2.new(
 1,
 0
 )
+end)
+
+aw.SideBarCollapsed=false
+
+local sidebarIcon=an.Image("panel-left","sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
+sidebarIcon.Size=UDim2.new(0,aw.TopBarButtonIconSize or 16,0,aw.TopBarButtonIconSize or 16)
+sidebarIcon.AnchorPoint=Vector2.new(0.5,0.5)
+sidebarIcon.Position=UDim2.new(0.5,0,0.5,0)
+
+local sidebarBtn=an.NewRoundFrame(
+aw.UICorner-(aw.UIPadding/2),
+"Squircle",
+{
+Size=UDim2.new(0,aw.Topbar.Height-16,0,aw.Topbar.Height-16),
+ThemeTag={ImageColor3="Text"},
+ImageTransparency=1,
+LayoutOrder=-999,
+Name="SidebarToggle",
+Parent=aw.UIElements.Main.Main.Topbar.Left,
+},
+{
+sidebarIcon,
+ao("UIScale",{Scale=1}),
+},
+true
+)
+
+function aw.ToggleSidebar(self,state)
+if state==nil then
+state=not aw.SideBarCollapsed
+end
+aw.SideBarCollapsed=state
+
+local targetW=state and 0 or aw.SideBarWidth
+local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
+
+ap(aw.UIElements.SideBarContainer,0.28,{
+Size=UDim2.new(0,targetW,1,hOffset),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+ap(aw.UIElements.MainBar,0.28,{
+Size=UDim2.new(1,state and 0 or-aw.SideBarWidth,1,-aw.Topbar.Height),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+if d then
+if state then
+ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+task.delay(0.2,function()
+if aw.SideBarCollapsed then d.Visible=false end
+end)
+else
+d.Visible=aw.User.Enabled or false
+ap(d,0.28,{Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+
+if sidebarIcon then
+ap(sidebarIcon,0.2,{
+ImageTransparency=state and 0.45 or 0.1,
+Rotation=state and 180 or 0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+
+an.AddSignal(sidebarBtn.MouseEnter,function()
+ap(sidebarBtn,0.15,{ImageTransparency=0.93}):Play()
+end)
+an.AddSignal(sidebarBtn.MouseLeave,function()
+ap(sidebarBtn,0.15,{ImageTransparency=1}):Play()
+end)
+an.AddSignal(sidebarBtn.MouseButton1Down,function()
+ap(sidebarBtn.UIScale,0.2,{Scale=0.9},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end)
+an.AddSignal(sidebarBtn.InputEnded,function()
+ap(sidebarBtn.UIScale,0.2,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+end)
+an.AddSignal(sidebarBtn.MouseButton1Click,function()
+aw:ToggleSidebar()
 end)
 
 if aw.Topbar.ButtonsType~="Default"then
