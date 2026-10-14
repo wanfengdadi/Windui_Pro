@@ -7347,21 +7347,15 @@ ImageColor3="SliderThumb",
 },
 Name="Thumb",
 },{
-ae.NewRoundFrame(999,"SquircleGlass",{
+ae.NewRoundFrame(99,"SquircleGlass",{
 Size=UDim2.new(1,0,1,0),
-ImageColor3=Color3.new(1,1,1),
-Name="Highlight",
-ImageTransparency=0.5,
-}),
-ae.NewRoundFrame(999,"Glass-1.4",{
-Size=UDim2.new(1,2,1,2),
-AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
+AnchorPoint=Vector2.new(0.5,0.5),
 ThemeTag={
 ImageColor3="White",
 },
 Name="GlassBorder",
-ImageTransparency=0.6,
+ImageTransparency=0.7,
 }),
 }),
 }),
@@ -7523,7 +7517,7 @@ ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)
 },Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
 
 if thumb:FindFirstChild"GlassBorder"then
-ag(thumb.GlassBorder,0.2,{ImageTransparency=0.6},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+ag(thumb.GlassBorder,0.2,{ImageTransparency=0.7},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
 end
 if ax then
 ax:Close(false)
@@ -7622,7 +7616,7 @@ al.ThumbSize+8
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 if thumb:FindFirstChild"GlassBorder"then
-ag(thumb.GlassBorder,0.24,{ImageTransparency=0.25},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ag(thumb.GlassBorder,0.24,{ImageTransparency=0.15},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 if ax then
 ax:Open()
