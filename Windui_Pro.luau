@@ -7972,8 +7972,24 @@ nil,
 aj.Window.NewElements and 12 or 10
 )
 
-ak.UIElements.Keybind.Size=
-UDim2.new(0,24+ak.UIElements.Keybind.Frame.Frame.TextLabel.TextBounds.X,0,42)
+local textLabel=ak.UIElements.Keybind.Frame.Frame.TextLabel
+textLabel.TextXAlignment="Center"
+if ak.UIElements.Keybind.Frame.Frame:FindFirstChild"UIListLayout"then
+ak.UIElements.Keybind.Frame.Frame.UIListLayout.HorizontalAlignment="Center"
+end
+
+local function UpdateKeybindSize()
+local tw=textLabel.TextBounds.X
+if tw<=0 and textLabel.Text~=""then
+tw=string.len(textLabel.Text)*9
+end
+local w=math.max(48,tw+32)
+ak.UIElements.Keybind.Size=UDim2.new(0,w,0,42)
+end
+
+UpdateKeybindSize()
+task.defer(UpdateKeybindSize)
+
 ak.UIElements.Keybind.AnchorPoint=Vector2.new(1,0.5)
 ak.UIElements.Keybind.Position=UDim2.new(1,0,0.5,0)
 ak.UIElements.Keybind.Interactable=false
@@ -7983,13 +7999,8 @@ Parent=ak.UIElements.Keybind,
 Scale=0.85,
 })
 
-ad.AddSignal(
-ak.UIElements.Keybind.Frame.Frame.TextLabel:GetPropertyChangedSignal"TextBounds",
-function()
-ak.UIElements.Keybind.Size=
-UDim2.new(0,24+ak.UIElements.Keybind.Frame.Frame.TextLabel.TextBounds.X,0,42)
-end
-)
+ad.AddSignal(textLabel:GetPropertyChangedSignal"TextBounds",UpdateKeybindSize)
+ad.AddSignal(textLabel:GetPropertyChangedSignal"Text",UpdateKeybindSize)
 
 function ak.Lock(an)
 ak.Locked=true
