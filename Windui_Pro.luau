@@ -950,13 +950,81 @@ r.SetLangForObject(u)
 return x
 end
 
-function r.SetTheme(u)
-local v=r.Theme
-r.Theme=u
-r.UpdateTheme(nil,false)
+function r.UpdateTheme(u,v,x,z,A,B)
+local function ApplyTheme(C)
+for F,G in pairs(C.Properties or{})do
+local H=r.GetThemeProperty(G,r.Theme)
+if H~=nil then
+if typeof(H)=="Color3"then
+local J=C.Object:FindFirstChild"LibraryGradient"
+if J then
+J:Destroy()
+end
 
-for x,z in next,r.ThemeChangeCallbacks do
-r.SafeCallback(z,u,v)
+if x then
+r.Tween(
+C.Object,
+z or 0.2,
+{[F]=H},
+A or Enum.EasingStyle.Quint,
+B or Enum.EasingDirection.Out
+):Play()
+elseif v then
+r.Tween(C.Object,0.08,{[F]=H}):Play()
+else
+C.Object[F]=H
+end
+elseif typeof(H)=="table"and H.Color and H.Transparency then
+C.Object[F]=Color3.new(1,1,1)
+
+local J=C.Object:FindFirstChild"LibraryGradient"
+if not J then
+J=Instance.new"UIGradient"
+J.Name="LibraryGradient"
+J.Parent=C.Object
+end
+
+J.Color=H.Color
+J.Transparency=H.Transparency
+
+for L,M in pairs(H)do
+if L~="Color"and L~="Transparency"and J[L]~=nil then
+J[L]=M
+end
+end
+elseif typeof(H)=="number"then
+if x then
+r.Tween(
+C.Object,
+z or 0.2,
+{[F]=H},
+A or Enum.EasingStyle.Quint,
+B or Enum.EasingDirection.Out
+):Play()
+elseif v then
+r.Tween(C.Object,0.08,{[F]=H}):Play()
+else
+C.Object[F]=H
+end
+end
+else
+local J=C.Object:FindFirstChild"LibraryGradient"
+if J then
+J:Destroy()
+end
+end
+end
+end
+
+if u then
+local C=r.Objects[u]
+if C then
+ApplyTheme(C)
+end
+else
+for C,F in pairs(r.Objects)do
+ApplyTheme(F)
+end
 end
 end
 
