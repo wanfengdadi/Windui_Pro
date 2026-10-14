@@ -825,14 +825,10 @@ end
 return A
 end
 
-function r.SetTheme(u,w)
+function r.SetTheme(u)
 local v=r.Theme
 r.Theme=u
-if v~=nil then
-r.UpdateTheme(nil,false,true,w or 0.25)
-else
 r.UpdateTheme(nil,false)
-end
 
 for x,z in next,r.ThemeChangeCallbacks do
 r.SafeCallback(z,u,v)
@@ -954,118 +950,13 @@ r.SetLangForObject(u)
 return x
 end
 
-function r.UpdateTheme(u,v,x,z,A,B)
-local function ApplyTheme(C)
-if not C or not C.Object or not C.Object.Parent then
-return
-end
-for F,G in pairs(C.Properties or{})do
-local H=r.GetThemeProperty(G,r.Theme)
-if H~=nil then
-if typeof(H)=="Color3"then
-local J=C.Object:FindFirstChild"LibraryGradient"
-if J then
-pcall(function()J:Destroy()end)
-end
+function r.SetTheme(u)
+local v=r.Theme
+r.Theme=u
+r.UpdateTheme(nil,false)
 
-if x then
-local s,tw=pcall(function()
-return r.Tween(
-C.Object,
-z or 0.25,
-{[F]=H},
-A or Enum.EasingStyle.Quint,
-B or Enum.EasingDirection.Out
-)
-end)
-if s and tw then
-tw:Play()
-else
-pcall(function()C.Object[F]=H end)
-end
-elseif v then
-local s,tw=pcall(function()
-return r.Tween(C.Object,0.08,{[F]=H})
-end)
-if s and tw then
-tw:Play()
-else
-pcall(function()C.Object[F]=H end)
-end
-else
-pcall(function()C.Object[F]=H end)
-end
-elseif typeof(H)=="table"and H.Color and H.Transparency then
-pcall(function()
-C.Object[F]=Color3.new(1,1,1)
-
-local J=C.Object:FindFirstChild"LibraryGradient"
-if not J then
-J=Instance.new"UIGradient"
-J.Name="LibraryGradient"
-J.Parent=C.Object
-end
-
-J.Color=H.Color
-J.Transparency=H.Transparency
-
-for L,M in pairs(H)do
-if L~="Color"and L~="Transparency"and J[L]~=nil then
-J[L]=M
-end
-end
-end)
-elseif typeof(H)=="number"then
-if x then
-local s,tw=pcall(function()
-return r.Tween(
-C.Object,
-z or 0.25,
-{[F]=H},
-A or Enum.EasingStyle.Quint,
-B or Enum.EasingDirection.Out
-)
-end)
-if s and tw then
-tw:Play()
-else
-pcall(function()C.Object[F]=H end)
-end
-elseif v then
-local s,tw=pcall(function()
-return r.Tween(C.Object,0.08,{[F]=H})
-end)
-if s and tw then
-tw:Play()
-else
-pcall(function()C.Object[F]=H end)
-end
-else
-pcall(function()C.Object[F]=H end)
-end
-end
-else
-local J=C.Object:FindFirstChild"LibraryGradient"
-if J then
-pcall(function()J:Destroy()end)
-end
-end
-end
-end
-
-if u then
-local C=r.Objects[u]
-if C then
-ApplyTheme(C)
-end
-else
-for C,F in pairs(r.Objects)do
-if not F or not F.Object or not F.Object.Parent then
-r.Objects[C]=nil
-else
-ApplyTheme(F)
-end
-end
+for x,z in next,r.ThemeChangeCallbacks do
+r.SafeCallback(z,u,v)
 end
 end
 
