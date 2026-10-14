@@ -13950,142 +13950,131 @@ PaddingBottom=UDim.new(0,aw.UIPadding),
 }),
 })
 
-an.AddSignal(aw.UIElements.Main.Main.Topbar.Left:GetPropertyChangedSignal"AbsoluteSize",function()
-local z=0
-local A=aw.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
-/av.WindUI.UIScale
+aw.SideBarCollapsed=false
 
-z=aw.UIElements.Main.Main.Topbar.Left.AbsoluteSize.X/av.WindUI.UIScale
-aw.SideBarCollapsed = false
+local initialIcon=an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
+local sidebarIcon=an.Image(initialIcon,"sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
+sidebarIcon.Size=UDim2.new(0,aw.TopBarButtonIconSize or 16,0,aw.TopBarButtonIconSize or 16)
+sidebarIcon.AnchorPoint=Vector2.new(0.5,0.5)
+sidebarIcon.Position=UDim2.new(0.5,0,0.5,0)
 
-local initialIcon = an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
-local sidebarIcon = an.Image(initialIcon, "sidebar", 0, aw.Folder, "WindowTopbarIcon", true, nil, "WindowTopbarButtonIcon")
-sidebarIcon.Size = UDim2.new(0, aw.TopBarButtonIconSize or 16, 0, aw.TopBarButtonIconSize or 16)
-sidebarIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-sidebarIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-
-local iconScale = ao("UIScale", {
-    Scale = 1,
-    Parent = sidebarIcon,
+local iconScale=ao("UIScale",{
+Scale=1,
+Parent=sidebarIcon,
 })
 
 local function switchSidebarIcon(iconName)
-    local iconData = an.Icon(iconName)
-    if not iconData then
-        if iconName == "panel-left-open" then
-            iconData = an.Icon("panel-right") or an.Icon("chevron-right") or an.Icon("panel-left") or an.Icon("menu")
-        else
-            iconData = an.Icon("chevron-left") or an.Icon("panel-left") or an.Icon("menu")
-        end
-    end
-    if not iconData then return end
-    local img = sidebarIcon:FindFirstChildOfClass("ImageLabel", true)
-    if img then
-        img.Image = iconData[1]
-        if iconData[2] then
-            img.ImageRectSize = iconData[2].ImageRectSize
-            img.ImageRectOffset = iconData[2].ImageRectPosition
-        end
-    end
+local iconData=an.Icon(iconName)
+if not iconData then
+if iconName=="panel-left-open" then
+iconData=an.Icon("panel-right") or an.Icon("chevron-right") or an.Icon("panel-left")
+else
+iconData=an.Icon("chevron-left") or an.Icon("panel-left")
+end
+end
+if not iconData then return end
+local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
+if img then
+img.Image=iconData[1]
+if iconData[2] then
+img.ImageRectSize=iconData[2].ImageRectSize
+img.ImageRectOffset=iconData[2].ImageRectPosition
+end
+end
 end
 
-local sidebarBtn = an.NewRoundFrame(
-    aw.UICorner - (aw.UIPadding / 2),
-    "Squircle",
-    {
-        Size = UDim2.new(0, aw.Topbar.Height - 16, 0, aw.Topbar.Height - 16),
-        ThemeTag = { ImageColor3 = "Text" },
-        ImageTransparency = 1,
-        LayoutOrder = -999,
-        Name = "SidebarToggle",
-        Parent = aw.UIElements.Main.Main.Topbar.Left,
-    },
-    {
-        sidebarIcon,
-        ao("UIScale", { Scale = 1, Name = "UIScale" }),
-    },
-    true
+local sidebarBtn=an.NewRoundFrame(
+aw.UICorner-(aw.UIPadding/2),
+"Squircle",
+{
+Size=UDim2.new(0,aw.Topbar.Height-16,0,aw.Topbar.Height-16),
+ThemeTag={ImageColor3="Text"},
+ImageTransparency=1,
+LayoutOrder=-999,
+Name="SidebarToggle",
+Parent=aw.UIElements.Main.Main.Topbar.Left,
+},
+{
+sidebarIcon,
+ao("UIScale",{Scale=1}),
+},
+true
 )
 
-function aw.ToggleSidebar(self, state)
-    if state == nil then
-        state = not aw.SideBarCollapsed
-    end
-    aw.SideBarCollapsed = state
+function aw.ToggleSidebar(self,state)
+if state==nil then
+state=not aw.SideBarCollapsed
+end
+aw.SideBarCollapsed=state
 
-    local targetW = state and 0 or aw.SideBarWidth
-    local hOffset = (aw.User and aw.User.Enabled) and (-aw.Topbar.Height - 42 - (aw.UIPadding * 2)) or -aw.Topbar.Height
+local targetW=state and 0 or aw.SideBarWidth
+local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
 
-    ap(aw.UIElements.SideBarContainer, 0.28, {
-        Size = UDim2.new(0, targetW, 1, hOffset),
-    }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+ap(aw.UIElements.SideBarContainer,0.28,{
+Size=UDim2.new(0,targetW,1,hOffset),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-    ap(aw.UIElements.MainBar, 0.28, {
-        Size = UDim2.new(1, state and 0 or -aw.SideBarWidth, 1, -aw.Topbar.Height),
-    }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+ap(aw.UIElements.MainBar,0.28,{
+Size=UDim2.new(1,state and 0 or-aw.SideBarWidth,1,-aw.Topbar.Height),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-    if d then
-        if state then
-            ap(d, 0.2, { Position = UDim2.new(0, -aw.SideBarWidth, 1, -(aw.UIPadding / 2)) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-            task.delay(0.2, function()
-                if aw.SideBarCollapsed then d.Visible = false end
-            end)
-        else
-            d.Visible = aw.User.Enabled or false
-            ap(d, 0.28, { Position = UDim2.new(0, aw.UIPadding / 2, 1, -(aw.UIPadding / 2)) }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-        end
-    end
-
-    local img = sidebarIcon:FindFirstChildOfClass("ImageLabel", true)
-    ap(iconScale, 0.12, { Scale = 0.35 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
-    if img then
-        ap(img, 0.12, { ImageTransparency = 1 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In):Play()
-    end
-
-    task.delay(0.12, function()
-        local nextIcon = state and "panel-left-open" or "panel-left-close"
-        switchSidebarIcon(nextIcon)
-        iconScale.Scale = 0.35
-        if img then img.ImageTransparency = 1 end
-
-        ap(iconScale, 0.22, { Scale = 1 }, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
-        if img then
-            ap(img, 0.18, { ImageTransparency = 0 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-        end
-    end)
+if d then
+if state then
+ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+task.delay(0.2,function()
+if aw.SideBarCollapsed then d.Visible=false end
+end)
+else
+d.Visible=aw.User.Enabled or false
+ap(d,0.28,{Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 
-an.AddSignal(sidebarBtn.MouseEnter, function()
-    ap(sidebarBtn, 0.15, { ImageTransparency = 0.93 }):Play()
+-- 图标动画：点击后当前图标往后缩进淡出，换成新图标后从深处往前弹出展现
+local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
+ap(iconScale,0.12,{Scale=0.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+if img then
+ap(img,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+end
+
+task.delay(0.12,function()
+local nextIcon=state and "panel-left-open" or "panel-left-close"
+switchSidebarIcon(nextIcon)
+iconScale.Scale=0.35
+if img then img.ImageTransparency=1 end
+
+ap(iconScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+if img then
+ap(img,0.18,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end)
+end
+
+an.AddSignal(sidebarBtn.MouseEnter,function()
+ap(sidebarBtn,0.15,{ImageTransparency=0.93}):Play()
+end)
+an.AddSignal(sidebarBtn.MouseLeave,function()
+ap(sidebarBtn,0.15,{ImageTransparency=1}):Play()
+end)
+an.AddSignal(sidebarBtn.MouseButton1Down,function()
+ap(sidebarBtn.UIScale,0.2,{Scale=0.9},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end)
+an.AddSignal(sidebarBtn.InputEnded,function()
+ap(sidebarBtn,0.15,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+end)
+an.AddSignal(sidebarBtn.MouseButton1Click,function()
+aw:ToggleSidebar()
 end)
 
-an.AddSignal(sidebarBtn.MouseLeave, function()
-    ap(sidebarBtn, 0.15, { ImageTransparency = 1 }):Play()
+if aw.Topbar.ButtonsType~="Default"then
+an.AddSignal(aw.UIElements.Main.Main.Topbar.Right:GetPropertyChangedSignal"AbsoluteSize",function()
+aw.UIElements.Main.Main.Topbar.Left.Position=UDim2.new(
+0,
+(aw.UIElements.Main.Main.Topbar.Right.AbsoluteSize.X/av.WindUI.UIScale)+aw.UIPadding-4,
+0,
+0
+)
 end)
-
-an.AddSignal(sidebarBtn.MouseButton1Down, function()
-    ap(sidebarBtn.UIScale, 0.2, { Scale = 0.9 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-end)
-
-an.AddSignal(sidebarBtn.InputEnded, function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        ap(sidebarBtn.UIScale, 0.15, { Scale = 1 }, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut):Play()
-    end
-end)
-
-an.AddSignal(sidebarBtn.MouseButton1Click, function()
-    aw:ToggleSidebar()
-end)
-
-if aw.Topbar.ButtonsType ~= "Default" then
-    an.AddSignal(aw.UIElements.Main.Main.Topbar.Right:GetPropertyChangedSignal("AbsoluteSize"), function()
-        aw.UIElements.Main.Main.Topbar.Left.Position = UDim2.new(
-            0,
-            (aw.UIElements.Main.Main.Topbar.Right.AbsoluteSize.X / av.WindUI.UIScale) + aw.UIPadding - 4,
-            0,
-            0
-        )
-    end)
 end
 
 function aw.CreateTopbarButton(z,A,B,C,F,G,H,J)
