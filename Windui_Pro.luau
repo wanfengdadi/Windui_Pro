@@ -8361,12 +8361,6 @@ MaxSize=Vector2.new(300,400),
 }),
 })
 
-local menuScale=al("UIScale",{
-Scale=1,
-Parent=ap.UIElements.MenuCanvas,
-})
-ap.UIElements.MenuScale=menuScale
-
 local function RecalculateCanvasSize()
 ap.UIElements.Menu.Frame.ScrollingFrame.CanvasSize=
 UDim2.fromOffset(0,ap.UIElements.UIListLayout.AbsoluteContentSize.Y)
@@ -8870,9 +8864,18 @@ if not ap.Locked then
 ap.UIElements.Menu.Visible=true
 ap.UIElements.MenuCanvas.Visible=true
 ap.UIElements.MenuCanvas.Active=true
-ap.UIElements.Menu.Size=UDim2.new(1,0,1,0)
+ap.UIElements.Menu.Size=UDim2.new(1,0,0,0)
+am(ap.UIElements.Menu,0.1,{
+Size=UDim2.new(1,0,1,0),
+ImageTransparency=0,
+},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
 
-UpdatePosition()
+task.spawn(function()
+task.wait(0.12)
+if ap.Locked then
+return
+end
+ap.Opened=true
 
 local ind=ap.UIElements.Indicator
 local mf=ap.UIElements.Menu.Frame
@@ -8885,27 +8888,13 @@ if targetH>0 then
 ind.Position=UDim2.new(0,0,0,targetY)
 ind.Size=UDim2.new(1,0,0,targetH)
 ind.Visible=true
-ind.ImageTransparency=an
-end
-else
-ind.Visible=false
+am(ind,0.15,{ImageTransparency=an}):Play()
 end
 end
-
-if ap.UIElements.MenuScale then
-ap.UIElements.MenuScale.Scale=0.75
-am(ap.UIElements.MenuScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 end
-ap.UIElements.Menu.ImageTransparency=1
-am(ap.UIElements.Menu,0.16,{ImageTransparency=0},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
-
-task.spawn(function()
-task.wait(0.12)
-if ap.Locked then
-return
-end
-ap.Opened=true
 end)
+
+UpdatePosition()
 end
 end
 
@@ -8913,24 +8902,24 @@ function as.Close(au)
 ap.Opened=false
 
 if ap.UIElements.Indicator then
-am(ap.UIElements.Indicator,0.12,{ImageTransparency=1}):Play()
+ap.UIElements.Indicator.Visible=false
+ap.UIElements.Indicator.ImageTransparency=1
 end
 
-if ap.UIElements.MenuScale then
-am(ap.UIElements.MenuScale,0.18,{Scale=0.75},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
-end
-am(ap.UIElements.Menu,0.15,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+am(ap.UIElements.Menu,0.25,{
+Size=UDim2.new(1,0,0,0),
+ImageTransparency=1,
+},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
 
 task.spawn(function()
-task.wait(0.18)
-if not ap.Opened then
+task.wait(0.1)
 ap.UIElements.Menu.Visible=false
+end)
+
+task.spawn(function()
+task.wait(0.25)
 ap.UIElements.MenuCanvas.Visible=false
 ap.UIElements.MenuCanvas.Active=false
-if ap.UIElements.Indicator then
-ap.UIElements.Indicator.Visible=false
-end
-end
 end)
 end
 
