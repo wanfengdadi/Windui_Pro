@@ -4761,31 +4761,6 @@ end
 end
 return ah
 end
-ah.Radius=an
-local dur=(ao==false or ao==0)and 0 or(ao or 0.15)
-local targetScale=math.max(an/310,0.0001)
-local borderScale=math.max((an+1)/310,0.0001)
-
-if alModule then
-alModule.Radius=an
-end
-if borderModule then
-borderModule.Radius=an+1
-end
-
-if dur==0 then
-al.SliceScale=targetScale
-if borderFrame then
-borderFrame.SliceScale=borderScale
-end
-else
-ad(al,dur,{SliceScale=targetScale},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-if borderFrame then
-ad(borderFrame,dur,{SliceScale=borderScale},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end
-return ah
-end
 
 function ah.SetTitle(am,an)
 ah.Title=an
