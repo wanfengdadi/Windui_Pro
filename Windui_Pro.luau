@@ -8464,9 +8464,24 @@ return
 end
 
 for aw,ax in next,ap.UIElements.Menu.Frame.ScrollingFrame:GetChildren()do
-if not ax:IsA"UIListLayout"then
+if not ax:IsA"UIListLayout"and ax.Name~="IndicatorFolder"then
 ax:Destroy()
 end
+end
+
+local indicatorFolder=ap.UIElements.Menu.Frame.ScrollingFrame:FindFirstChild"IndicatorFolder"
+if not indicatorFolder then
+indicatorFolder=al("Folder",{Name="IndicatorFolder",Parent=ap.UIElements.Menu.Frame.ScrollingFrame})
+local ind=ak.NewRoundFrame(aq.MenuCorner-aq.MenuPadding,"Squircle",{
+Size=UDim2.new(1,0,0,36),
+Position=UDim2.new(0,0,0,0),
+ImageTransparency=1,
+ThemeTag={ImageColor3="DropdownTabBackground"},
+ZIndex=1,
+Visible=false,
+Parent=indicatorFolder,
+})
+ap.UIElements.Indicator=ind
 end
 
 ap.Tabs={}
@@ -8518,7 +8533,7 @@ Size=UDim2.new(1,0,0,36),
 AutomaticSize=ay.Desc and"Y",
 ImageTransparency=1,
 Parent=ap.UIElements.Menu.Frame.ScrollingFrame,
-
+ZIndex=2,
 ThemeTag={
 ImageColor3="DropdownTabBackground",
 },
@@ -8707,24 +8722,32 @@ end
 end
 else
 for aA,aB in next,ap.Tabs do
-am(aB.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
-
-am(
-aB.UIElements.TabItem.Frame.Title.TextLabel,
-0.1,
-{TextTransparency=0.4}
-):Play()
+am(aB.UIElements.TabItem.Frame.Title.TextLabel,0.2,{TextTransparency=0.4},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if aB.UIElements.TabIcon then
-am(aB.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0.2}):Play()
+am(aB.UIElements.TabIcon.ImageLabel,0.2,{ImageTransparency=0.2},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 aB.Selected=false
 end
 ay.Selected=true
-am(ay.UIElements.TabItem,0.1,{ImageTransparency=an}):Play()
 
-am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0}):Play()
+local ind=ap.UIElements.Indicator
+local sf=ap.UIElements.Menu.Frame.ScrollingFrame
+if ind and sf then
+local targetY=ay.UIElements.TabItem.AbsolutePosition.Y-sf.AbsolutePosition.Y+sf.CanvasPosition.Y
+local targetH=ay.UIElements.TabItem.AbsoluteSize.Y
+ind.Visible=true
+if ind.ImageTransparency>=0.95 then
+ind.Position=UDim2.new(0,0,0,targetY)
+ind.Size=UDim2.new(1,0,0,targetH)
+am(ind,0.2,{ImageTransparency=an}):Play()
+else
+am(ind,0.26,{Position=UDim2.new(0,0,0,targetY),Size=UDim2.new(1,0,0,targetH),ImageTransparency=an},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+
+am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.35,{TextTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if ay.UIElements.TabIcon then
-am(ay.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0}):Play()
+am(ay.UIElements.TabIcon.ImageLabel,0.35,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 ap.Value=ay.Original
 end
@@ -8809,6 +8832,26 @@ if ap.Locked then
 return
 end
 ap.Opened=true
+end)
+
+task.defer(function()
+local ind=ap.UIElements.Indicator
+local sf=ap.UIElements.Menu.Frame.ScrollingFrame
+if ind and sf and not ap.Multi then
+for _,tab in next,ap.Tabs do
+if tab.Selected and tab.UIElements and tab.UIElements.TabItem then
+local targetY=tab.UIElements.TabItem.AbsolutePosition.Y-sf.AbsolutePosition.Y+sf.CanvasPosition.Y
+local targetH=tab.UIElements.TabItem.AbsoluteSize.Y
+if targetH>0 then
+ind.Visible=true
+ind.Position=UDim2.new(0,0,0,targetY)
+ind.Size=UDim2.new(1,0,0,targetH)
+ind.ImageTransparency=an
+end
+break
+end
+end
+end
 end)
 
 UpdatePosition()
