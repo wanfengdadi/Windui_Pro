@@ -1657,34 +1657,45 @@ Notifications={},
 function f.Init(g)
 local h={
 Lower=false,
+Holders={},
 }
 
-function h.SetLower(i)
-h.Lower=i
-h.Frame.Size=i and f.SizeLower or f.Size
-end
-
-h.Frame=d("Frame",{
-Position=UDim2.new(1,-29,0,56),
-AnchorPoint=Vector2.new(1,0),
+local function createHolder(name,anchor,pos,vAlign,pTop,pBottom)
+return d("Frame",{
+Name=name,
+Position=pos,
+AnchorPoint=anchor,
 Size=f.Size,
 Parent=g,
 BackgroundTransparency=1,
-
-
-
-
 },{
 d("UIListLayout",{
 HorizontalAlignment="Center",
 SortOrder="LayoutOrder",
-VerticalAlignment="Bottom",
+VerticalAlignment=vAlign,
 Padding=UDim.new(0,8),
 }),
 d("UIPadding",{
-PaddingBottom=UDim.new(0,29),
+PaddingTop=UDim.new(0,pTop or 0),
+PaddingBottom=UDim.new(0,pBottom or 0),
 }),
 })
+end
+
+h.Holders.TopLeft=createHolder("TopLeft",Vector2.new(0,0),UDim2.new(0,29,0,56),"Top",10,0)
+h.Holders.BottomLeft=createHolder("BottomLeft",Vector2.new(0,1),UDim2.new(0,29,1,-29),"Bottom",0,29)
+h.Holders.TopRight=createHolder("TopRight",Vector2.new(1,0),UDim2.new(1,-29,0,56),"Top",10,0)
+h.Holders.BottomRight=createHolder("BottomRight",Vector2.new(1,1),UDim2.new(1,-29,1,-29),"Bottom",0,29)
+
+h.Frame=h.Holders.BottomRight
+
+function h.SetLower(i)
+h.Lower=i
+for _,holder in pairs(h.Holders) do
+holder.Size=i and f.SizeLower or f.Size
+end
+end
+
 return h
 end
 
@@ -1699,47 +1710,23 @@ BackgroundImageTransparency=g.BackgroundImageTransparency,
 Duration=g.Duration or 5,
 Buttons=g.Buttons or{},
 CanClose=g.CanClose~=false,
+Position=g.Position or"BottomRight",
 UIElements={},
 Closed=false,
 }
 
-
-
 f.NotificationIndex=f.NotificationIndex+1
 f.Notifications[f.NotificationIndex]=h
 
+local posStr=string.lower(tostring(h.Position))
+local isLeft=string.find(posStr,"left")~=nil or posStr=="tl" or posStr=="lt" or posStr=="bl" or posStr=="lb"
+local isTop=string.find(posStr,"top")~=nil or posStr=="tl" or posStr=="lt" or posStr=="tr" or posStr=="rt"
 
-
-
-
-
-
-
+local holderKey=(isTop and"Top"or"Bottom")..(isLeft and"Left"or"Right")
+local targetHolder=(g.Holders and g.Holders[holderKey])or g.Holder or(g.Holders and g.Holders.BottomRight)
 
 local i
-
 if h.Icon then
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 i=b.Image(
 h.Icon,
 h.Title..":"..h.Icon,
@@ -1750,7 +1737,6 @@ h.IconThemed
 )
 i.Size=UDim2.new(0,26,0,26)
 i.Position=UDim2.new(0,f.UIPadding,0,f.UIPadding)
-
 end
 
 local l
@@ -1784,7 +1770,6 @@ ThemeTag={
 ImageTransparency="NotificationDurationTransparency",
 ImageColor3="NotificationDuration",
 },
-
 })
 
 local p=d("Frame",{
@@ -1828,7 +1813,6 @@ TextWrapped=true,
 TextXAlignment="Left",
 RichText=true,
 BackgroundTransparency=1,
-
 TextSize=15,
 ThemeTag={
 TextColor3="NotificationContent",
@@ -1840,16 +1824,19 @@ Parent=p,
 })
 end
 
+local startX=isLeft and -2 or 2
+local startY=isTop and 0 or 1
+local anchorY=isTop and 0 or 1
+
 local r=b.NewRoundFrame(f.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
-Position=UDim2.new(2,0,1,0),
-AnchorPoint=Vector2.new(0,1),
+Position=UDim2.new(startX,0,startY,0),
+AnchorPoint=Vector2.new(0,anchorY),
 AutomaticSize="Y",
 ImageTransparency=0.05,
 ThemeTag={
 ImageColor3="Notification",
 },
-
 },{
 b.NewRoundFrame(f.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
@@ -1863,12 +1850,6 @@ Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
 Name="DurationFrame",
 },{
-
-
-
-
-
-
 d("Frame",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
@@ -1876,10 +1857,6 @@ ClipsDescendants=true,
 },{
 m,
 }),
-
-
-
-
 }),
 d("ImageLabel",{
 Name="Background",
@@ -1888,13 +1865,11 @@ BackgroundTransparency=1,
 Size=UDim2.new(1,0,1,0),
 ScaleType="Crop",
 ImageTransparency=h.BackgroundImageTransparency,
-
 },{
 d("UICorner",{
 CornerRadius=UDim.new(0,f.UICorner),
 }),
 }),
-
 p,
 i,
 l,
@@ -1903,7 +1878,7 @@ l,
 local u=d("Frame",{
 BackgroundTransparency=1,
 Size=UDim2.new(1,0,0,0),
-Parent=g.Holder,
+Parent=targetHolder,
 },{
 r,
 })
@@ -1911,6 +1886,7 @@ r,
 function h.Close(v)
 if not h.Closed then
 h.Closed=true
+local exitX=isLeft and -2 or 2
 e(
 u,
 0.45,
@@ -1918,7 +1894,7 @@ u,
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
-e(r,0.55,{Position=UDim2.new(2,0,1,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+e(r,0.55,{Position=UDim2.new(exitX,0,startY,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 task.wait(0.45)
 u:Destroy()
 end
@@ -1933,7 +1909,7 @@ u,
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
-e(r,0.45,{Position=UDim2.new(0,0,1,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+e(r,0.45,{Position=UDim2.new(0,0,startY,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if h.Duration then
 m.Size=UDim2.new(0,r.DurationFrame.AbsoluteSize.X,1,0)
 e(
@@ -1953,7 +1929,6 @@ b.AddSignal(l.TextButton.MouseButton1Click,function()
 h:Close()
 end)
 end
-
 
 return h
 end
@@ -7978,29 +7953,53 @@ if ak.UIElements.Keybind.Frame.Frame:FindFirstChild"UIListLayout"then
 ak.UIElements.Keybind.Frame.Frame.UIListLayout.HorizontalAlignment="Center"
 end
 
-local function UpdateKeybindSize()
+local keybindScale=ae("UIScale",{
+Parent=ak.UIElements.Keybind,
+Scale=0.85,
+})
+
+local function AnimateKeybind(targetWidth,scaleVal,duration,easingStyle)
+af(ak.UIElements.Keybind,duration or 0.25,{
+Size=UDim2.new(0,targetWidth,0,42)
+},easingStyle or Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+
+if keybindScale then
+af(keybindScale,duration or 0.22,{
+Scale=scaleVal or 0.85
+},easingStyle or Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+
+local function UpdateKeybindSize(animate)
 local tw=textLabel.TextBounds.X
 if tw<=0 and textLabel.Text~=""then
 tw=string.len(textLabel.Text)*9
 end
-local w=math.max(48,tw+32)
+local w=math.max(52,tw+32)
+if animate then
+AnimateKeybind(w,0.85,0.26,Enum.EasingStyle.Back)
+else
 ak.UIElements.Keybind.Size=UDim2.new(0,w,0,42)
 end
+end
 
-UpdateKeybindSize()
-task.defer(UpdateKeybindSize)
+UpdateKeybindSize(false)
+task.defer(function() UpdateKeybindSize(false) end)
 
 ak.UIElements.Keybind.AnchorPoint=Vector2.new(1,0.5)
 ak.UIElements.Keybind.Position=UDim2.new(1,0,0.5,0)
 ak.UIElements.Keybind.Interactable=false
 
-ae("UIScale",{
-Parent=ak.UIElements.Keybind,
-Scale=0.85,
-})
-
-ad.AddSignal(textLabel:GetPropertyChangedSignal"TextBounds",UpdateKeybindSize)
-ad.AddSignal(textLabel:GetPropertyChangedSignal"Text",UpdateKeybindSize)
+ad.AddSignal(textLabel:GetPropertyChangedSignal"TextBounds",function()
+if not ak.Picking then
+UpdateKeybindSize(true)
+end
+end)
+ad.AddSignal(textLabel:GetPropertyChangedSignal"Text",function()
+if not ak.Picking then
+UpdateKeybindSize(true)
+end
+end)
 
 function ak.Lock(an)
 ak.Locked=true
@@ -8016,7 +8015,8 @@ end
 function ak.Set(an,ao)
 local ap=NormalizeKeyCode(ao)
 ak.Value=ap
-ak.UIElements.Keybind.Frame.Frame.TextLabel.Text=ap
+textLabel.Text=ap
+UpdateKeybindSize(true)
 end
 
 if ak.Locked then
@@ -8026,12 +8026,11 @@ end
 local an
 
 ad.AddSignal(ak.KeybindFrame.UIElements.Main.MouseButton1Click,function()
-if am then
-if ak.CanChange then
+if am and ak.CanChange then
 ak.Picking=true
-ak.UIElements.Keybind.Frame.Frame.TextLabel.Text="..."
+textLabel.Text="..."
 
-
+AnimateKeybind(68,0.95,0.22,Enum.EasingStyle.Back)
 
 local ao
 ao=ac.InputBegan:Connect(function(ap)
@@ -8071,15 +8070,21 @@ or aq=="MouseRight"and ar.UserInputType==Enum.UserInputType.MouseButton2
 then
 ak.Picking=false
 
-ak.UIElements.Keybind.Frame.Frame.TextLabel.Text=aq
+textLabel.Text=aq
 ak.Value=aq
+
+local tw=textLabel.TextBounds.X
+if tw<=0 and textLabel.Text~=""then
+tw=string.len(textLabel.Text)*9
+end
+local w=math.max(52,tw+32)
+AnimateKeybind(w,0.85,0.28,Enum.EasingStyle.Back)
 
 ao:Disconnect()
 an:Disconnect()
 end
 end)
 end)
-end
 end
 end)
 
@@ -15573,6 +15578,7 @@ math.clamp(aa.TransparencyValue,0,1)
 local ay=aa.NotificationModule.Init(aa.NotificationGui)
 
 function aa.Notify(az,aA)
+aA.Holders=ay.Holders
 aA.Holder=ay.Frame
 aA.Window=aa.Window
 
