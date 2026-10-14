@@ -7246,6 +7246,7 @@ end
 local am
 local an
 local ao
+local moveConn
 local ap=al.Value.Default or al.Value.Min or 0
 
 local aq=ap
@@ -7262,11 +7263,7 @@ return math.floor(au+0.5)
 end
 
 local function CalculateValue(au)
-if at then
 return math.floor(au/al.Step+0.5)*al.Step
-else
-return math.floor(au/al.Step+0.5)*al.Step
-end
 end
 
 local au,av
@@ -7456,8 +7453,20 @@ if al.Locked then
 al:Lock()
 end
 
-
 local ay=ak.Tab.UIElements.ContainerFrame
+
+local function applyValue(newVal, ratio)
+if newVal~=aq then
+ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(ratio,0,1,0)}):Play()
+al.UIElements.SliderContainer.TextBox.Text=FormatValue(newVal)
+if ax then
+ax.TitleFrame.Text=FormatValue(newVal)
+end
+al.Value.Default=FormatValue(newVal)
+aq=newVal
+ae.SafeCallback(al.Callback,FormatValue(newVal))
+end
+end
 
 function al.Set(az,aA,aB)
 if as then
@@ -7477,65 +7486,47 @@ am=(aB.UserInputType==Enum.UserInputType.Touch)
 ay.ScrollingEnabled=false
 ai=true
 
-local b=am and aB.Position.X or ac:GetMouseLocation().X
+local function calcFromX(posX)
 local d=math.clamp(
-(b-al.UIElements.SliderIcon.AbsolutePosition.X)
+(posX-al.UIElements.SliderIcon.AbsolutePosition.X)
 /al.UIElements.SliderIcon.AbsoluteSize.X,
 0,
 1
 )
-aA=CalculateValue(al.Value.Min+d*(al.Value.Max-al.Value.Min))
-aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
-
-if aA~=aq then
-ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(d,0,1,0)}):Play()
-al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
-al.Value.Default=FormatValue(aA)
-aq=aA
-ae.SafeCallback(al.Callback,FormatValue(aA))
+local val=CalculateValue(al.Value.Min+d*(al.Value.Max-al.Value.Min))
+val=math.clamp(val,al.Value.Min or 0,al.Value.Max or 100)
+applyValue(val, d)
 end
 
-an=ad.RenderStepped:Connect(function()
-local f=am and aB.Position.X or ac:GetMouseLocation().X
-local g=math.clamp(
-(f-al.UIElements.SliderIcon.AbsolutePosition.X)
-/al.UIElements.SliderIcon.AbsoluteSize.X,
-0,
-1
-)
-aA=CalculateValue(al.Value.Min+g*(al.Value.Max-al.Value.Min))
+calcFromX(am and aB.Position.X or ac:GetMouseLocation().X)
 
-if aA~=aq then
-ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(g,0,1,0)}):Play()
-al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
-al.Value.Default=FormatValue(aA)
-aq=aA
-ae.SafeCallback(al.Callback,FormatValue(aA))
+if am then
+moveConn=ac.InputChanged:Connect(function(input)
+if input.UserInputType==Enum.UserInputType.Touch then
+calcFromX(input.Position.X)
 end
 end)
-
+else
+an=ad.RenderStepped:Connect(function()
+calcFromX(ac:GetMouseLocation().X)
+end)
+end
 
 ao=ac.InputEnded:Connect(function(f)
 if
-(
 f.UserInputType==Enum.UserInputType.MouseButton1
 or f.UserInputType==Enum.UserInputType.Touch
-)and aB==f
 then
-an:Disconnect()
-ao:Disconnect()
+if an then an:Disconnect() an=nil end
+if moveConn then moveConn:Disconnect() moveConn=nil end
+if ao then ao:Disconnect() ao=nil end
 ai=false
 ay.ScrollingEnabled=true
 
 ak.WindUI.CurrentInput=nil
 
-local thumb=al.UIElements.SliderIcon.Frame.Thumb
+local thumb=al.UIElements.SliderIcon.Frame:FindFirstChild"Thumb"
+if thumb then
 ag(thumb,0.2,{
 Size=UDim2.new(
 0,
@@ -7548,6 +7539,8 @@ ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)
 if thumb:FindFirstChild"BarOverlay"then
 ag(thumb.BarOverlay,0.2,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
 end
+end
+
 if ax then
 ax:Close(false)
 end
@@ -7555,24 +7548,13 @@ end
 end)
 else
 aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
-
 local b=math.clamp(
 (aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),
 0,
 1
 )
-aA=CalculateValue(al.Value.Min+b*(al.Value.Max-al.Value.Min))
-
-if aA~=aq then
-ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(b,0,1,0)}):Play()
-al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
-al.Value.Default=FormatValue(aA)
-aq=aA
-ae.SafeCallback(al.Callback,FormatValue(aA))
-end
+local val=CalculateValue(al.Value.Min+b*(al.Value.Max-al.Value.Min))
+applyValue(val, b)
 end
 end
 end
@@ -7580,20 +7562,17 @@ end
 
 function al.SetMax(az,aA)
 al.Value.Max=aA
-
 local aB=tonumber(al.Value.Default)or aq
 if aB>aA then
 al:Set(aA)
 else
-local b=
-math.clamp((aB-(al.Value.Min or 0))/(aA-(al.Value.Min or 0)),0,1)
+local b=math.clamp((aB-(al.Value.Min or 0))/(aA-(al.Value.Min or 0)),0,1)
 ag(al.UIElements.SliderIcon.Frame,0.1,{Size=UDim2.new(b,0,1,0)}):Play()
 end
 end
 
 function al.SetMin(az,aA)
 al.Value.Min=aA
-
 local aB=tonumber(al.Value.Default)or aq
 if aB<aA then
 al:Set(aA)
@@ -7632,8 +7611,8 @@ ak.WindUI.CurrentInput=az
 
 al:Set(ap,aA)
 
-
-local thumb=al.UIElements.SliderIcon.Frame.Thumb
+local thumb=al.UIElements.SliderIcon.Frame:FindFirstChild"Thumb"
+if thumb then
 ag(thumb,0.24,{
 Size=UDim2.new(
 0,
@@ -7646,10 +7625,11 @@ al.ThumbSize+8
 if thumb:FindFirstChild"BarOverlay"then
 ag(thumb.BarOverlay,0.24,{ImageTransparency=0.86},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
+end
+
 if ax then
 ax:Open()
 end
-
 end
 end)
 
