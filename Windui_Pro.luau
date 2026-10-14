@@ -4729,10 +4729,38 @@ Padding=UDim.new(0,ah.Padding/1.5),
 }),
 })
 
+if alModule then alModule.AutoChange=false end
+if borderModule then borderModule.AutoChange=false end
+
 ah.TagFrame=al
 ah.BorderFrame=borderFrame
 
 function ah.SetRadius(am,an,ao)
+ah.Radius=an
+local dur=(ao==false or ao==0)and 0 or(ao or 0.08)
+local targetScale=math.max(an/310,0.0001)
+local borderScale=math.max((an+1)/310,0.0001)
+
+if alModule then
+alModule.Radius=an
+end
+if borderModule then
+borderModule.Radius=an+1
+end
+
+if dur==0 then
+al.SliceScale=targetScale
+if borderFrame then
+borderFrame.SliceScale=borderScale
+end
+else
+ad(al,dur,{SliceScale=targetScale},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
+if borderFrame then
+ad(borderFrame,dur,{SliceScale=borderScale},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
+end
+end
+return ah
+end
 ah.Radius=an
 local dur=(ao==false or ao==0)and 0 or(ao or 0.15)
 local targetScale=math.max(an/310,0.0001)
