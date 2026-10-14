@@ -8272,11 +8272,30 @@ AutomaticCanvasSize="Y",
 CanvasSize=UDim2.new(0,0,0,0),
 BackgroundTransparency=1,
 ScrollBarImageTransparency=1,
+ZIndex=2,
 },{
 ap.UIElements.UIListLayout,
 }),
 }),
 })
+
+local ind=ak.NewRoundFrame(aq.MenuCorner-aq.MenuPadding,"Squircle",{
+Size=UDim2.new(1,0,0,36),
+Position=UDim2.new(0,0,0,0),
+ImageTransparency=1,
+ThemeTag={ImageColor3="DropdownTabBackground"},
+ZIndex=1,
+Visible=false,
+Parent=ap.UIElements.Menu.Frame,
+})
+ap.UIElements.Indicator=ind
+
+ak.AddSignal(ap.UIElements.Menu.Frame.ScrollingFrame:GetPropertyChangedSignal"CanvasPosition",function()
+if ind.Visible and ap.CurrentSelectedTab and ap.CurrentSelectedTab.UIElements and ap.CurrentSelectedTab.UIElements.TabItem then
+local tY=ap.CurrentSelectedTab.UIElements.TabItem.AbsolutePosition.Y-ap.UIElements.Menu.Frame.AbsolutePosition.Y
+ind.Position=UDim2.new(0,0,0,tY)
+end
+end)
 
 ap.UIElements.MenuCanvas=al("Frame",{
 Size=UDim2.new(0,ap.MenuWidth,0,300),
@@ -8666,10 +8685,17 @@ ay.Selected=aA
 else
 local aA=typeof(ap.Value)=="table"and ap.Value.Title or ap.Value
 ay.Selected=aA==ay.Name
+if ay.Selected then
+ap.CurrentSelectedTab=ay
+end
 end
 
 if ay.Selected and not ay.Locked then
+if ar~="Dropdown" or ap.Multi then
 ay.UIElements.TabItem.ImageTransparency=an
+else
+ay.UIElements.TabItem.ImageTransparency=1
+end
 
 ay.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0
 if ay.UIElements.TabIcon then
@@ -8722,6 +8748,7 @@ end
 end
 else
 for aA,aB in next,ap.Tabs do
+aB.UIElements.TabItem.ImageTransparency=1
 am(aB.UIElements.TabItem.Frame.Title.TextLabel,0.2,{TextTransparency=0.4},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if aB.UIElements.TabIcon then
 am(aB.UIElements.TabIcon.ImageLabel,0.2,{ImageTransparency=0.2},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -8729,11 +8756,13 @@ end
 aB.Selected=false
 end
 ay.Selected=true
+ap.CurrentSelectedTab=ay
+ay.UIElements.TabItem.ImageTransparency=1
 
 local ind=ap.UIElements.Indicator
-local sf=ap.UIElements.Menu.Frame.ScrollingFrame
-if ind and sf then
-local targetY=ay.UIElements.TabItem.AbsolutePosition.Y-sf.AbsolutePosition.Y+sf.CanvasPosition.Y
+local mf=ap.UIElements.Menu.Frame
+if ind and mf then
+local targetY=ay.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
 local targetH=ay.UIElements.TabItem.AbsoluteSize.Y
 ind.Visible=true
 if ind.ImageTransparency>=0.95 then
@@ -8836,20 +8865,15 @@ end)
 
 task.defer(function()
 local ind=ap.UIElements.Indicator
-local sf=ap.UIElements.Menu.Frame.ScrollingFrame
-if ind and sf and not ap.Multi then
-for _,tab in next,ap.Tabs do
-if tab.Selected and tab.UIElements and tab.UIElements.TabItem then
-local targetY=tab.UIElements.TabItem.AbsolutePosition.Y-sf.AbsolutePosition.Y+sf.CanvasPosition.Y
-local targetH=tab.UIElements.TabItem.AbsoluteSize.Y
-if targetH>0 then
+local mf=ap.UIElements.Menu.Frame
+if ind and mf and not ap.Multi and ap.CurrentSelectedTab and ap.CurrentSelectedTab.UIElements and ap.CurrentSelectedTab.UIElements.TabItem then
+local tY=ap.CurrentSelectedTab.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
+local tH=ap.CurrentSelectedTab.UIElements.TabItem.AbsoluteSize.Y
+if tH>0 then
 ind.Visible=true
-ind.Position=UDim2.new(0,0,0,targetY)
-ind.Size=UDim2.new(1,0,0,targetH)
+ind.Position=UDim2.new(0,0,0,tY)
+ind.Size=UDim2.new(1,0,0,tH)
 ind.ImageTransparency=an
-end
-break
-end
 end
 end
 end)
