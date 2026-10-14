@@ -4686,7 +4686,17 @@ ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))
 end
 end
 
-local al=ab.NewRoundFrame(ah.Radius,"Squircle",{
+local borderFrame,borderModule=ab.NewRoundFrame(ah.Radius+1,"SquircleGlass",{
+Size=UDim2.new(1,1,1,1),
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0.5,0,0.5,0),
+ThemeTag={
+ImageColor3="White",
+},
+ImageTransparency=0.75,
+})
+
+local al,alModule=ab.NewRoundFrame(ah.Radius,"Squircle",{
 AutomaticSize="X",
 Size=UDim2.new(0,0,0,ah.Height),
 Parent=ag,
@@ -4698,15 +4708,7 @@ ImageColor3=ah.Color,
 },
 },{
 ak,
-ab.NewRoundFrame(ah.Radius+1,"SquircleGlass",{
-Size=UDim2.new(1,1,1,1),
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.new(0.5,0,0.5,0),
-ThemeTag={
-ImageColor3="White",
-},
-ImageTransparency=0.75,
-}),
+borderFrame,
 ac("Frame",{
 Size=UDim2.new(0,0,1,0),
 AutomaticSize="X",
@@ -4726,6 +4728,36 @@ Padding=UDim.new(0,ah.Padding/1.5),
 }),
 }),
 })
+
+ah.TagFrame=al
+ah.BorderFrame=borderFrame
+
+function ah.SetRadius(am,an,ao)
+ah.Radius=an
+local dur=(ao==false or ao==0)and 0 or(ao or 0.15)
+local targetScale=math.max(an/310,0.0001)
+local borderScale=math.max((an+1)/310,0.0001)
+
+if alModule then
+alModule.Radius=an
+end
+if borderModule then
+borderModule.Radius=an+1
+end
+
+if dur==0 then
+al.SliceScale=targetScale
+if borderFrame then
+borderFrame.SliceScale=borderScale
+end
+else
+ad(al,dur,{SliceScale=targetScale},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if borderFrame then
+ad(borderFrame,dur,{SliceScale=borderScale},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+return ah
+end
 
 function ah.SetTitle(am,an)
 ah.Title=an
