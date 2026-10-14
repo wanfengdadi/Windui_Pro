@@ -13972,6 +13972,7 @@ aw.UIElements.Main.Main.Topbar.Center.Size=UDim2.new(
 )
 end)
 
+aw.SideBarMode="Full" -- "Full", "Compact", "None"
 aw.SideBarCollapsed=false
 
 local initialIcon=an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
@@ -14023,32 +14024,108 @@ ao("UIScale",{Scale=1}),
 true
 )
 
-function aw.ToggleSidebar(self,state)
-if state==nil then
-state=not aw.SideBarCollapsed
-end
-aw.SideBarCollapsed=state
+local miniDropdown=an.NewRoundFrame(14,"Squircle",{
+Size=UDim2.new(0,185,0,0),
+AutomaticSize="Y",
+Position=UDim2.new(0,8,0,aw.Topbar.Height+2),
+ThemeTag={ImageColor3="DropdownBackground"},
+ImageTransparency=0.05,
+ZIndex=99999,
+Visible=false,
+ClipsDescendants=true,
+Parent=aw.UIElements.Main.Main,
+},{
+ao("UIPadding",{
+PaddingTop=UDim.new(0,6),
+PaddingBottom=UDim.new(0,6),
+PaddingLeft=UDim.new(0,6),
+PaddingRight=UDim.new(0,6),
+}),
+ao("UIListLayout",{
+FillDirection="Vertical",
+Padding=UDim.new(0,4),
+}),
+an.NewRoundFrame(13,"SquircleOutline",{
+Size=UDim2.new(1,0,1,0),
+ThemeTag={ImageColor3="Outline"},
+ImageTransparency=0.85,
+}),
+ao("UIScale",{Scale=0.8}),
+})
 
-local targetW=state and 0 or aw.SideBarWidth
+local function closeMiniDropdown()
+if not miniDropdown.Visible then return end
+ap(miniDropdown.UIScale,0.15,{Scale=0.8},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+ap(miniDropdown,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+task.delay(0.15,function()
+miniDropdown.Visible=false
+end)
+end
+
+function aw.SetSidebarMode(self,mode)
+aw.SideBarMode=mode
+local isNone=(mode=="None")
+local isCompact=(mode=="Compact")
+aw.SideBarCollapsed=isNone
+
+local targetW=isNone and 0 or(isCompact and 52 or aw.SideBarWidth)
 local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
+
+if isNone then
+task.delay(0.28,function()
+if aw.SideBarMode=="None" then
+aw.UIElements.SideBarContainer.Visible=false
+end
+end)
+else
+aw.UIElements.SideBarContainer.Visible=true
+end
 
 ap(aw.UIElements.SideBarContainer,0.28,{
 Size=UDim2.new(0,targetW,1,hOffset),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 ap(aw.UIElements.MainBar,0.28,{
-Size=UDim2.new(1,state and 0 or-aw.SideBarWidth,1,-aw.Topbar.Height),
+Size=UDim2.new(1,-targetW,1,-aw.Topbar.Height),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
+if aw.TabModule and aw.TabModule.Tabs then
+for _,tab in next,aw.TabModule.Tabs do
+if tab.UIElements and tab.UIElements.Main and tab.UIElements.Main.Frame then
+local txt=tab.UIElements.Main.Frame:FindFirstChildOfClass"TextLabel"
+if txt then
+txt.Visible=not isCompact
+end
+local layout=tab.UIElements.Main.Frame:FindFirstChildOfClass"UIListLayout"
+if layout then
+layout.HorizontalAlignment=isCompact and "Center" or "Left"
+end
+end
+end
+end
+
 if d then
-if state then
+if isNone then
 ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 task.delay(0.2,function()
-if aw.SideBarCollapsed then d.Visible=false end
+if aw.SideBarMode=="None" then d.Visible=false end
 end)
+elseif isCompact then
+d.Visible=aw.User.Enabled or false
+ap(d,0.28,{
+Position=UDim2.new(0,6,1,-(aw.UIPadding/2)),
+Size=UDim2.new(0,40,0,40),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local userText=d:FindFirstChild("Frame",true)
+if userText then userText.Visible=false end
 else
 d.Visible=aw.User.Enabled or false
-ap(d,0.28,{Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ap(d,0.28,{
+Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2)),
+Size=UDim2.new(0,aw.SideBarWidth-(aw.UIPadding/2),0,42+aw.UIPadding),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local userText=d:FindFirstChild("Frame",true)
+if userText then userText.Visible=true end
 end
 end
 
@@ -14059,7 +14136,7 @@ ap(img,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In)
 end
 
 task.delay(0.12,function()
-local nextIcon=state and "panel-left-open" or "panel-left-close"
+local nextIcon=isNone and "panel-left-open" or "panel-left-close"
 switchSidebarIcon(nextIcon)
 iconScale.Scale=0.35
 if img then img.ImageTransparency=1 end
@@ -14071,20 +14148,158 @@ end
 end)
 end
 
+function aw.ToggleSidebar(self,state)
+if state~=nil then
+aw:SetSidebarMode(state and "None" or "Full")
+else
+if aw.SideBarMode=="None" or aw.SideBarMode=="Compact" then
+aw:SetSidebarMode("Full")
+else
+aw:SetSidebarMode("None")
+end
+end
+end
+
+local function buildMiniDropdown()
+for _,c in next,miniDropdown:GetChildren()do
+if c:IsA"ImageButton"or c:IsA"TextButton"then
+c:Destroy()
+end
+end
+
+local options={
+{
+Title=aw.SideBarMode=="None"and "展开全部" or "收回全部",
+Icon=aw.SideBarMode=="None"and "panel-left-open" or "panel-left-close",
+Callback=function()
+if aw.SideBarMode=="None" then
+aw:SetSidebarMode("Full")
+else
+aw:SetSidebarMode("None")
+end
+end,
+},
+{
+Title=aw.SideBarMode=="Compact"and "恢复完整显示" or "收回文字仅保留icon",
+Icon="columns-2",
+Callback=function()
+if aw.SideBarMode=="Compact" then
+aw:SetSidebarMode("Full")
+else
+aw:SetSidebarMode("Compact")
+end
+end,
+},
+}
+
+for _,opt in ipairs(options)do
+local optBtn=an.NewRoundFrame(10,"Squircle",{
+Size=UDim2.new(1,0,0,32),
+ThemeTag={ImageColor3="DropdownTabBackground"},
+ImageTransparency=1,
+ZIndex=100000,
+Active=true,
+Parent=miniDropdown,
+},{
+ao("UIListLayout",{
+FillDirection="Horizontal",
+VerticalAlignment="Center",
+Padding=UDim.new(0,8),
+}),
+ao("UIPadding",{
+PaddingLeft=UDim.new(0,8),
+PaddingRight=UDim.new(0,8),
+}),
+ao("TextLabel",{
+Text=opt.Title,
+FontFace=Font.new(an.Font,Enum.FontWeight.Medium),
+TextSize=13,
+ThemeTag={TextColor3="Text"},
+TextXAlignment="Left",
+BackgroundTransparency=1,
+AutomaticSize="XY",
+}),
+},true)
+
+local ico=an.Image(opt.Icon,opt.Icon,0,aw.Folder,"Dropdown",true)
+ico.Size=UDim2.new(0,15,0,15)
+ico.Parent=optBtn
+ico.LayoutOrder=-1
+
+an.AddSignal(optBtn.MouseEnter,function()
+ap(optBtn,0.08,{ImageTransparency=0.67}):Play()
+end)
+an.AddSignal(optBtn.MouseLeave,function()
+ap(optBtn,0.08,{ImageTransparency=1}):Play()
+end)
+an.AddSignal(optBtn.MouseButton1Click,function()
+closeMiniDropdown()
+opt.Callback()
+end)
+end
+end
+
+local function openMiniDropdown()
+buildMiniDropdown()
+miniDropdown.Visible=true
+miniDropdown.UIScale.Scale=0.8
+miniDropdown.ImageTransparency=1
+ap(miniDropdown.UIScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+ap(miniDropdown,0.15,{ImageTransparency=0.05},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
+end
+
+local pressStart=0
+local isHolding=false
+local holdTriggered=false
+
+an.AddSignal(sidebarBtn.MouseButton1Down,function()
+pressStart=tick()
+isHolding=true
+holdTriggered=false
+task.delay(0.35,function()
+if isHolding and(tick()-pressStart>=0.32)then
+holdTriggered=true
+openMiniDropdown()
+end
+end)
+end)
+
+an.AddSignal(sidebarBtn.MouseButton1Click,function()
+if not holdTriggered and(tick()-pressStart<0.32)then
+aw:ToggleSidebar()
+end
+end)
+
+an.AddSignal(sidebarBtn.InputEnded,function()
+isHolding=false
+ap(sidebarBtn.UIScale,0.15,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+end)
+
 an.AddSignal(sidebarBtn.MouseEnter,function()
 ap(sidebarBtn,0.15,{ImageTransparency=0.93}):Play()
 end)
 an.AddSignal(sidebarBtn.MouseLeave,function()
 ap(sidebarBtn,0.15,{ImageTransparency=1}):Play()
 end)
-an.AddSignal(sidebarBtn.MouseButton1Down,function()
-ap(sidebarBtn.UIScale,0.2,{Scale=0.9},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end)
-an.AddSignal(sidebarBtn.InputEnded,function()
-ap(sidebarBtn,0.15,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
-end)
-an.AddSignal(sidebarBtn.MouseButton1Click,function()
-aw:ToggleSidebar()
+
+-- 点击外部空白处自动关闭 Dropdown
+an.AddSignal(af.InputBegan,function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+if miniDropdown.Visible then
+local mousePos=input.Position
+local dropPos=miniDropdown.AbsolutePosition
+local dropSize=miniDropdown.AbsoluteSize
+local btnPos=sidebarBtn.AbsolutePosition
+local btnSize=sidebarBtn.AbsoluteSize
+
+local inDrop=mousePos.X>=dropPos.X and mousePos.X<=(dropPos.X+dropSize.X)and mousePos.Y>=dropPos.Y and mousePos.Y<=(dropPos.Y+dropSize.Y)
+local inBtn=mousePos.X>=btnPos.X and mousePos.X<=(btnPos.X+btnSize.X)and mousePos.Y>=btnPos.Y and mousePos.Y<=(btnPos.Y+btnSize.Y)
+
+if not inDrop and not inBtn then
+closeMiniDropdown()
+end
+end
+end
 end)
 
 if aw.Topbar.ButtonsType~="Default"then
