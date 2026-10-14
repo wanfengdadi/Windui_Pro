@@ -8235,7 +8235,7 @@ ai
 return"Divider",{__type="Divider",ElementFrame=aj}
 end
 
-return af end function a.N()
+function a.N()
 local aa={}
 
 local ae=(cloneref or clonereference or function(ae)
@@ -8518,24 +8518,9 @@ return
 end
 
 for aw,ax in next,ap.UIElements.Menu.Frame.ScrollingFrame:GetChildren()do
-if not ax:IsA"UIListLayout"and ax.Name~="IndicatorFolder"then
+if not ax:IsA"UIListLayout"then
 ax:Destroy()
 end
-end
-
-local indicatorFolder=ap.UIElements.Menu.Frame.ScrollingFrame:FindFirstChild"IndicatorFolder"
-if not indicatorFolder then
-indicatorFolder=al("Folder",{Name="IndicatorFolder",Parent=ap.UIElements.Menu.Frame.ScrollingFrame})
-local ind=ak.NewRoundFrame(aq.MenuCorner-aq.MenuPadding,"Squircle",{
-Size=UDim2.new(1,0,0,36),
-Position=UDim2.new(0,0,0,0),
-ImageTransparency=1,
-ThemeTag={ImageColor3="DropdownTabBackground"},
-ZIndex=1,
-Visible=false,
-Parent=indicatorFolder,
-})
-ap.UIElements.Indicator=ind
 end
 
 ap.Tabs={}
@@ -8602,19 +8587,6 @@ ImageColor3="DropdownTabBorder",
 ImageTransparency=1,
 Name="Highlight",
 },{
-
-
-
-
-
-
-
-
-
-
-
-
-
 }),
 al("Frame",{
 Size=UDim2.new(1,0,1,0),
@@ -8719,7 +8691,7 @@ end
 ay.Selected=aA
 else
 local aA=typeof(ap.Value)=="table"and ap.Value.Title or ap.Value
-ay.Selected=aA==ay.Name
+ay.Selected=(aA==ay.Name)
 if ay.Selected then
 ap.CurrentSelectedTab=ay
 end
@@ -8735,6 +8707,12 @@ end
 ay.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0
 if ay.UIElements.TabIcon then
 ay.UIElements.TabIcon.ImageLabel.ImageTransparency=0
+end
+else
+ay.UIElements.TabItem.ImageTransparency=1
+ay.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0.4
+if ay.UIElements.TabIcon then
+ay.UIElements.TabIcon.ImageLabel.ImageTransparency=0.2
 end
 end
 
@@ -8790,6 +8768,7 @@ am(aB.UIElements.TabIcon.ImageLabel,0.2,{ImageTransparency=0.2},Enum.EasingStyle
 end
 aB.Selected=false
 end
+
 ay.Selected=true
 ap.CurrentSelectedTab=ay
 ay.UIElements.TabItem.ImageTransparency=1
@@ -8800,13 +8779,11 @@ if ind and mf then
 local targetY=ay.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
 local targetH=ay.UIElements.TabItem.AbsoluteSize.Y
 ind.Visible=true
-if ind.ImageTransparency>=0.95 then
-ind.Position=UDim2.new(0,0,0,targetY)
-ind.Size=UDim2.new(1,0,0,targetH)
-am(ind,0.2,{ImageTransparency=an}):Play()
-else
-am(ind,0.26,{Position=UDim2.new(0,0,0,targetY),Size=UDim2.new(1,0,0,targetH),ImageTransparency=an},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
+am(ind,0.26,{
+Position=UDim2.new(0,0,0,targetY),
+Size=UDim2.new(1,0,0,targetH),
+ImageTransparency=an
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 
 am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.35,{TextTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -8840,15 +8817,6 @@ else a.load'M'
 :New{Parent=ap.UIElements.Menu.Frame.ScrollingFrame}
 end
 end
-
-
-
-
-
-
-
-
-
 
 ap.UIElements.MenuCanvas.Size=UDim2.new(
 0,
@@ -8891,24 +8859,25 @@ ImageTransparency=0,
 },Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
 
 task.spawn(function()
-task.wait(0.1)
+task.wait(0.12)
 if ap.Locked then
 return
 end
 ap.Opened=true
-end)
 
-task.defer(function()
 local ind=ap.UIElements.Indicator
 local mf=ap.UIElements.Menu.Frame
-if ind and mf and not ap.Multi and ap.CurrentSelectedTab and ap.CurrentSelectedTab.UIElements and ap.CurrentSelectedTab.UIElements.TabItem then
-local tY=ap.CurrentSelectedTab.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
-local tH=ap.CurrentSelectedTab.UIElements.TabItem.AbsoluteSize.Y
-if tH>0 then
+if ind and mf and not ap.Multi then
+local cur=ap.CurrentSelectedTab
+if cur and cur.UIElements and cur.UIElements.TabItem then
+local targetY=cur.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
+local targetH=cur.UIElements.TabItem.AbsoluteSize.Y
+if targetH>0 then
+ind.Position=UDim2.new(0,0,0,targetY)
+ind.Size=UDim2.new(1,0,0,targetH)
 ind.Visible=true
-ind.Position=UDim2.new(0,0,0,tY)
-ind.Size=UDim2.new(1,0,0,tH)
-ind.ImageTransparency=an
+am(ind,0.15,{ImageTransparency=an}):Play()
+end
 end
 end
 end)
@@ -8919,6 +8888,11 @@ end
 
 function as.Close(au)
 ap.Opened=false
+
+if ap.UIElements.Indicator then
+ap.UIElements.Indicator.Visible=false
+ap.UIElements.Indicator.ImageTransparency=1
+end
 
 am(ap.UIElements.Menu,0.25,{
 Size=UDim2.new(1,0,0,0),
