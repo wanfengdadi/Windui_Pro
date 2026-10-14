@@ -8235,7 +8235,7 @@ ai
 return"Divider",{__type="Divider",ElementFrame=aj}
 end
 
-function a.N()
+return af end function a.N()
 local aa={}
 
 local ae=(cloneref or clonereference or function(ae)
@@ -8320,6 +8320,7 @@ Position=UDim2.new(0,0,0,0),
 ImageTransparency=1,
 ThemeTag={ImageColor3="DropdownTabBackground"},
 ZIndex=1,
+Active=false,
 Visible=false,
 Parent=ap.UIElements.Menu.Frame,
 })
@@ -8529,14 +8530,14 @@ if ap.SearchBarEnabled then
 if not at then
 at=aj("Search...","search",ap.UIElements.Menu,nil,function(aw)
 for ax,ay in next,ap.Tabs do
-if string.find(string.lower(ay.Name),string.lower(aw),1,true)then
-ay.UIElements.TabItem.Visible=true
-else
-ay.UIElements.TabItem.Visible=false
+local match=string.find(string.lower(ay.Name),string.lower(aw),1,true)
+ay.UIElements.TabItem.Visible=match and true or false
+if not match and ay.Selected and ind then
+ind.Visible=false
+end
 end
 RecalculateListSize()
 RecalculateCanvasSize()
-end
 end,true)
 at.Size=UDim2.new(1,0,0,aq.SearchBarHeight)
 at.Position=UDim2.new(0,0,0,0)
