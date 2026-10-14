@@ -13956,12 +13956,6 @@ local A=aw.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
 /av.WindUI.UIScale
 
 z=aw.UIElements.Main.Main.Topbar.Left.AbsoluteSize.X/av.WindUI.UIScale
-an.AddSignal(aw.UIElements.Main.Main.Topbar.Left:GetPropertyChangedSignal"AbsoluteSize",function()
-local z=0
-local A=aw.UIElements.Main.Main.Topbar.Right.UIListLayout.AbsoluteContentSize.X
-/av.WindUI.UIScale
-
-z=aw.UIElements.Main.Main.Topbar.Left.AbsoluteSize.X/av.WindUI.UIScale
 if aw.Topbar.ButtonsType~="Default"then
 z=z+A+aw.UIPadding-4
 end
@@ -13978,39 +13972,12 @@ aw.UIElements.Main.Main.Topbar.Center.Size=UDim2.new(
 )
 end)
 
-aw.SideBarMode="Full"
 aw.SideBarCollapsed=false
 
-local initialIcon=an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
-local sidebarIcon=an.Image(initialIcon,"sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
+local sidebarIcon=an.Image("panel-left","sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
 sidebarIcon.Size=UDim2.new(0,aw.TopBarButtonIconSize or 16,0,aw.TopBarButtonIconSize or 16)
 sidebarIcon.AnchorPoint=Vector2.new(0.5,0.5)
 sidebarIcon.Position=UDim2.new(0.5,0,0.5,0)
-
-local iconScale=ao("UIScale",{
-Scale=1,
-Parent=sidebarIcon,
-})
-
-local function switchSidebarIcon(iconName)
-local iconData=an.Icon(iconName)
-if not iconData then
-if iconName=="panel-left-open" then
-iconData=an.Icon("panel-right") or an.Icon("chevron-right") or an.Icon("panel-left") or an.Icon("menu")
-else
-iconData=an.Icon("chevron-left") or an.Icon("panel-left") or an.Icon("menu")
-end
-end
-if not iconData then return end
-local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
-if img then
-img.Image=iconData[1]
-if iconData[2] then
-img.ImageRectSize=iconData[2].ImageRectSize
-img.ImageRectOffset=iconData[2].ImageRectPosition
-end
-end
-end
 
 local sidebarBtn=an.NewRoundFrame(
 aw.UICorner-(aw.UIPadding/2),
@@ -14030,93 +13997,40 @@ ao("UIScale",{Scale=1}),
 true
 )
 
-function aw.SetSidebarMode(self,mode)
-aw.SideBarMode=mode
-local isNone=(mode=="None")
-local isCompact=(mode=="Compact")
-aw.SideBarCollapsed=isNone
+function aw.ToggleSidebar(self,state)
+if state==nil then
+state=not aw.SideBarCollapsed
+end
+aw.SideBarCollapsed=state
 
-local targetW=isNone and 0 or(isCompact and 52 or aw.SideBarWidth)
+local targetW=state and 0 or aw.SideBarWidth
 local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
-
-if isNone then
-task.delay(0.28,function()
-if aw.SideBarMode=="None" then
-aw.UIElements.SideBarContainer.Visible=false
-end
-end)
-else
-aw.UIElements.SideBarContainer.Visible=true
-end
 
 ap(aw.UIElements.SideBarContainer,0.28,{
 Size=UDim2.new(0,targetW,1,hOffset),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 ap(aw.UIElements.MainBar,0.28,{
-Size=UDim2.new(1,-targetW,1,-aw.Topbar.Height),
+Size=UDim2.new(1,state and 0 or-aw.SideBarWidth,1,-aw.Topbar.Height),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-if aw.TabModule and aw.TabModule.Tabs then
-for _,tab in next,aw.TabModule.Tabs do
-if tab.UIElements and tab.UIElements.Main and tab.UIElements.Main.Frame then
-local txt=tab.UIElements.Main.Frame:FindFirstChildOfClass"TextLabel"
-if txt then txt.Visible=not isCompact end
-local layout=tab.UIElements.Main.Frame:FindFirstChildOfClass"UIListLayout"
-if layout then layout.HorizontalAlignment=isCompact and "Center" or "Left" end
-end
-end
-end
 
 if d then
-if isNone then
+if state then
 ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 task.delay(0.2,function()
-if aw.SideBarMode=="None" then d.Visible=false end
+if aw.SideBarCollapsed then d.Visible=false end
 end)
-elseif isCompact then
-d.Visible=aw.User.Enabled or false
-ap(d,0.28,{
-Position=UDim2.new(0,6,1,-(aw.UIPadding/2)),
-Size=UDim2.new(0,40,0,40),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-local userText=d:FindFirstChild("Frame",true)
-if userText then userText.Visible=false end
 else
 d.Visible=aw.User.Enabled or false
-ap(d,0.28,{
-Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2)),
-Size=UDim2.new(0,aw.SideBarWidth-(aw.UIPadding/2),0,42+aw.UIPadding),
+ap(d,0.28,{Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+
+if sidebarIcon then
+ap(sidebarIcon,0.2,{
+ImageTransparency=state and 0.45 or 0.1,
+Rotation=state and 180 or 0,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-local userText=d:FindFirstChild("Frame",true)
-if userText then userText.Visible=true end
-end
-end
-
-local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
-ap(iconScale,0.12,{Scale=0.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
-if img then
-ap(img,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
-end
-
-task.delay(0.12,function()
-local nextIcon=isNone and "panel-left-open" or "panel-left-close"
-switchSidebarIcon(nextIcon)
-iconScale.Scale=0.35
-if img then img.ImageTransparency=1 end
-
-ap(iconScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
-if img then
-ap(img,0.18,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end)
-end
-
-function aw.ToggleSidebar(self)
-if aw.SideBarMode=="None" or aw.SideBarMode=="Compact" then
-aw:SetSidebarMode("Full")
-else
-aw:SetSidebarMode("None")
 end
 end
 
@@ -14130,7 +14044,7 @@ an.AddSignal(sidebarBtn.MouseButton1Down,function()
 ap(sidebarBtn.UIScale,0.2,{Scale=0.9},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end)
 an.AddSignal(sidebarBtn.InputEnded,function()
-ap(sidebarBtn.UIScale,0.15,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+ap(sidebarBtn.UIScale,0.2,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
 end)
 an.AddSignal(sidebarBtn.MouseButton1Click,function()
 aw:ToggleSidebar()
