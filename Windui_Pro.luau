@@ -7339,50 +7339,24 @@ ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)
 ),
 Position=UDim2.new(1,0,0.5,0),
 AnchorPoint=Vector2.new(0.5,0.5),
-ImageTransparency=1,
-Name="Thumb",
-},{
-ae.NewRoundFrame(99,"Squircle",{
-Size=UDim2.new(1,0,1,0),
-Name="GlassBackground",
-ImageTransparency=0,
-ThemeTag={
-ImageColor3="ElementBackground",
-},
-ZIndex=-1,
-}),
-af("ImageLabel",{
-Size=UDim2.new(1,0,1,0),
-BackgroundTransparency=1,
-Name="Glass",
-Image="rbxassetid://92258969882244",
-ImageRectSize=Vector2.new(102,128),
-ImageRectOffset=Vector2.new(0,0),
-ImageTransparency=0,
-ThemeTag={
-ImageColor3="Slider",
-},
-},{
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-}),
-ae.NewRoundFrame(999,"SquircleGlass",{
-Size=UDim2.new(1,1,1,1),
-ImageColor3=Color3.new(1,1,1),
-Name="SquircleGlass",
-ImageTransparency=0.5,
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.new(0.5,0,0.5,0),
-}),
-ae.NewRoundFrame(99,"Squircle",{
-Size=UDim2.new(1,0,1,0),
-Name="BarOverlay",
 ThemeTag={
 ImageColor3="SliderThumb",
 },
-ZIndex=999,
-ImageTransparency=0,
+Name="Thumb",
+},{
+ae.NewRoundFrame(99,"SquircleGlass",{
+Size=UDim2.new(1,0,1,0),
+ImageColor3=Color3.new(1,1,1),
+Name="Glass",
+ImageTransparency=0.5,
+}),
+ae.NewRoundFrame(99,"SquircleOutline",{
+Size=UDim2.new(1,0,1,0),
+ThemeTag={
+ImageColor3="White",
+},
+Name="Border",
+ImageTransparency=0.7,
 }),
 }),
 }),
@@ -7528,6 +7502,7 @@ ak.WindUI.CurrentInput=nil
 local thumb=al.UIElements.SliderIcon.Frame:FindFirstChild"Thumb"
 if thumb then
 ag(thumb,0.2,{
+ImageTransparency=0,
 Size=UDim2.new(
 0,
 ak.Window.NewElements and(al.ThumbSize*2)or(al.ThumbSize+2),
@@ -7536,8 +7511,11 @@ ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)
 ),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
 
-if thumb:FindFirstChild"BarOverlay"then
-ag(thumb.BarOverlay,0.2,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+if thumb:FindFirstChild"Border"then
+ag(thumb.Border,0.2,{ImageTransparency=0.7},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
+end
+if thumb:FindFirstChild"Glass"then
+ag(thumb.Glass,0.2,{ImageTransparency=0.5},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
 end
 end
 
@@ -7614,6 +7592,7 @@ al:Set(ap,aA)
 local thumb=al.UIElements.SliderIcon.Frame:FindFirstChild"Thumb"
 if thumb then
 ag(thumb,0.24,{
+ImageTransparency=0.85,
 Size=UDim2.new(
 0,
 (ak.Window.NewElements and(al.ThumbSize*2)or al.ThumbSize)+8,
@@ -7622,8 +7601,11 @@ al.ThumbSize+8
 ),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-if thumb:FindFirstChild"BarOverlay"then
-ag(thumb.BarOverlay,0.24,{ImageTransparency=0.86},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if thumb:FindFirstChild"Border"then
+ag(thumb.Border,0.24,{ImageTransparency=0.15},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+if thumb:FindFirstChild"Glass"then
+ag(thumb.Glass,0.24,{ImageTransparency=0.2},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end
 
