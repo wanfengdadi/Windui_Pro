@@ -13972,9 +13972,11 @@ aw.UIElements.Main.Main.Topbar.Center.Size=UDim2.new(
 )
 end)
 
+aw.SideBarMode="Full"
 aw.SideBarCollapsed=false
 
-local sidebarIcon=an.Image("panel-left-close","sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
+local initialIcon=an.Icon("panel-left-close") and "panel-left-close" or "panel-left"
+local sidebarIcon=an.Image(initialIcon,"sidebar",0,aw.Folder,"WindowTopbarIcon",true,nil,"WindowTopbarButtonIcon")
 sidebarIcon.Size=UDim2.new(0,aw.TopBarButtonIconSize or 16,0,aw.TopBarButtonIconSize or 16)
 sidebarIcon.AnchorPoint=Vector2.new(0.5,0.5)
 sidebarIcon.Position=UDim2.new(0.5,0,0.5,0)
@@ -14023,11 +14025,11 @@ true
 )
 
 function aw.SetSidebarMode(self,mode)
-local isNone=(mode=="None" or mode=="Option 2")
-local isCompact=(mode=="Compact" or mode=="Option 1")
+aw.SideBarMode=mode
+local isNone=(mode=="None")
 aw.SideBarCollapsed=isNone
 
-local targetW=isNone and 0 or(isCompact and 52 or aw.SideBarWidth)
+local targetW=isNone and 0 or aw.SideBarWidth
 local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
 
 if isNone then
@@ -14052,13 +14054,9 @@ if aw.TabModule and aw.TabModule.Tabs then
 for _,tab in next,aw.TabModule.Tabs do
 if tab.UIElements and tab.UIElements.Main and tab.UIElements.Main.Frame then
 local txt=tab.UIElements.Main.Frame:FindFirstChildOfClass"TextLabel"
-if txt then
-txt.Visible=not isCompact
-end
+if txt then txt.Visible=true end
 local layout=tab.UIElements.Main.Frame:FindFirstChildOfClass"UIListLayout"
-if layout then
-layout.HorizontalAlignment=isCompact and "Center" or "Left"
-end
+if layout then layout.HorizontalAlignment="Left" end
 end
 end
 end
@@ -14069,14 +14067,6 @@ ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.Easin
 task.delay(0.2,function()
 if aw.SideBarCollapsed then d.Visible=false end
 end)
-elseif isCompact then
-d.Visible=aw.User.Enabled or false
-ap(d,0.28,{
-Position=UDim2.new(0,6,1,-(aw.UIPadding/2)),
-Size=UDim2.new(0,40,0,40),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-local userText=d:FindFirstChild("Frame",true)
-if userText then userText.Visible=false end
 else
 d.Visible=aw.User.Enabled or false
 ap(d,0.28,{
@@ -14090,44 +14080,33 @@ end
 
 local nextIcon=isNone and "panel-left-open" or "panel-left-close"
 switchSidebarIcon(nextIcon)
-ap(sidebarIcon,0.2,{
-ImageTransparency=isNone and 0.45 or 0.1,
-Rotation=isNone and 180 or 0,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
+ap(iconScale,0.12,{Scale=0.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+if img then
+ap(img,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
+end
+
+task.delay(0.12,function()
+iconScale.Scale=0.35
+if img then img.ImageTransparency=1 end
+ap(iconScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+if img then
+ap(img,0.18,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end)
 end
 
 function aw.ToggleSidebar(self,state)
 if state~=nil then
 aw:SetSidebarMode(state and "None" or "Full")
 else
-if aw.SideBarCollapsed then
-aw:SetSidebarMode("Full")
-else
+if aw.SideBarMode=="Full" then
 aw:SetSidebarMode("None")
+else
+aw:SetSidebarMode("Full")
 end
 end
-end
-
-local dropdownModule=a.load'O'
-local dummyTab={Parent=av.WindUI.DropdownGui,Window=aw,WindUI=av.WindUI}
-local topbarDropdown=dropdownModule.New(dummyTab,{
-Title="",
-Values={"Option 1", "Option 2"},
-Value="Option 1",
-MenuWidth=160,
-Callback=function(selected)
-local val=typeof(selected)=="table" and selected.Title or selected
-aw:SetSidebarMode(val)
-end
-})
-
-if topbarDropdown and topbarDropdown.DropdownFrame then
-topbarDropdown.DropdownFrame.UIElements.Main.Parent=aw.UIElements.Main.Main.Topbar.Left
-topbarDropdown.DropdownFrame.UIElements.Main.Size=UDim2.new(0,aw.Topbar.Height-16,0,aw.Topbar.Height-16)
-topbarDropdown.DropdownFrame.UIElements.Main.Position=UDim2.new(0,0,0.5,0)
-topbarDropdown.DropdownFrame.UIElements.Main.AnchorPoint=Vector2.new(0,0.5)
-local label=topbarDropdown.DropdownFrame.UIElements.Main:FindFirstChild("TextLabel",true)
-if label then label.Visible=false end
 end
 
 an.AddSignal(sidebarBtn.MouseEnter,function()
