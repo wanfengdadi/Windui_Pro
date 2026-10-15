@@ -1824,15 +1824,13 @@ Parent=p,
 })
 end
 
+local startX=isLeft and -2 or 2
 local startY=isTop and 0 or 1
 local anchorY=isTop and 0 or 1
-local startPos=isLeft and UDim2.new(0,-340,startY,0) or UDim2.new(1,40,startY,0)
-local exitPos=isLeft and UDim2.new(0,-340,startY,0) or UDim2.new(1,40,startY,0)
-local targetPos=UDim2.new(0,0,startY,0)
 
 local r=b.NewRoundFrame(f.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
-Position=startPos,
+Position=UDim2.new(startX,0,startY,0),
 AnchorPoint=Vector2.new(0,anchorY),
 AutomaticSize="Y",
 ImageTransparency=0.05,
@@ -1888,37 +1886,40 @@ r,
 function h.Close(v)
 if not h.Closed then
 h.Closed=true
-e(u,0.22,{Size=UDim2.new(1,0,0,-8)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-e(r,0.22,{Position=exitPos},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-task.wait(0.22)
+local exitX=isLeft and -2 or 2
+e(
+u,
+0.45,
+{Size=UDim2.new(1,0,0,-8)},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+e(r,0.55,{Position=UDim2.new(exitX,0,startY,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+task.wait(0.45)
 u:Destroy()
 end
 end
 
 task.spawn(function()
-local timeout=0
-while r.AbsoluteSize.Y<=0 and timeout<10 do
 task.wait()
-timeout=timeout+1
-end
-local targetH=r.AbsoluteSize.Y>0 and r.AbsoluteSize.Y or 60
-
-e(u,0.26,{Size=UDim2.new(1,0,0,targetH)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-e(r,0.26,{Position=targetPos},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-local sizeSignal
-sizeSignal=r:GetPropertyChangedSignal"AbsoluteSize":Connect(function()
-if not h.Closed and r.AbsoluteSize.Y>0 then
-u.Size=UDim2.new(1,0,0,r.AbsoluteSize.Y)
-end
-end)
-
+e(
+u,
+0.45,
+{Size=UDim2.new(1,0,0,r.AbsoluteSize.Y)},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+e(r,0.45,{Position=UDim2.new(0,0,startY,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if h.Duration then
-local barWidth=r.DurationFrame.AbsoluteSize.X>0 and r.DurationFrame.AbsoluteSize.X or(r.AbsoluteSize.X>0 and r.AbsoluteSize.X or 272)
-m.Size=UDim2.new(0,barWidth,1,0)
-e(r.DurationFrame.Frame,h.Duration,{Size=UDim2.new(0,0,1,0)},Enum.EasingStyle.Linear,Enum.EasingDirection.InOut):Play()
+m.Size=UDim2.new(0,r.DurationFrame.AbsoluteSize.X,1,0)
+e(
+r.DurationFrame.Frame,
+h.Duration,
+{Size=UDim2.new(0,0,1,0)},
+Enum.EasingStyle.Linear,
+Enum.EasingDirection.InOut
+):Play()
 task.wait(h.Duration)
-if sizeSignal then sizeSignal:Disconnect() end
 h:Close()
 end
 end)
@@ -13256,7 +13257,7 @@ AnchorPoint=Vector2.new(0.5,0.5),
 ImageTransparency=1,
 }),
 })
-local aA=an.NewRoundFrame(aw.UICorner,"Squircle",{
+local aA,aAModule=an.NewRoundFrame(aw.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 ImageColor3=Color3.new(0,0,0),
@@ -13275,13 +13276,55 @@ ImageTransparency=1,
 }),
 })
 
-local aB=an.NewRoundFrame(aw.UICorner,"Squircle",{
+local aB,aBModule=an.NewRoundFrame(aw.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 ImageColor3=Color3.new(0,0,0),
 ZIndex=999,
 Active=false,
 })
+
+function aw.SetRadius(A,B,C)
+local D=typeof(A)=="table"and B or A
+local E=typeof(A)=="table"and C or B
+local F=math.clamp(tonumber(D)or 16,0,34)
+aw.UICorner=F
+aw.Radius=F
+local G=F<=0 and 0.0001 or math.max(F/310,0.0001)
+local H=UDim.new(0,F)
+local I=E or 0.25
+
+local bg=aw.UIElements and aw.UIElements.Main and aw.UIElements.Main:FindFirstChild"Background"
+local mainFrame=aw.UIElements and aw.UIElements.Main and aw.UIElements.Main:FindFirstChild"Main"
+local mainCorner=mainFrame and mainFrame:FindFirstChildOfClass"UICorner"
+local imgBg=bg and bg:FindFirstChildOfClass"ImageLabel"
+local imgCorner=imgBg and imgBg:FindFirstChildOfClass"UICorner"
+
+if I>0 then
+if ay then ap(ay,I,{CornerRadius=H},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if mainCorner then ap(mainCorner,I,{CornerRadius=H},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if imgCorner then ap(imgCorner,I,{CornerRadius=H},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if aA then ap(aA,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if aB then ap(aB,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if bg then ap(bg,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if aw.UIElements and aw.UIElements.BackgroundGradient then
+ap(aw.UIElements.BackgroundGradient,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+else
+if ay then ay.CornerRadius=H end
+if mainCorner then mainCorner.CornerRadius=H end
+if imgCorner then imgCorner.CornerRadius=H end
+if aA then aA.SliceScale=G end
+if aB then aB.SliceScale=G end
+if bg then bg.SliceScale=G end
+if aw.UIElements and aw.UIElements.BackgroundGradient then
+aw.UIElements.BackgroundGradient.SliceScale=G
+end
+end
+if aAModule then aAModule.Radius=F end
+if aBModule then aBModule.Radius=F end
+return aw
+end
 
 
 
