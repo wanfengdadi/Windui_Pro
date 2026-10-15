@@ -11713,18 +11713,13 @@ local al=ak.New
 local am=a.load'B'.New
 local an=a.load'x'.New
 
-
-
 local ao={
-
-
 Tabs={},
 Containers={},
 SelectedTab=nil,
 TabCount=0,
 ToolTipParent=nil,
 TabHighlight=nil,
-
 OnChangeFunc=function(ao)end,
 }
 
@@ -11758,21 +11753,11 @@ UIElements={},
 Elements={},
 ContainerFrame=nil,
 UICorner=Window.UICorner-(Window.UIPadding/2),
-
 Gap=Window.NewElements and 1 or 6,
-
 TabPaddingX=4+(Window.UIPadding/2),
 TabPaddingY=3+(Window.UIPadding/2),
 TitlePaddingY=0,
 }
-
-
-
-
-
-
-
-
 
 if ar.IconShape then
 ar.TabPaddingX=2+(Window.UIPadding/4)
@@ -11804,20 +11789,6 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 ImageTransparency=1,
 Name="Outline",
-},{
-
-
-
-
-
-
-
-
-
-
-
-
-
 }),
 ak.NewRoundFrame(ar.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
@@ -11852,8 +11823,6 @@ BackgroundTransparency=1,
 },{
 al("UIPadding",{
 PaddingTop=UDim.new(0,ar.TitlePaddingY),
-
-
 PaddingBottom=UDim.new(0,ar.TitlePaddingY),
 }),
 }),
@@ -11912,21 +11881,6 @@ ImageColor3="White",
 },
 ImageTransparency=0,
 Name="Outline",
-},
-{
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 ),
 }
@@ -11939,15 +11893,10 @@ at=-28-(Window.UIPadding/2)
 ar.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,at,0,0)
 end
 
-av=
-ak.Image(ar.Icon,ar.Icon..":"..ar.Title,0,Window.Folder,ar.__type,true,ar.IconThemed)
+av=ak.Image(ar.Icon,ar.Icon..":"..ar.Title,0,Window.Folder,ar.__type,true,ar.IconThemed)
 av.Size=UDim2.new(0,16,0,16)
 av.ImageLabel.ImageTransparency=not ar.Locked and 0 or 0.7
 at=-30
-
-
-
-
 end
 
 ar.UIElements.ContainerFrame=al("ScrollingFrame",{
@@ -11959,7 +11908,6 @@ CanvasSize=UDim2.new(0,0,0,0),
 AnchorPoint=Vector2.new(0,1),
 Position=UDim2.new(0,0,1,0),
 AutomaticCanvasSize="Y",
-
 ScrollingDirection="Y",
 },{
 al("UIPadding",{
@@ -11974,10 +11922,6 @@ Padding=UDim.new(0,ar.Gap),
 HorizontalAlignment="Center",
 }),
 })
-
-
-
-
 
 ar.UIElements.ContainerFrameCanvas=al("Frame",{
 Size=UDim2.new(1,0,1,0),
@@ -12010,7 +11954,6 @@ TextSize=20,
 TextTransparency=0.1,
 Size=UDim2.new(0,0,1,0),
 FontFace=Font.new(ak.Font,Enum.FontWeight.SemiBold),
-
 RichText=true,
 LayoutOrder=2,
 TextXAlignment="Left",
@@ -12068,7 +12011,6 @@ local ax
 local ay
 local az=false
 
-
 if ar.Desc then
 ak.AddSignal(ar.UIElements.Main.InputBegan,function()
 az=true
@@ -12100,6 +12042,7 @@ ImageColor3="TabBackgroundHover",
 },0.1)
 end
 end)
+
 ak.AddSignal(ar.UIElements.Main.InputEnded,function()
 if ar.Desc then
 az=false
@@ -12148,8 +12091,6 @@ end)
 return ar
 end
 
-
-
 local aA=a.load'_'
 
 aA.Load(
@@ -12165,13 +12106,13 @@ ar
 )
 
 function ar.LockAll(aB)
-
 for b,d in next,Window.AllElements do
 if d.Tab and d.Tab.Index and d.Tab.Index==ar.Index and d.Lock then
 d:Lock()
 end
 end
 end
+
 function ar.UnlockAll(aB)
 for b,d in next,Window.AllElements do
 if d.Tab and d.Tab.Index and d.Tab.Index==ar.Index and d.Unlock then
@@ -12179,195 +12120,36 @@ d:Unlock()
 end
 end
 end
+
 function ar.GetLocked(aB)
 local b={}
-
 for d,f in next,Window.AllElements do
 if f.Tab and f.Tab.Index and f.Tab.Index==ar.Index and f.Locked==true then
 table.insert(b,f)
 end
 end
-
 return b
 end
+
 function ar.GetUnlocked(aB)
 local b={}
-
 for d,f in next,Window.AllElements do
 if f.Tab and f.Tab.Index and f.Tab.Index==ar.Index and f.Locked==false then
 table.insert(b,f)
 end
 end
-
 return b
 end
 
-local collapsedPopup=nil
-local spinConn=nil
-
-function aw.ToggleSidebar(self,state)
-if state==nil then
-state=not aw.SideBarCollapsed
-end
-aw.SideBarCollapsed=state
-
-local targetW=state and 0 or aw.SideBarWidth
-local hOffset=(aw.User and aw.User.Enabled)and(-aw.Topbar.Height-42-(aw.UIPadding*2))or-aw.Topbar.Height
-
-ap(aw.UIElements.SideBarContainer,0.28,{
-Size=UDim2.new(0,targetW,1,hOffset),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-ap(aw.UIElements.MainBar,0.28,{
-Size=UDim2.new(1,state and 0 or-aw.SideBarWidth,1,-aw.Topbar.Height),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-if d then
-if state then
-ap(d,0.2,{Position=UDim2.new(0,-aw.SideBarWidth,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-task.delay(0.2,function()
-if aw.SideBarCollapsed then d.Visible=false end
-end)
-else
-d.Visible=aw.User.Enabled or false
-ap(d,0.28,{Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2))},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end
-
-local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
-ap(iconScale,0.12,{Scale=0.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
-if img then
-ap(img,0.12,{ImageTransparency=1},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
-end
-
-task.delay(0.12,function()
-local nextIcon=state and "panel-left-open" or "panel-left-close"
-switchSidebarIcon(nextIcon)
-iconScale.Scale=0.35
-if img then img.ImageTransparency=1 end
-
-ap(iconScale,0.22,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
-if img then
-ap(img,0.18,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end)
-
-if aw.TabModule and aw.TabModule.Containers then
-for _,c in pairs(aw.TabModule.Containers)do
-local sf=c:FindFirstChildOfClass"ScrollingFrame"or c:FindFirstChild"ScrollingFrame"
-if sf then
-sf.ScrollingEnabled=not state
-end
-end
-end
-
-if state then
-if not collapsedPopup then
-local iconData=an.Icon"loader-circle"or an.Icon"lucide:loader-circle"or an.Icon"loader-2"
-local spinIcon=ao("ImageLabel",{
-Size=UDim2.fromOffset(36,36),
-BackgroundTransparency=1,
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.fromScale(0.5,0.5),
-Image=iconData and iconData[1]or"",
-ImageRectSize=iconData and iconData[2]and iconData[2].ImageRectSize or Vector2.zero,
-ImageRectOffset=iconData and iconData[2]and iconData[2].ImageRectPosition or Vector2.zero,
-ImageColor3=Color3.fromRGB(255,255,255),
-})
-
-local titleLbl=ao("TextLabel",{
-Text=av.CollapsedTitle or"",
-TextSize=18,
-FontFace=Font.new(an.Font,Enum.FontWeight.SemiBold),
-TextColor3=Color3.fromRGB(255,255,255),
-BackgroundTransparency=1,
-AutomaticSize=Enum.AutomaticSize.XY,
-})
-
-local descLbl=ao("TextLabel",{
-Text=av.CollapsedDesc or"",
-TextSize=14,
-FontFace=Font.new(an.Font,Enum.FontWeight.Medium),
-TextColor3=Color3.fromRGB(160,160,160),
-BackgroundTransparency=1,
-AutomaticSize=Enum.AutomaticSize.XY,
-TextWrapped=true,
-})
-
-local popScale=ao("UIScale",{Scale=0.75})
-
-collapsedPopup=an.NewRoundFrame(18,"Squircle",{
-Size=UDim2.fromOffset(260,0),
-AutomaticSize=Enum.AutomaticSize.Y,
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.fromScale(0.5,0.5),
-BackgroundColor3=Color3.fromRGB(18,18,20),
-ImageColor3=Color3.fromRGB(18,18,20),
-ImageTransparency=1,
-ZIndex=100,
-Parent=aw.UIElements.MainBar,
-},{
-popScale,
-ao("UICorner",{CornerRadius=UDim.new(0,18)}),
-ao("UIStroke",{
-Color=Color3.fromRGB(255,255,255),
-Transparency=0.88,
-Thickness=1,
-}),
-ao("UIPadding",{
-PaddingTop=UDim.new(0,22),
-PaddingBottom=UDim.new(0,22),
-PaddingLeft=UDim.new(0,20),
-PaddingRight=UDim.new(0,20),
-}),
-ao("UIListLayout",{
-FillDirection=Enum.FillDirection.Vertical,
-HorizontalAlignment=Enum.HorizontalAlignment.Center,
-VerticalAlignment=Enum.VerticalAlignment.Center,
-Padding=UDim.new(0,8),
-}),
-ao("Frame",{
-Size=UDim2.fromOffset(40,40),
-BackgroundTransparency=1,
-},{spinIcon}),
-titleLbl,
-descLbl,
-})
-
-spinConn=ai.RenderStepped:Connect(function(dt)
-if not spinIcon.Parent then
-if spinConn then spinConn:Disconnect() spinConn=nil end
-return
-end
-spinIcon.Rotation=(spinIcon.Rotation+360*dt)%360
-end)
-
-ap(popScale,0.3,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
-ap(collapsedPopup,0.25,{ImageTransparency=0.15},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-else
-if collapsedPopup then
-if spinConn then spinConn:Disconnect() spinConn=nil end
-local p=collapsedPopup
-collapsedPopup=nil
-local ps=p:FindFirstChildOfClass"UIScale"
-if ps then ap(ps,0.2,{Scale=0.75},Enum.EasingStyle.Quint,Enum.EasingDirection.In):Play() end
-local tw=ap(p,0.2,{ImageTransparency=1},Enum.EasingStyle.Quint,Enum.EasingDirection.In)
-tw:Play()
-tw.Completed:Connect(function()
-p:Destroy()
-end)
-end
-end
+function ar.Select(aB)
+return ao:SelectTab(ar.Index)
 end
 
 task.spawn(function()
 local aB
 if ar.CustomEmptyPage.Icon then
-aB=
-ak.Image(ar.CustomEmptyPage.Icon,ar.CustomEmptyPage.Icon,0,"Temp","EmptyPage",true)
-aB.Size=
-UDim2.fromOffset(ar.CustomEmptyPage.IconSize or 48,ar.CustomEmptyPage.IconSize or 48)
+aB=ak.Image(ar.CustomEmptyPage.Icon,ar.CustomEmptyPage.Icon,0,"Temp","EmptyPage",true)
+aB.Size=UDim2.fromOffset(ar.CustomEmptyPage.IconSize or 48,ar.CustomEmptyPage.IconSize or 48)
 end
 
 local b=al("Frame",{
@@ -12382,17 +12164,6 @@ VerticalAlignment="Center",
 HorizontalAlignment="Center",
 FillDirection="Vertical",
 }),
-
-
-
-
-
-
-
-
-
-
-
 aB,
 ar.CustomEmptyPage.Title and al("TextLabel",{
 AutomaticSize="XY",
@@ -12417,10 +12188,6 @@ BackgroundTransparency=1,
 FontFace=Font.new(ak.Font,Enum.FontWeight.Regular),
 })or nil,
 })
-
-
-
-
 
 local d
 d=ak.AddSignal(ar.UIElements.ContainerFrame.ChildAdded,function()
