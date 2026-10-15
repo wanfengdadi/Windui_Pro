@@ -13404,8 +13404,10 @@ BackgroundTransparency=1,
 },{
 an.NewRoundFrame(aw.UICorner-(aw.UIPadding/2),"Squircle",{
 Size=UDim2.new(1,0,1,0),
-ImageColor3=av.PanelColor or Color3.fromHex"#121214",
-ImageTransparency=av.PanelTransparency or 0,
+ThemeTag={
+ImageColor3="PanelBackground",
+ImageTransparency="PanelBackgroundTransparency",
+},
 ZIndex=3,
 Name="Background",
 Visible=not aw.HidePanelBackground,
