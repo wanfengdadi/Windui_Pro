@@ -12202,9 +12202,122 @@ end
 return b
 end
 
-function ar.Select(aB)
-return ao:SelectTab(ar.Index)
+local retractPopup=nil
+local spinConn=nil
+
+function ar.Retract(bTitle,bDesc)
+if retractPopup then return end
+ar.UIElements.ContainerFrame.ScrollingEnabled=false
+ar.UIElements.ContainerFrame.Visible=false
+
+local iconData=ak.Icon("loader-circle")or ak.Icon("lucide:loader-circle")or ak.Icon("loader-2")
+local spinIcon=al("ImageLabel",{
+Size=UDim2.fromOffset(36,36),
+BackgroundTransparency=1,
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.fromScale(0.5,0.5),
+Image=iconData and iconData[1]or"",
+ImageRectSize=iconData and iconData[2]and iconData[2].ImageRectSize or Vector2.zero,
+ImageRectOffset=iconData and iconData[2]and iconData[2].ImageRectPosition or Vector2.zero,
+ImageColor3=Color3.fromRGB(255,255,255),
+})
+
+local titleLbl=al("TextLabel",{
+Text=bTitle or"Adjustments",
+TextSize=18,
+FontFace=Font.new(ak.Font,Enum.FontWeight.SemiBold),
+TextColor3=Color3.fromRGB(255,255,255),
+BackgroundTransparency=1,
+AutomaticSize=Enum.AutomaticSize.XY,
+})
+
+local descLbl=al("TextLabel",{
+Text=bDesc or"Content is being adjusted; please wait.",
+TextSize=14,
+FontFace=Font.new(ak.Font,Enum.FontWeight.Medium),
+TextColor3=Color3.fromRGB(160,160,160),
+BackgroundTransparency=1,
+AutomaticSize=Enum.AutomaticSize.XY,
+TextWrapped=true,
+})
+
+local popScale=al("UIScale",{Scale=0.75})
+
+local popCard=ak.NewRoundFrame(18,"Squircle",{
+Size=UDim2.fromOffset(260,0),
+AutomaticSize=Enum.AutomaticSize.Y,
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.fromScale(0.5,0.5),
+BackgroundColor3=Color3.fromRGB(18,18,20),
+ImageColor3=Color3.fromRGB(18,18,20),
+ImageTransparency=0.15,
+ZIndex=100,
+Parent=ar.UIElements.ContainerFrameCanvas,
+},{
+popScale,
+al("UICorner",{CornerRadius=UDim.new(0,18)}),
+al("UIStroke",{
+Color=Color3.fromRGB(255,255,255),
+Transparency=0.88,
+Thickness=1,
+}),
+al("UIPadding",{
+PaddingTop=UDim.new(0,22),
+PaddingBottom=UDim.new(0,22),
+PaddingLeft=UDim.new(0,20),
+PaddingRight=UDim.new(0,20),
+}),
+al("UIListLayout",{
+FillDirection=Enum.FillDirection.Vertical,
+HorizontalAlignment=Enum.HorizontalAlignment.Center,
+VerticalAlignment=Enum.VerticalAlignment.Center,
+Padding=UDim.new(0,8),
+}),
+al("Frame",{
+Size=UDim2.fromOffset(40,40),
+BackgroundTransparency=1,
+},{spinIcon}),
+titleLbl,
+descLbl,
+})
+
+spinConn=game:GetService("RunService").RenderStepped:Connect(function(dt)
+if not spinIcon.Parent then
+if spinConn then spinConn:Disconnect() spinConn=nil end
+return
 end
+spinIcon.Rotation=(spinIcon.Rotation+360*dt)%360
+end)
+
+ak.Tween(popScale,0.3,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+ak.Tween(popCard,0.25,{ImageTransparency=0.15},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+retractPopup=popCard
+end
+
+function ar.Restore()
+if not retractPopup then return end
+if spinConn then spinConn:Disconnect() spinConn=nil end
+
+local popCard=retractPopup
+retractPopup=nil
+
+local popScale=popCard:FindFirstChildOfClass("UIScale")
+if popScale then
+ak.Tween(popScale,0.2,{Scale=0.75},Enum.EasingStyle.Quint,Enum.EasingDirection.In):Play()
+end
+local tw=ak.Tween(popCard,0.2,{ImageTransparency=1},Enum.EasingStyle.Quint,Enum.EasingDirection.In)
+tw:Play()
+tw.Completed:Connect(function()
+popCard:Destroy()
+end)
+
+ar.UIElements.ContainerFrame.Visible=true
+ar.UIElements.ContainerFrame.ScrollingEnabled=true
+end
+
+ar.Collapse=ar.Retract
+ar.Expand=ar.Restore
 
 task.spawn(function()
 local aB
