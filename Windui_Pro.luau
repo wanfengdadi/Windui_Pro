@@ -13368,6 +13368,34 @@ av.WindUI
 )
 end
 
+local bottomFadeCorner=ao("UICorner",{
+CornerRadius=UDim.new(0,aw.UICorner-(aw.UIPadding/2)),
+})
+
+local bottomFade=ao("Frame",{
+Name="BottomFade",
+Size=UDim2.new(1,-aw.UIPadding/2,0,50),
+Position=UDim2.new(1,0,1,0),
+AnchorPoint=Vector2.new(1,1),
+BackgroundColor3=Color3.fromRGB(0,0,0),
+BackgroundTransparency=0,
+BorderSizePixel=0,
+ZIndex=20,
+Active=false,
+Interactable=false,
+},{
+ao("UIGradient",{
+Rotation=90,
+Color=ColorSequence.new(Color3.fromRGB(0,0,0)),
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,1),
+NumberSequenceKeypoint.new(0.35,0.7),
+NumberSequenceKeypoint.new(1,0),
+},
+}),
+bottomFadeCorner,
+})
+
 aw.UIElements.MainBar=ao("Frame",{
 Size=UDim2.new(1,-aw.UIElements.SideBarContainer.AbsoluteSize.X,1,-aw.Topbar.Height),
 Position=UDim2.new(1,0,1,0),
@@ -13387,6 +13415,7 @@ PaddingLeft=UDim.new(0,aw.UIPadding/2),
 PaddingRight=UDim.new(0,aw.UIPadding/2),
 PaddingBottom=UDim.new(0,aw.UIPadding/2),
 }),
+bottomFade,
 })
 
 local b=ao("ImageLabel",{
