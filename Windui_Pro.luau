@@ -13087,8 +13087,6 @@ end
 
 return af end function a.ae()
 
-
-
 local aa=(cloneref or clonereference or function(aa)
 return aa
 end)
@@ -13105,15 +13103,12 @@ local an=a.load'd'
 local ao=an.New
 local ap=an.Tween
 
-
 local aq=a.load'w'.New
 local ar=a.load'm'.New
 local as=a.load'x'.New
 local at=a.load'y'
 
 local au=a.load'z'
-
-
 
 return function(av)
 local aw={
@@ -13284,73 +13279,6 @@ ZIndex=999,
 Active=false,
 })
 
-local tweenCache={}
-local function smoothTween(inst,prop,target,dur)
-if not inst then return end
-if tweenCache[inst]and tweenCache[inst][prop]then
-tweenCache[inst][prop]:Cancel()
-tweenCache[inst][prop]=nil
-end
-if dur and dur>0 then
-local tw=ap(inst,dur,{[prop]=target},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
-if not tweenCache[inst]then tweenCache[inst]={}end
-tweenCache[inst][prop]=tw
-tw:Play()
-else
-inst[prop]=target
-end
-end
-
-function aw.SetRadius(A,B,C)
-local D=typeof(A)=="table"and B or A
-local E=typeof(A)=="table"and C or B
-local F=math.clamp(tonumber(D)or 16,0,34)
-aw.UICorner=F
-aw.Radius=F
-local G=F<=0 and 0.0001 or math.max((F/34)*0.26,0.0001)
-local H=UDim.new(0,F)
-local I=E or 0.05
-
-local main=aw.UIElements and aw.UIElements.Main
-local bg=main and main:FindFirstChild"Background"
-local mainFrame=main and main:FindFirstChild"Main"
-local mainCorner=mainFrame and mainFrame:FindFirstChildOfClass"UICorner"
-local imgBg=bg and bg:FindFirstChildOfClass"ImageLabel"
-local imgCorner=imgBg and imgBg:FindFirstChildOfClass"UICorner"
-local mainBar=aw.UIElements and aw.UIElements.MainBar
-local mainBarBg=mainBar and mainBar:FindFirstChild"Background"
-local acrylicFrame=aw.AcrylicPaint and aw.AcrylicPaint.Frame
-local acrylicCorner=acrylicFrame and acrylicFrame:FindFirstChildOfClass"UICorner"
-
-smoothTween(ay,"CornerRadius",H,I)
-smoothTween(mainCorner,"CornerRadius",H,I)
-smoothTween(imgCorner,"CornerRadius",H,I)
-smoothTween(acrylicCorner,"CornerRadius",H,I)
-
-smoothTween(aA,"SliceScale",G,I)
-smoothTween(aB,"SliceScale",G,I)
-smoothTween(bg,"SliceScale",G,I)
-
-if mainBarBg then
-local barScale=F<=0 and 0.0001 or math.max(((math.max(F-4,0))/34)*0.24,0.0001)
-smoothTween(mainBarBg,"SliceScale",barScale,I)
-end
-
-if aw.UIElements and aw.UIElements.BackgroundGradient then
-smoothTween(aw.UIElements.BackgroundGradient,"SliceScale",G,I)
-end
-
-return aw
-end
-
-
-
-
-
-
-
-
-
 aw.UIElements.SideBar=ao("ScrollingFrame",{
 Size=UDim2.new(
 1,
@@ -13376,9 +13304,6 @@ Size=UDim2.new(1,0,0,0),
 Name="Frame",
 },{
 ao("UIPadding",{
-
-
-
 PaddingBottom=UDim.new(0,aw.UIPadding/2),
 }),
 ao("UIListLayout",{
@@ -13387,12 +13312,10 @@ Padding=UDim.new(0,aw.Gap),
 }),
 }),
 ao("UIPadding",{
-
 PaddingLeft=UDim.new(0,aw.UIPadding/2),
 PaddingRight=UDim.new(0,aw.UIPadding/2),
 PaddingBottom=UDim.new(0,aw.UIPadding/2),
 }),
-
 })
 
 aw.UIElements.SideBarContainer=ao("Frame",{
@@ -13439,14 +13362,11 @@ ThemeTag={
 ImageColor3="PanelBackground",
 ImageTransparency="PanelBackgroundTransparency",
 },
-
-
 ZIndex=3,
 Name="Background",
 Visible=not aw.HidePanelBackground,
 }),
 ao("UIPadding",{
-
 PaddingLeft=UDim.new(0,aw.UIPadding/2),
 PaddingRight=UDim.new(0,aw.UIPadding/2),
 PaddingBottom=UDim.new(0,aw.UIPadding/2),
@@ -13457,7 +13377,6 @@ local b=ao("ImageLabel",{
 Image="rbxassetid://8992230677",
 ThemeTag={
 ImageColor3="WindowShadow",
-
 },
 ImageTransparency=1,
 Size=UDim2.new(1,100,1,100),
@@ -13476,12 +13395,6 @@ aw.IsPC=true
 else
 aw.IsPC=nil
 end
-
-
-
-
-
-
 
 local d
 if aw.User then
@@ -13685,8 +13598,6 @@ end
 return".png"
 end
 
-
-
 if typeof(aw.Background)=="string"and l then
 h=true
 
@@ -13694,11 +13605,6 @@ if string.find(l,"http")then
 local r=(aw.Folder or"Temp").."/assets/."..an.SanitizeFilename(l)..".webm"
 if not isfile(r)then
 local u,v=pcall(function()
-
-
-
-
-
 local u=game.HttpGet and game:HttpGet(l)
 or an.Request{
 Url=l,
@@ -13866,7 +13772,6 @@ BackgroundTransparency=1,
 Parent=av.Parent,
 AnchorPoint=Vector2.new(0.5,0.5),
 Active=true,
-
 },{
 av.WindUI.UIScaleObj,
 aw.AcrylicPaint and aw.AcrylicPaint.Frame or nil,
@@ -13880,16 +13785,11 @@ Name="Background",
 ThemeTag={
 ImageColor3="WindowBackground",
 },
-
 },{
 i,
 r,
 az,
 }),
-
-
-
-
 ay,
 aA,
 aB,
@@ -13897,7 +13797,6 @@ ao("Frame",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
 Name="Main",
-
 Visible=false,
 ZIndex=97,
 },{
@@ -13906,9 +13805,7 @@ CornerRadius=UDim.new(0,aw.UICorner),
 }),
 aw.UIElements.SideBarContainer,
 aw.UIElements.MainBar,
-
 d,
-
 g,
 ao("Frame",{
 Size=UDim2.new(1,0,0,aw.Topbar.Height),
@@ -13917,12 +13814,6 @@ BackgroundColor3=Color3.fromRGB(50,50,50),
 Name="Topbar",
 },{
 f,
-
-
-
-
-
-
 ao("Frame",{
 AutomaticSize="X",
 Size=UDim2.new(0,0,1,0),
@@ -13964,9 +13855,6 @@ Position=UDim2.new(0,0,0.5,0),
 AutomaticSize="Y",
 Visible=false,
 },{
-
-
-
 ao("ScrollingFrame",{
 Name="Holder",
 BackgroundTransparency=1,
@@ -13976,10 +13864,7 @@ ScrollingDirection="X",
 AutomaticCanvasSize="X",
 CanvasSize=UDim2.new(0,0,0,0),
 Size=UDim2.new(1,0,1,0),
-
-
 },{
-
 ao("UIListLayout",{
 FillDirection="Horizontal",
 VerticalAlignment="Center",
@@ -14094,7 +13979,6 @@ ap(d,0.28,{Position=UDim2.new(0,aw.UIPadding/2,1,-(aw.UIPadding/2))},Enum.Easing
 end
 end
 
--- 图标动画：点击后当前图标往后缩进淡出，换成新图标后从深处往前弹出展现
 local img=sidebarIcon:FindFirstChildOfClass("ImageLabel",true)
 ap(iconScale,0.12,{Scale=0.35},Enum.EasingStyle.Quad,Enum.EasingDirection.In):Play()
 if img then
@@ -14171,8 +14055,6 @@ Size=aw.Topbar.ButtonsType=="Default"
 and UDim2.new(0,aw.Topbar.Height-16,0,aw.Topbar.Height-16)
 or UDim2.new(0,14,0,14),
 LayoutOrder=F or 999,
-
-
 ZIndex=9999,
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
@@ -14183,18 +14065,6 @@ ImageColor3="Text",
 ImageTransparency=aw.Topbar.ButtonsType=="Default"and 1 or 0,
 },
 {
-
-
-
-
-
-
-
-
-
-
-
-
 L,
 ao("UIScale",{
 Scale=1,
@@ -14213,8 +14083,6 @@ LayoutOrder=F or 999,
 M,
 })
 
-
-
 aw.TopBarButtons[100-F]={
 Name=A,
 Object=N,
@@ -14228,10 +14096,7 @@ end)
 an.AddSignal(M.MouseEnter,function()
 if aw.Topbar.ButtonsType=="Default"then
 ap(M,0.15,{ImageTransparency=0.93}):Play()
-
-
 else
-
 ap(
 L.ImageLabel,
 0.1,
@@ -14257,10 +14122,7 @@ end)
 an.AddSignal(M.MouseLeave,function()
 if aw.Topbar.ButtonsType=="Default"then
 ap(M,0.1,{ImageTransparency=1}):Play()
-
-
 else
-
 ap(
 L.ImageLabel,
 0.1,
@@ -14305,8 +14167,6 @@ A.IconSize
 )
 end
 
-
-
 local z=an.Drag(
 aw.UIElements.Main,
 {aw.UIElements.Main.Main.Topbar,r.Frame},
@@ -14338,19 +14198,6 @@ A,
 })
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 aw.OpenButtonMain=a.load'A'.New(aw)
 
 task.spawn(function()
@@ -14377,22 +14224,83 @@ v.Position=UDim2.new(0.5,0,0.5,0)
 v.AnchorPoint=Vector2.new(0.5,0.5)
 
 aw.OpenButtonMain:SetIcon(aw.Icon)
-
-
-
-
-
-
-
-
-
-
-
 else
 aw.OpenButtonMain:SetIcon(aw.Icon)
-
 end
 end)
+
+local twMap={}
+local function setTargetProp(obj,prop,val,dur)
+if not obj then return end
+if twMap[obj]and twMap[obj][prop]then
+twMap[obj][prop]:Cancel()
+twMap[obj][prop]=nil
+end
+if dur and dur>0 then
+local t=ap(obj,dur,{[prop]=val},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+if not twMap[obj]then twMap[obj]={}end
+twMap[obj][prop]=t
+t:Play()
+else
+obj[prop]=val
+end
+end
+
+function aw.SetRadius(A,B,C)
+local D=typeof(A)=="table"and B or A
+local E=typeof(A)=="table"and C or B
+local F=math.clamp(tonumber(D)or 16,0,34)
+aw.UICorner=F
+aw.Radius=F
+local G=F<=0 and 0.0001 or math.max((F/34)*0.26,0.0001)
+local H=UDim.new(0,F)
+local I=E or 0.05
+
+local main=aw.UIElements and aw.UIElements.Main
+setTargetProp(ay,"CornerRadius",H,I)
+setTargetProp(aA,"SliceScale",G,I)
+setTargetProp(aB,"SliceScale",G,I)
+
+if main then
+local bg=main:FindFirstChild"Background"
+if bg then
+setTargetProp(bg,"SliceScale",G,I)
+for _,child in ipairs(bg:GetChildren())do
+local cCorner=child:FindFirstChildOfClass"UICorner"
+if cCorner then
+setTargetProp(cCorner,"CornerRadius",H,I)
+end
+end
+end
+local mainFrame=main:FindFirstChild"Main"
+if mainFrame then
+local mCorner=mainFrame:FindFirstChildOfClass"UICorner"
+if mCorner then
+setTargetProp(mCorner,"CornerRadius",H,I)
+end
+end
+end
+
+local mainBar=aw.UIElements and aw.UIElements.MainBar
+local mainBarBg=mainBar and mainBar:FindFirstChild"Background"
+if mainBarBg then
+local barScale=F<=0 and 0.0001 or math.max(((math.max(F-4,0))/34)*0.24,0.0001)
+setTargetProp(mainBarBg,"SliceScale",barScale,I)
+end
+
+if aw.AcrylicPaint and aw.AcrylicPaint.Frame then
+local acCorner=aw.AcrylicPaint.Frame:FindFirstChildOfClass"UICorner"
+if acCorner then
+setTargetProp(acCorner,"CornerRadius",H,I)
+end
+end
+
+if aw.UIElements and aw.UIElements.BackgroundGradient then
+setTargetProp(aw.UIElements.BackgroundGradient,"SliceScale",G,I)
+end
+
+return aw
+end
 
 function aw.SetToggleKey(A,B)
 aw.ToggleKey=B
@@ -14408,14 +14316,12 @@ aw.Author=B
 if not u then
 u=createAuthor(aw.Author)
 end
-
 u.Text=B
 end
 
 function aw.SetSize(A,B)
 if typeof(B)=="UDim2"then
 aw.Size=B
-
 ap(aw.UIElements.Main,0.08,{Size=B},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end
@@ -14423,6 +14329,7 @@ end
 function aw.SetBackgroundImage(A,B)
 aw.UIElements.Main.Background.ImageLabel.Image=B
 end
+
 function aw.SetBackgroundImageTransparency(A,B)
 local val = typeof(A) == "number" and A or (tonumber(B) or 0)
 local targetVal = math.clamp(val, 0, 1)
@@ -14513,28 +14420,6 @@ aw:CreateTopbarButton("Minimize","minus",function()
 if aw.Close then
 aw:Close()
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 end,(aw.Topbar.ButtonsType=="Default"and 997 or 998),nil,Color3.fromHex"#F4C948")
 
 function aw.OnOpen(C,F)
@@ -14583,7 +14468,6 @@ aw.Closed=false
 aw.UIElements.Main.Size=UDim2.new(aw.Size.X.Scale,aw.Size.X.Offset,0,100)
 
 ap(aw.UIElements.Main,0.8,{
-
 Size=aw.Size,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
@@ -14613,14 +14497,6 @@ if aw.OpenButtonMain and aw.IsOpenButtonEnabled then
 aw.OpenButtonMain:Visible(false)
 end
 
-
-
-
-
-
-
-
-
 ap(
 b,
 0.25,
@@ -14628,9 +14504,6 @@ b,
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
-
-
-
 
 ap(
 r,
@@ -14654,15 +14527,12 @@ end
 
 aw.CanDropdown=true
 aw.UIElements.Main.Visible=true
-
-
-
 aw.UIElements.Main:WaitForChild"Main".Visible=true
 
 av.WindUI:ToggleAcrylic(true)
-
 end)
 end
+
 function aw.Close(C)
 if aw.Destroyed then
 return
@@ -14686,7 +14556,6 @@ aw.CanDropdown=false
 aw.Closed=true
 
 ap(aw.UIElements.Main,0.9,{
-
 Size=UDim2.new(aw.Size.X.Scale,aw.Size.X.Offset,0,0),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if aw.UIElements.BackgroundGradient then
@@ -14696,16 +14565,8 @@ ImageTransparency=1,
 end
 
 ap(aw.UIElements.Main.Background,0.3,{
-
 ImageTransparency=1,
 },Enum.EasingStyle.Exponential,Enum.EasingDirection.InOut):Play()
-
-
-
-
-
-
-
 
 if i then
 if i:IsA"VideoFrame"then
@@ -14717,9 +14578,6 @@ ImageTransparency=1,
 end
 end
 ap(b,0.25,{ImageTransparency=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-
-
 
 ap(
 r,
@@ -14765,7 +14623,6 @@ aw.AcrylicPaint.Model:Destroy()
 end
 
 aw.Destroyed=true
-
 task.wait(0.4)
 
 av.WindUI.ScreenGui:Destroy()
@@ -14774,16 +14631,17 @@ av.WindUI.DropdownGui:Destroy()
 av.WindUI.TooltipGui:Destroy()
 
 an.DisconnectAll()
-
 return
 end)
 end
 
 return F
 end
+
 function aw.Destroy(C)
 return aw:Close():Destroy()
 end
+
 function aw.Toggle(C)
 if aw.Closed then
 aw:Open()
@@ -14806,6 +14664,7 @@ G:Lock()
 end
 end
 end
+
 function aw.UnlockAll(C)
 for F,G in next,aw.AllElements do
 if G.Unlock then
@@ -14813,26 +14672,24 @@ G:Unlock()
 end
 end
 end
+
 function aw.GetLocked(C)
 local F={}
-
 for G,H in next,aw.AllElements do
 if H.Locked then
 table.insert(F,H)
 end
 end
-
 return F
 end
+
 function aw.GetUnlocked(C)
 local F={}
-
 for G,H in next,aw.AllElements do
 if H.Locked==false then
 table.insert(F,H)
 end
 end
-
 return F
 end
 
@@ -14874,10 +14731,8 @@ local L=H/G.X
 local M=J/G.Y
 
 local N=math.min(L,M)
-
 local O=0.3
 local P=1.0
-
 local Q=math.clamp(N,O,P)
 
 local R=aw:GetUIScale()or 1
@@ -14891,8 +14746,6 @@ end
 
 if aw.OpenButtonMain and aw.OpenButtonMain.Button then
 an.AddSignal(aw.OpenButtonMain.Button.TextButton.MouseButton1Click,function()
-
-
 aw:Open()
 end)
 end
@@ -14910,7 +14763,6 @@ end
 end)
 
 task.spawn(function()
-
 aw:Open()
 end)
 
@@ -14958,18 +14810,14 @@ end
 function aw.SetPanelBackground(H,J)
 if typeof(J)=="boolean"then
 aw.HidePanelBackground=J
-
 aw.UIElements.MainBar.Background.Visible=J
 
 if G then
 for L,M in next,G.Containers do
 M.ScrollingFrame.UIPadding.PaddingTop=UDim.new(0,aw.HidePanelBackground and 20 or 10)
-M.ScrollingFrame.UIPadding.PaddingLeft=
-UDim.new(0,aw.HidePanelBackground and 20 or 10)
-M.ScrollingFrame.UIPadding.PaddingRight=
-UDim.new(0,aw.HidePanelBackground and 20 or 10)
-M.ScrollingFrame.UIPadding.PaddingBottom=
-UDim.new(0,aw.HidePanelBackground and 20 or 10)
+M.ScrollingFrame.UIPadding.PaddingLeft=UDim.new(0,aw.HidePanelBackground and 20 or 10)
+M.ScrollingFrame.UIPadding.PaddingRight=UDim.new(0,aw.HidePanelBackground and 20 or 10)
+M.ScrollingFrame.UIPadding.PaddingBottom=UDim.new(0,aw.HidePanelBackground and 20 or 10)
 end
 end
 end
@@ -14987,7 +14835,6 @@ BackgroundColor3="Text",
 })
 local L=ao("Frame",{
 Parent=aw.UIElements.SideBar.Frame,
-
 Size=UDim2.new(1,-7,0,5),
 BackgroundTransparency=1,
 },{
@@ -15004,7 +14851,6 @@ Title=L.Title or"Dialog",
 Width=L.Width or 320,
 Content=L.Content,
 Buttons=L.Buttons or{},
-
 TextPadding=14,
 }
 local N=H.Create(false,"Dialog",aw,av.WindUI,aw.UIElements.Main.Main)
@@ -15019,7 +14865,6 @@ Parent=N.UIElements.Main,
 },{
 ao("UIListLayout",{
 FillDirection="Vertical",
-
 Padding=UDim.new(0,N.UIPadding),
 }),
 })
@@ -15127,77 +14972,16 @@ Parent=N.UIElements.Main,
 LayoutOrder=4,
 },{
 R,
-
-
-
-
-
-
 })
 
 local T={}
-
 for U,V in next,M.Buttons do
-local W=
-ar(V.Title,V.Icon,V.Callback,V.Variant,S,N,true)
+local W=ar(V.Title,V.Icon,V.Callback,V.Variant,S,N,true)
 table.insert(T,W)
 W.Size=UDim2.new(1,0,1,0)
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 N:Open()
-
 return N
 end
 
@@ -15207,15 +14991,12 @@ aw:CreateTopbarButton("Close","x",function()
 if not J then
 if not aw.IgnoreAlerts then
 J=true
-
 aw:Dialog{
-
 Title="Close Window",
 Content="Do you want to close this window? You will not be able to open it again.",
 Buttons={
 {
 Title="Cancel",
-
 Callback=function()
 J=false
 end,
@@ -15223,7 +15004,6 @@ Variant="Secondary",
 },
 {
 Title="Close Window",
-
 Callback=function()
 J=false
 aw:Destroy()
@@ -15255,7 +15035,6 @@ aA.Active=true
 initialSize=aw.UIElements.Main.Size
 initialInputPosition=M.Position
 
-
 ap(az.ImageLabel,0.1,{ImageTransparency=0.35}):Play()
 
 an.AddSignal(M.Changed,function()
@@ -15263,13 +15042,9 @@ if M.UserInputState==Enum.UserInputState.End then
 if av.WindUI.CurrentInput and av.WindUI.CurrentInput~=L then
 return
 end
-
 av.WindUI.CurrentInput=nil
-
 isResizing=false
 aA.Active=false
-
-
 ap(az.ImageLabel,0.17,{ImageTransparency=0.8}):Play()
 end
 end)
@@ -15285,7 +15060,6 @@ if av.WindUI.CurrentInput and av.WindUI.CurrentInput~=L then
 return
 end
 av.WindUI.CurrentInput=L
-
 if aw.CanResize then
 startResizing(M)
 end
@@ -15334,8 +15108,6 @@ ap(az.ImageLabel,0.17,{ImageTransparency=0.8}):Play()
 end
 end)
 
-
-
 local M=0
 local N=0.4
 local O
@@ -15354,7 +15126,6 @@ P=P+1
 if P==1 then
 M=Q
 O=R
-
 task.spawn(function()
 task.wait(N)
 if P==1 then
@@ -15366,7 +15137,6 @@ elseif P==2 then
 if Q-M<=N and R==O then
 onDoubleClick()
 end
-
 P=0
 O=nil
 M=0
@@ -15377,31 +15147,9 @@ O=R
 end
 end)
 
-
-
 if not aw.HideSearchBar then
 local Q=a.load'ad'
 local R=false
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 local S=aq("Search","search",aw.UIElements.SideBarContainer,true)
 S.Size=UDim2.new(1,-aw.UIPadding/2,0,39)
@@ -15413,12 +15161,10 @@ return
 end
 
 Q.new(aw.TabModule,aw.UIElements.Main,function()
-
 R=false
 if aw.Resizable then
 aw.CanResize=true
 end
-
 ap(aB,0.1,{ImageTransparency=1}):Play()
 aB.Active=false
 end)
@@ -15430,8 +15176,6 @@ aw.CanResize=false
 end)
 end
 
-
-
 function aw.DisableTopbarButtons(Q,R)
 for S,T in next,R do
 for U,V in next,aw.TopBarButtons do
@@ -15441,32 +15185,6 @@ end
 end
 end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 return aw
 end end end
