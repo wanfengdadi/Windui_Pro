@@ -14365,23 +14365,25 @@ function aw.SetBackgroundImage(A,B)
 aw.UIElements.Main.Background.ImageLabel.Image=B
 end
 function aw.SetBackgroundImageTransparency(A,B)
-local targetVal=math.clamp(tonumber(B) or 0,0,1)
-aw.BackgroundImageTransparency=targetVal
+local val = typeof(A) == "number" and A or (tonumber(B) or 0)
+local targetVal = math.clamp(val, 0, 1)
+aw.BackgroundImageTransparency = targetVal
 if i and i:IsA"ImageLabel" then
-ap(i,0.25,{ImageTransparency=targetVal},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ap(i, 0.25, {ImageTransparency = targetVal}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 end
 end
 
 function aw.SetBackgroundTransparency(A,B)
-local targetVal=math.clamp(tonumber(B) or 0,0,1)
-av.WindUI.TransparencyValue=targetVal
-aw.Transparent=(targetVal>0)
-av.WindUI.Transparent=(targetVal>0)
+local val = typeof(A) == "number" and A or (tonumber(B) or 0)
+local targetVal = math.clamp(val, 0, 0.85)
+av.WindUI.TransparencyValue = targetVal
+aw.Transparent = (targetVal > 0)
+av.WindUI.Transparent = (targetVal > 0)
 if aw.UIElements and aw.UIElements.Main and aw.UIElements.Main.Background then
-ap(aw.UIElements.Main.Background,0.25,{ImageTransparency=targetVal},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ap(aw.UIElements.Main.Background, 0.25, {ImageTransparency = targetVal}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 end
 if aw.UIElements and aw.UIElements.BackgroundGradient then
-ap(aw.UIElements.BackgroundGradient,0.25,{ImageTransparency=targetVal},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ap(aw.UIElements.BackgroundGradient, 0.25, {ImageTransparency = targetVal}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 end
 end
 
@@ -14533,9 +14535,9 @@ ImageTransparency=0,
 end
 
 aw.UIElements.Main.Background.ImageTransparency=1
+local safeTrans = aw.Transparent and math.clamp(av.WindUI.TransparencyValue or 0.15, 0, 0.85) or 0
 ap(aw.UIElements.Main.Background,0.4,{
-
-ImageTransparency=aw.Transparent and av.WindUI.TransparencyValue or 0,
+ImageTransparency=safeTrans,
 },Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
 if i then
@@ -14732,13 +14734,10 @@ end
 end
 
 function aw.ToggleTransparency(C,F)
-
 aw.Transparent=F
 av.WindUI.Transparent=F
-
-aw.UIElements.Main.Background.ImageTransparency=F and av.WindUI.TransparencyValue or 0
-
-
+local safeTrans = math.clamp(av.WindUI.TransparencyValue or 0.15, 0, 0.85)
+aw.UIElements.Main.Background.ImageTransparency=F and safeTrans or 0
 end
 
 function aw.LockAll(C)
