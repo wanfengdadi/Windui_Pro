@@ -11713,13 +11713,18 @@ local al=ak.New
 local am=a.load'B'.New
 local an=a.load'x'.New
 
+
+
 local ao={
+
+
 Tabs={},
 Containers={},
 SelectedTab=nil,
 TabCount=0,
 ToolTipParent=nil,
 TabHighlight=nil,
+
 OnChangeFunc=function(ao)end,
 }
 
@@ -11753,11 +11758,21 @@ UIElements={},
 Elements={},
 ContainerFrame=nil,
 UICorner=Window.UICorner-(Window.UIPadding/2),
+
 Gap=Window.NewElements and 1 or 6,
+
 TabPaddingX=4+(Window.UIPadding/2),
 TabPaddingY=3+(Window.UIPadding/2),
 TitlePaddingY=0,
 }
+
+
+
+
+
+
+
+
 
 if ar.IconShape then
 ar.TabPaddingX=2+(Window.UIPadding/4)
@@ -11789,6 +11804,20 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 ImageTransparency=1,
 Name="Outline",
+},{
+
+
+
+
+
+
+
+
+
+
+
+
+
 }),
 ak.NewRoundFrame(ar.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
@@ -11823,6 +11852,8 @@ BackgroundTransparency=1,
 },{
 al("UIPadding",{
 PaddingTop=UDim.new(0,ar.TitlePaddingY),
+
+
 PaddingBottom=UDim.new(0,ar.TitlePaddingY),
 }),
 }),
@@ -11881,6 +11912,21 @@ ImageColor3="White",
 },
 ImageTransparency=0,
 Name="Outline",
+},
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 ),
 }
@@ -11893,10 +11939,15 @@ at=-28-(Window.UIPadding/2)
 ar.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,at,0,0)
 end
 
-av=ak.Image(ar.Icon,ar.Icon..":"..ar.Title,0,Window.Folder,ar.__type,true,ar.IconThemed)
+av=
+ak.Image(ar.Icon,ar.Icon..":"..ar.Title,0,Window.Folder,ar.__type,true,ar.IconThemed)
 av.Size=UDim2.new(0,16,0,16)
 av.ImageLabel.ImageTransparency=not ar.Locked and 0 or 0.7
 at=-30
+
+
+
+
 end
 
 ar.UIElements.ContainerFrame=al("ScrollingFrame",{
@@ -11908,6 +11959,7 @@ CanvasSize=UDim2.new(0,0,0,0),
 AnchorPoint=Vector2.new(0,1),
 Position=UDim2.new(0,0,1,0),
 AutomaticCanvasSize="Y",
+
 ScrollingDirection="Y",
 },{
 al("UIPadding",{
@@ -11922,6 +11974,10 @@ Padding=UDim.new(0,ar.Gap),
 HorizontalAlignment="Center",
 }),
 })
+
+
+
+
 
 ar.UIElements.ContainerFrameCanvas=al("Frame",{
 Size=UDim2.new(1,0,1,0),
@@ -11954,6 +12010,7 @@ TextSize=20,
 TextTransparency=0.1,
 Size=UDim2.new(0,0,1,0),
 FontFace=Font.new(ak.Font,Enum.FontWeight.SemiBold),
+
 RichText=true,
 LayoutOrder=2,
 TextXAlignment="Left",
@@ -12011,6 +12068,7 @@ local ax
 local ay
 local az=false
 
+
 if ar.Desc then
 ak.AddSignal(ar.UIElements.Main.InputBegan,function()
 az=true
@@ -12042,7 +12100,6 @@ ImageColor3="TabBackgroundHover",
 },0.1)
 end
 end)
-
 ak.AddSignal(ar.UIElements.Main.InputEnded,function()
 if ar.Desc then
 az=false
@@ -12091,6 +12148,8 @@ end)
 return ar
 end
 
+
+
 local aA=a.load'_'
 
 aA.Load(
@@ -12106,13 +12165,13 @@ ar
 )
 
 function ar.LockAll(aB)
+
 for b,d in next,Window.AllElements do
 if d.Tab and d.Tab.Index and d.Tab.Index==ar.Index and d.Lock then
 d:Lock()
 end
 end
 end
-
 function ar.UnlockAll(aB)
 for b,d in next,Window.AllElements do
 if d.Tab and d.Tab.Index and d.Tab.Index==ar.Index and d.Unlock then
@@ -12120,24 +12179,26 @@ d:Unlock()
 end
 end
 end
-
 function ar.GetLocked(aB)
 local b={}
+
 for d,f in next,Window.AllElements do
 if f.Tab and f.Tab.Index and f.Tab.Index==ar.Index and f.Locked==true then
 table.insert(b,f)
 end
 end
+
 return b
 end
-
 function ar.GetUnlocked(aB)
 local b={}
+
 for d,f in next,Window.AllElements do
 if f.Tab and f.Tab.Index and f.Tab.Index==ar.Index and f.Locked==false then
 table.insert(b,f)
 end
 end
+
 return b
 end
 
@@ -12148,8 +12209,10 @@ end
 task.spawn(function()
 local aB
 if ar.CustomEmptyPage.Icon then
-aB=ak.Image(ar.CustomEmptyPage.Icon,ar.CustomEmptyPage.Icon,0,"Temp","EmptyPage",true)
-aB.Size=UDim2.fromOffset(ar.CustomEmptyPage.IconSize or 48,ar.CustomEmptyPage.IconSize or 48)
+aB=
+ak.Image(ar.CustomEmptyPage.Icon,ar.CustomEmptyPage.Icon,0,"Temp","EmptyPage",true)
+aB.Size=
+UDim2.fromOffset(ar.CustomEmptyPage.IconSize or 48,ar.CustomEmptyPage.IconSize or 48)
 end
 
 local b=al("Frame",{
@@ -12164,6 +12227,17 @@ VerticalAlignment="Center",
 HorizontalAlignment="Center",
 FillDirection="Vertical",
 }),
+
+
+
+
+
+
+
+
+
+
+
 aB,
 ar.CustomEmptyPage.Title and al("TextLabel",{
 AutomaticSize="XY",
@@ -12188,6 +12262,10 @@ BackgroundTransparency=1,
 FontFace=Font.new(ak.Font,Enum.FontWeight.Regular),
 })or nil,
 })
+
+
+
+
 
 local d
 d=ak.AddSignal(ar.UIElements.ContainerFrame.ChildAdded,function()
