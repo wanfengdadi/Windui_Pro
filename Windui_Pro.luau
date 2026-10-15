@@ -13257,7 +13257,7 @@ AnchorPoint=Vector2.new(0.5,0.5),
 ImageTransparency=1,
 }),
 })
-local aA,aAModule=an.NewRoundFrame(aw.UICorner,"Squircle",{
+local aA=an.NewRoundFrame(aw.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 ImageColor3=Color3.new(0,0,0),
@@ -13276,7 +13276,7 @@ ImageTransparency=1,
 }),
 })
 
-local aB,aBModule=an.NewRoundFrame(aw.UICorner,"Squircle",{
+local aB=an.NewRoundFrame(aw.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 ImageColor3=Color3.new(0,0,0),
@@ -13284,45 +13284,62 @@ ZIndex=999,
 Active=false,
 })
 
+local tweenCache={}
+local function smoothTween(inst,prop,target,dur)
+if not inst then return end
+if tweenCache[inst]and tweenCache[inst][prop]then
+tweenCache[inst][prop]:Cancel()
+tweenCache[inst][prop]=nil
+end
+if dur and dur>0 then
+local tw=ap(inst,dur,{[prop]=target},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+if not tweenCache[inst]then tweenCache[inst]={}end
+tweenCache[inst][prop]=tw
+tw:Play()
+else
+inst[prop]=target
+end
+end
+
 function aw.SetRadius(A,B,C)
 local D=typeof(A)=="table"and B or A
 local E=typeof(A)=="table"and C or B
 local F=math.clamp(tonumber(D)or 16,0,34)
 aw.UICorner=F
 aw.Radius=F
-local G=F<=0 and 0.0001 or math.max(F/310,0.0001)
+local G=F<=0 and 0.0001 or math.max((F/34)*0.26,0.0001)
 local H=UDim.new(0,F)
-local I=E or 0.25
+local I=E or 0.05
 
-local bg=aw.UIElements and aw.UIElements.Main and aw.UIElements.Main:FindFirstChild"Background"
-local mainFrame=aw.UIElements and aw.UIElements.Main and aw.UIElements.Main:FindFirstChild"Main"
+local main=aw.UIElements and aw.UIElements.Main
+local bg=main and main:FindFirstChild"Background"
+local mainFrame=main and main:FindFirstChild"Main"
 local mainCorner=mainFrame and mainFrame:FindFirstChildOfClass"UICorner"
 local imgBg=bg and bg:FindFirstChildOfClass"ImageLabel"
 local imgCorner=imgBg and imgBg:FindFirstChildOfClass"UICorner"
+local mainBar=aw.UIElements and aw.UIElements.MainBar
+local mainBarBg=mainBar and mainBar:FindFirstChild"Background"
+local acrylicFrame=aw.AcrylicPaint and aw.AcrylicPaint.Frame
+local acrylicCorner=acrylicFrame and acrylicFrame:FindFirstChildOfClass"UICorner"
 
-if I>0 then
-if ay then ap(ay,I,{CornerRadius=H},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-if mainCorner then ap(mainCorner,I,{CornerRadius=H},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-if imgCorner then ap(imgCorner,I,{CornerRadius=H},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-if aA then ap(aA,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-if aB then ap(aB,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-if bg then ap(bg,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+smoothTween(ay,"CornerRadius",H,I)
+smoothTween(mainCorner,"CornerRadius",H,I)
+smoothTween(imgCorner,"CornerRadius",H,I)
+smoothTween(acrylicCorner,"CornerRadius",H,I)
+
+smoothTween(aA,"SliceScale",G,I)
+smoothTween(aB,"SliceScale",G,I)
+smoothTween(bg,"SliceScale",G,I)
+
+if mainBarBg then
+local barScale=F<=0 and 0.0001 or math.max(((math.max(F-4,0))/34)*0.24,0.0001)
+smoothTween(mainBarBg,"SliceScale",barScale,I)
+end
+
 if aw.UIElements and aw.UIElements.BackgroundGradient then
-ap(aw.UIElements.BackgroundGradient,I,{SliceScale=G},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+smoothTween(aw.UIElements.BackgroundGradient,"SliceScale",G,I)
 end
-else
-if ay then ay.CornerRadius=H end
-if mainCorner then mainCorner.CornerRadius=H end
-if imgCorner then imgCorner.CornerRadius=H end
-if aA then aA.SliceScale=G end
-if aB then aB.SliceScale=G end
-if bg then bg.SliceScale=G end
-if aw.UIElements and aw.UIElements.BackgroundGradient then
-aw.UIElements.BackgroundGradient.SliceScale=G
-end
-end
-if aAModule then aAModule.Radius=F end
-if aBModule then aBModule.Radius=F end
+
 return aw
 end
 
