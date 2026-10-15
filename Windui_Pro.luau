@@ -13369,37 +13369,14 @@ av.WindUI
 end
 
 local bottomFadeCorner=ao("UICorner",{
-CornerRadius=UDim.new(0,aw.UICorner),
+CornerRadius=UDim.new(0,aw.UICorner-(aw.UIPadding/2)),
 })
 
 local bottomFade=ao("Frame",{
 Name="BottomFade",
-Size=UDim2.new(1,aw.UIPadding,0,25),
-Position=UDim2.new(1,aw.UIPadding/2,1,aw.UIPadding/2),
+Size=UDim2.new(1,-aw.UIPadding/2,0,50),
+Position=UDim2.new(1,0,1,0),
 AnchorPoint=Vector2.new(1,1),
-BackgroundColor3=Color3.fromRGB(0,0,0),
-BackgroundTransparency=0,
-BorderSizePixel=0,
-ZIndex=20,
-Active=false,
-Interactable=false,
-},{
-ao("UIGradient",{
-Rotation=270,
-Color=ColorSequence.new(Color3.fromRGB(0,0,0)),
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0,0.5),
-NumberSequenceKeypoint.new(1,1),
-},
-}),
-bottomFadeCorner,
-})
-
-local topFade=ao("Frame",{
-Name="TopFade",
-Size=UDim2.new(1,aw.UIPadding,0,25),
-Position=UDim2.new(1,aw.UIPadding/2,0,0),
-AnchorPoint=Vector2.new(1,0),
 BackgroundColor3=Color3.fromRGB(0,0,0),
 BackgroundTransparency=0,
 BorderSizePixel=0,
@@ -13411,10 +13388,12 @@ ao("UIGradient",{
 Rotation=90,
 Color=ColorSequence.new(Color3.fromRGB(0,0,0)),
 Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0,0.5),
-NumberSequenceKeypoint.new(1,1),
+NumberSequenceKeypoint.new(0,1),
+NumberSequenceKeypoint.new(0.35,0.7),
+NumberSequenceKeypoint.new(1,0),
 },
 }),
+bottomFadeCorner,
 })
 
 aw.UIElements.MainBar=ao("Frame",{
@@ -13425,10 +13404,8 @@ BackgroundTransparency=1,
 },{
 an.NewRoundFrame(aw.UICorner-(aw.UIPadding/2),"Squircle",{
 Size=UDim2.new(1,0,1,0),
-ThemeTag={
-ImageColor3="PanelBackground",
-ImageTransparency="PanelBackgroundTransparency",
-},
+ImageColor3=av.PanelColor or Color3.fromHex"#121214",
+ImageTransparency=av.PanelTransparency or 0,
 ZIndex=3,
 Name="Background",
 Visible=not aw.HidePanelBackground,
@@ -13439,7 +13416,6 @@ PaddingRight=UDim.new(0,aw.UIPadding/2),
 PaddingBottom=UDim.new(0,aw.UIPadding/2),
 }),
 bottomFade,
-topFade,
 })
 
 local b=ao("ImageLabel",{
