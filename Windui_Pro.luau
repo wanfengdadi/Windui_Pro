@@ -14365,16 +14365,24 @@ function aw.SetBackgroundImage(A,B)
 aw.UIElements.Main.Background.ImageLabel.Image=B
 end
 function aw.SetBackgroundImageTransparency(A,B)
-if i and i:IsA"ImageLabel"then
-i.ImageTransparency=math.floor(B*10+0.5)/10
+local targetVal=math.clamp(tonumber(B) or 0,0,1)
+aw.BackgroundImageTransparency=targetVal
+if i and i:IsA"ImageLabel" then
+ap(i,0.25,{ImageTransparency=targetVal},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
-aw.BackgroundImageTransparency=math.floor(B*10+0.5)/10
 end
 
 function aw.SetBackgroundTransparency(A,B)
-local C=math.floor(tonumber(B)*10+0.5)/10
-av.WindUI.TransparencyValue=C
-aw:ToggleTransparency(C>0)
+local targetVal=math.clamp(tonumber(B) or 0,0,1)
+av.WindUI.TransparencyValue=targetVal
+aw.Transparent=(targetVal>0)
+av.WindUI.Transparent=(targetVal>0)
+if aw.UIElements and aw.UIElements.Main and aw.UIElements.Main.Background then
+ap(aw.UIElements.Main.Background,0.25,{ImageTransparency=targetVal},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+if aw.UIElements and aw.UIElements.BackgroundGradient then
+ap(aw.UIElements.BackgroundGradient,0.25,{ImageTransparency=targetVal},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 
 local A
