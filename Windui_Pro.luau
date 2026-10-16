@@ -12501,7 +12501,8 @@ if not ao.Tabs[aq].Locked then
 ao.SelectedTab=aq
 
 for ar,as in next,ao.Tabs do
-if not as.Locked then
+if not as.Locked and as.UIElements.Main and as.UIElements.Main.Parent then
+pcall(function()
 ak.SetThemeTag(as.UIElements.Main,{
 ImageTransparency="TabBorderTransparency",
 },0.15)
@@ -12518,7 +12519,6 @@ ak.SetThemeTag(as.UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparency",
 },0.15)
 end
-pcall(function()
 local textPad=as.UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if textPad then
 ak.Tween(textPad,0.2,{PaddingLeft=UDim.new(0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12527,6 +12527,9 @@ end)
 as.Selected=false
 end
 end
+
+if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
+pcall(function()
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
@@ -12544,12 +12547,12 @@ ak.SetThemeTag(ao.Tabs[aq].UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparencyActive",
 },0.15)
 end
-pcall(function()
 local activePad=ao.Tabs[aq].UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if activePad then
 ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
+end
 ao.Tabs[aq].Selected=true
 
 task.spawn(function()
