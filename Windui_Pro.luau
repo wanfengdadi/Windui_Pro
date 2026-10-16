@@ -3984,7 +3984,7 @@ end
 
 return aa end function a.v()
 return function(aa,ab)
-return{
+return {
 Dark={
 Name="Dark",
 
@@ -4164,11 +4164,6 @@ Dialog=aa:Gradient({
 ["100"]={Color=Color3.fromHex"#6b2e05",Transparency=0},
 },{Rotation=90}),
 
-
-
-
-
-
 Text=aa:Gradient({
 ["0"]={Color=Color3.fromHex"#fffbeb",Transparency=0},
 ["100"]={Color=Color3.fromHex"#fff7ed",Transparency=0},
@@ -4338,7 +4333,6 @@ Dialog=aa:Gradient({
 ["100"]={Color=Color3.fromHex"#ff8000",Transparency=0},
 },{Rotation=135}),
 
-
 Text=Color3.fromHex"#ffffff",
 Placeholder=Color3.fromHex"#00ff80",
 
@@ -4360,6 +4354,158 @@ Button=aa:Gradient({
 },{Rotation=60}),
 
 Icon=Color3.fromHex"#ffffff",
+},
+
+NewsTheme3 = {
+    Name = "NewsTheme-[3]",
+
+    Accent = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#483D8B", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#6495ED", Transparency = 0.2 },
+    }, { Rotation = 0 }),
+
+    Dialog = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#E6E6FA", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#B0C4DE", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Text = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#483D8B", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#6495ED", Transparency = 0.2 },
+    }, { Rotation = 0 }),
+
+    Placeholder = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#B0C4DE", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#D2B48C", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Background = Color3.fromHex"#101010",
+
+    Button = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#483D8B", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#6495ED", Transparency = 0.2 },
+    }, { Rotation = 0 }),
+
+    Icon = Color3.fromHex"#E6E6FA",
+
+    Outline = Color3.fromHex"#6495ED",
+    Toggle = Color3.fromHex"#6495ED",
+    Slider = Color3.fromHex"#6495ED",
+    SliderIcon = Color3.fromHex"#E6E6FA",
+    Checkbox = Color3.fromHex"#6495ED",
+    Primary = Color3.fromHex"#6495ED",
+
+    PanelBackground = Color3.fromHex"#B0C4DE",
+    PanelBackgroundTransparency = 0.95,
+
+    LabelBackground = Color3.fromHex"#000000",
+    LabelBackgroundTransparency = 0.83,
+
+    ElementBackground = Color3.fromHex"#1C1E2E",
+    ElementBackgroundTransparency = 0,
+},
+
+NewsTheme4 = {
+    Name = "NewsTheme-[4]",
+
+    Accent = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#4169E1", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#D2B48C", Transparency = 0 },
+    }, { Rotation = 0 }),
+
+    Dialog = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#E6E6FA", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#B0C4DE", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Text = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#FFF0F5", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#483D8B", Transparency = 0.2 },
+    }, { Rotation = 0 }),
+
+    Placeholder = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#FFFFE0", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#FF7F50", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Background = Color3.fromHex"#101010",
+
+    Button = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#FFF0F5", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#D2B48C", Transparency = 0.2 },
+    }, { Rotation = 0 }),
+
+    Icon = Color3.fromHex"#E6E6FA",
+
+    Outline = Color3.fromHex"#4169E1",
+    Toggle = Color3.fromHex"#4169E1",
+    Slider = Color3.fromHex"#4169E1",
+    SliderIcon = Color3.fromHex"#D2B48C",
+    Checkbox = Color3.fromHex"#4169E1",
+    Primary = Color3.fromHex"#4169E1",
+
+    PanelBackground = Color3.fromHex"#B0C4DE",
+    PanelBackgroundTransparency = 0.95,
+
+    LabelBackground = Color3.fromHex"#000000",
+    LabelBackgroundTransparency = 0.83,
+
+    ElementBackground = Color3.fromHex"#1D202D",
+    ElementBackgroundTransparency = 0,
+},
+
+NewsTheme5 = {
+    Name = "NewsTheme-[5]",
+
+    Accent = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#e6bafb", Transparency = 0.1 },
+        ["50"] = { Color = Color3.fromHex"#a1a9e1", Transparency = 0.2 },
+        ["100"] = { Color = Color3.fromHex"#8ac9f2", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Dialog = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#e6bafb", Transparency = 0.1 },
+        ["50"] = { Color = Color3.fromHex"#a1a9e1", Transparency = 0.2 },
+        ["100"] = { Color = Color3.fromHex"#8ac9f2", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Text = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#e6bafb", Transparency = 0.1 },
+        ["50"] = { Color = Color3.fromHex"#a1a9e1", Transparency = 0.2 },
+        ["100"] = { Color = Color3.fromHex"#8ac9f2", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Placeholder = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#e6bafb", Transparency = 0.1 },
+        ["50"] = { Color = Color3.fromHex"#a1a9e1", Transparency = 0.2 },
+        ["100"] = { Color = Color3.fromHex"#8ac9f2", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Background = Color3.fromHex"#101010",
+
+    Button = aa:Gradient({
+        ["0"] = { Color = Color3.fromHex"#e6bafb", Transparency = 0.1 },
+        ["50"] = { Color = Color3.fromHex"#a1a9e1", Transparency = 0.2 },
+        ["100"] = { Color = Color3.fromHex"#8ac9f2", Transparency = 0.3 },
+    }, { Rotation = 0 }),
+
+    Icon = Color3.fromHex"#E6E6FA",
+
+    Outline = Color3.fromHex"#a1a9e1",
+    Toggle = Color3.fromHex"#e6bafb",
+    Slider = Color3.fromHex"#a1a9e1",
+    SliderIcon = Color3.fromHex"#8ac9f2",
+    Checkbox = Color3.fromHex"#8ac9f2",
+    Primary = Color3.fromHex"#a1a9e1",
+
+    PanelBackground = Color3.fromHex"#e6bafb",
+    PanelBackgroundTransparency = 0.95,
+
+    LabelBackground = Color3.fromHex"#000000",
+    LabelBackgroundTransparency = 0.83,
+
+    ElementBackground = Color3.fromHex"#252033",
+    ElementBackgroundTransparency = 0,
 },
 }
 end end function a.w()
