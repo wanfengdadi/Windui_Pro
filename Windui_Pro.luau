@@ -12283,19 +12283,13 @@ end
 
 function ao.SelectTab(ap,aq)
 if not ao.Tabs[aq].Locked then
-local prevTab=ao.SelectedTab
-if prevTab==aq and ao.TabHighlight then
-return
-end
-
-local isUp=prevTab and(aq<prevTab)
-local isDown=prevTab and(aq>prevTab)
 ao.SelectedTab=aq
 
 for ar,as in next,ao.Tabs do
 if not as.Locked then
-as.UIElements.Main.ZIndex=2
-as.UIElements.Main.ImageTransparency=1
+ak.SetThemeTag(as.UIElements.Main,{
+ImageTransparency="TabBorderTransparency",
+},0.15)
 if as.Border then
 ak.SetThemeTag(as.UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparency",
@@ -12318,98 +12312,41 @@ end)
 as.Selected=false
 end
 end
-
-local curTab=ao.Tabs[aq]
-local curMain=curTab.UIElements.Main
-curMain.ZIndex=2
-curMain.ImageTransparency=1
-
-if curTab.Border then
-ak.SetThemeTag(curMain.Outline,{
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
+ImageColor3="TabBackgroundActive",
+ImageTransparency="TabBackgroundActiveTransparency",
+},0.15)
+if ao.Tabs[aq].Border then
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
 },0.15)
 end
-ak.SetThemeTag(curMain.Frame.TextLabel,{
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Frame.TextLabel,{
 TextTransparency="TabTextTransparencyActive",
 },0.15)
-if curTab.UIElements.Icon and not curTab.IconColor then
-ak.SetThemeTag(curTab.UIElements.Icon.ImageLabel,{
+if ao.Tabs[aq].UIElements.Icon and not ao.Tabs[aq].IconColor then
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparencyActive",
 },0.15)
 end
 pcall(function()
-local activePad=curMain.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
+local activePad=ao.Tabs[aq].UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if activePad then
 ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
-curTab.Selected=true
-
-local sBar=Window and Window.UIElements and Window.UIElements.SideBar
-if sBar then
-local scale=WindUI and WindUI.UIScale or 1
-local targetW=curMain.AbsoluteSize.X>0 and(curMain.AbsoluteSize.X/scale)or(sBar.AbsoluteSize.X/scale-14)
-local targetH=curMain.AbsoluteSize.Y>0 and(curMain.AbsoluteSize.Y/scale)or 36
-local targetX=(curMain.AbsolutePosition.X-sBar.AbsolutePosition.X)/scale
-local targetY=(curMain.AbsolutePosition.Y-sBar.AbsolutePosition.Y+sBar.CanvasPosition.Y)/scale
-
-if not ao.TabHighlight then
-local hFrame,hMod=ak.NewRoundFrame(curTab.UICorner,"Squircle",{
-Size=UDim2.new(0,targetW,0,targetH),
-Position=UDim2.new(0,targetX,0,targetY),
-ThemeTag={
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},
-ZIndex=1,
-Active=false,
-Visible=true,
-Parent=sBar,
-})
-ao.TabHighlight=hFrame
-ao.TabHighlightMod=hMod
-if hMod and hMod.SetRadius then
-hMod:SetRadius(curTab.UICorner)
-end
-else
-if ao.TabHighlightTween then
-ao.TabHighlightTween:Cancel()
-ao.TabHighlightTween=nil
-end
-if ao.TabHighlightMod and ao.TabHighlightMod.SetRadius then
-ao.TabHighlightMod:SetRadius(curTab.UICorner)
-end
-ao.TabHighlight.Visible=true
-local tw=ak.Tween(ao.TabHighlight,0.24,{
-Position=UDim2.new(0,targetX,0,targetY),
-Size=UDim2.new(0,targetW,0,targetH),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
-ao.TabHighlightTween=tw
-tw:Play()
-end
-end
+ao.Tabs[aq].Selected=true
 
 task.spawn(function()
-local targetContainer=ao.Containers[aq]
-local startAnchorY=0.03
-if isUp then
-startAnchorY=-0.04
-elseif isDown then
-startAnchorY=0.04
-end
-
 for ar,as in next,ao.Containers do
-if as~=targetContainer then
+as.AnchorPoint=Vector2.new(0,0.05)
 as.Visible=false
 end
-end
-
-targetContainer.Visible=true
-targetContainer.AnchorPoint=Vector2.new(0,startAnchorY)
-
+ao.Containers[aq].Visible=true
 local ar=game:GetService"TweenService"
-local as=TweenInfo.new(0.24,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
-local at=ar:Create(targetContainer,as,{
+
+local as=TweenInfo.new(0.15,Enum.EasingStyle.Quart,Enum.EasingDirection.Out)
+local at=ar:Create(ao.Containers[aq],as,{
 AnchorPoint=Vector2.new(0,0),
 })
 at:Play()
