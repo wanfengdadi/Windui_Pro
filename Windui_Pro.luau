@@ -13440,7 +13440,7 @@ local bottomFadeCorner=ao("UICorner",{
 
 local bottomFade=ao("Frame",{
     Name="BottomFade",
-    Size=UDim2.new(1,-aw.UIPadding/2,0,50),
+    Size=UDim2.new(1,0,0,50),
     Position=UDim2.new(1,0,1,0),
     AnchorPoint=Vector2.new(1,1),
     BackgroundColor3=Color3.fromRGB(0,0,0),
