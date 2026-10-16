@@ -12283,6 +12283,9 @@ end
 
 function ao.SelectTab(ap,aq)
 if not ao.Tabs[aq].Locked then
+local prevTab=ao.SelectedTab
+local isUp=prevTab and(aq<prevTab)
+local isDown=prevTab and(aq>prevTab)
 ao.SelectedTab=aq
 
 for ar,as in next,ao.Tabs do
@@ -12312,41 +12315,71 @@ end)
 as.Selected=false
 end
 end
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
+
+local curTab=ao.Tabs[aq]
+local curMain=curTab.UIElements.Main
+local bgScale=curMain:FindFirstChild"TabScale"
+if not bgScale then
+bgScale=Instance.new"UIScale"
+bgScale.Name="TabScale"
+bgScale.Parent=curMain
+end
+bgScale.Scale=0.94
+ak.Tween(bgScale,0.26,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+
+local curFrame=curMain:FindFirstChild"Frame"
+if curFrame then
+local startY=isUp and 4 or(isDown and-4 or 0)
+curFrame.Position=UDim2.new(0,0,0,startY)
+ak.Tween(curFrame,0.25,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+
+ak.SetThemeTag(curMain,{
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
 },0.15)
-if ao.Tabs[aq].Border then
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
+if curTab.Border then
+ak.SetThemeTag(curMain.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
 },0.15)
 end
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Frame.TextLabel,{
+ak.SetThemeTag(curMain.Frame.TextLabel,{
 TextTransparency="TabTextTransparencyActive",
 },0.15)
-if ao.Tabs[aq].UIElements.Icon and not ao.Tabs[aq].IconColor then
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Icon.ImageLabel,{
+if curTab.UIElements.Icon and not curTab.IconColor then
+ak.SetThemeTag(curTab.UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparencyActive",
 },0.15)
 end
 pcall(function()
-local activePad=ao.Tabs[aq].UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
+local activePad=curMain.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if activePad then
 ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
-ao.Tabs[aq].Selected=true
+curTab.Selected=true
 
 task.spawn(function()
+local targetContainer=ao.Containers[aq]
+local startAnchorY=0.04
+if isUp then
+startAnchorY=-0.05
+elseif isDown then
+startAnchorY=0.05
+end
+
 for ar,as in next,ao.Containers do
-as.AnchorPoint=Vector2.new(0,0.05)
+if as~=targetContainer then
 as.Visible=false
 end
-ao.Containers[aq].Visible=true
-local ar=game:GetService"TweenService"
+end
 
-local as=TweenInfo.new(0.15,Enum.EasingStyle.Quart,Enum.EasingDirection.Out)
-local at=ar:Create(ao.Containers[aq],as,{
+targetContainer.Visible=true
+targetContainer.AnchorPoint=Vector2.new(0,startAnchorY)
+
+local ar=game:GetService"TweenService"
+local as=TweenInfo.new(0.25,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
+local at=ar:Create(targetContainer,as,{
 AnchorPoint=Vector2.new(0,0),
 })
 at:Play()
