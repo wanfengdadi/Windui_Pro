@@ -15941,247 +15941,146 @@ end
 return h
 end
 
-function aa:OverlaysUi(Info)
-    Info = Info or {}
-    local Title = Info.Title or "Overlay"
-    local Description = Info.Description or ""
-    local Icon = Info.Icon
-    local OutsideClickDismiss = if Info.OutsideClickDismiss ~= nil then Info.OutsideClickDismiss else true
+function aa:AddDraggableLabel(...)
+    local Params = select(1, ...)
+    local Text = ""
+    local Icon
+    local IconPosition = "left"
 
-    local TweenService = game:GetService("TweenService")
-    local DefaultTween = TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-    local TargetParent = self.ScreenGui or (self.Window and self.Window.UIElements and self.Window.UIElements.Main)
-
-    local function New(className, properties)
-        local inst = Instance.new(className)
-        for prop, val in pairs(properties or {}) do
-            if prop == "BackgroundColor3" or prop == "TextColor3" or prop == "ImageColor3" then
-                if typeof(val) == "string" then
-                    if val == "DarkColor" then val = Color3.fromRGB(0, 0, 0)
-                    elseif val == "BackgroundColor" then val = Color3.fromRGB(24, 24, 27)
-                    elseif val == "AccentColor" then val = Color3.fromRGB(0, 145, 255)
-                    elseif val == "MainColor" then val = Color3.fromRGB(39, 39, 42)
-                    elseif val == "FontColor" then val = Color3.fromRGB(240, 240, 240)
-                    else val = Color3.fromRGB(255, 255, 255) end
-                end
-            end
-            pcall(function() inst[prop] = val end)
-        end
-        return inst
+    if typeof(Params) == "table" then
+        Text = Params.Text or ""
+        Icon = Params.Icon
+        IconPosition = Params.IconPosition or "left"
+    elseif typeof(Params) == "string" then
+        Text = Params
+        Icon = select(2, ...)
+        IconPosition = select(3, ...) or "left"
     end
 
-    local OverlayMask = New("TextButton", {
-        Name = "OverlayMask",
-        AutoButtonColor = false,
-        BackgroundColor3 = "DarkColor",
-        BackgroundTransparency = 1,
-        Size = UDim2.fromScale(1, 1),
-        Text = "",
-        Active = true,
-        ZIndex = 9000,
-        Parent = TargetParent,
-    })
-
-    TweenService:Create(OverlayMask, DefaultTween, {
-        BackgroundTransparency = 0.55,
-    }):Play()
-
-    local Card = New("TextButton", {
-        Name = "OverlayCard",
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = "BackgroundColor",
-        Position = UDim2.fromScale(0.5, 0.5),
-        Size = UDim2.fromOffset(400, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        Text = "",
-        AutoButtonColor = false,
-        ZIndex = 9001,
-        Parent = OverlayMask,
-    })
-
-    New("UICorner", {
-        CornerRadius = UDim.new(0, 12),
-        Parent = Card,
-    })
-    New("UIStroke", {
-        Color = Color3.fromRGB(60, 60, 65),
-        Thickness = 1,
-        Transparency = 0.5,
-        Parent = Card,
-    })
-
-    local CardScale = New("UIScale", {
-        Scale = 0.94,
-        Parent = Card,
-    })
-    TweenService:Create(CardScale, DefaultTween, {
-        Scale = 1,
-    }):Play()
-
-    New("UIPadding", {
-        PaddingTop = UDim.new(0, 14),
-        PaddingBottom = UDim.new(0, 14),
-        PaddingLeft = UDim.new(0, 16),
-        PaddingRight = UDim.new(0, 16),
-        Parent = Card,
-    })
-
-    New("UIListLayout", {
-        Padding = UDim.new(0, 10),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Parent = Card,
-    })
-
-    local Header = New("Frame", {
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 22),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        LayoutOrder = 1,
-        Parent = Card,
-    })
-
-    New("UIListLayout", {
-        FillDirection = Enum.FillDirection.Horizontal,
-        VerticalAlignment = Enum.VerticalAlignment.Center,
-        Padding = UDim.new(0, 8),
-        Parent = Header,
-    })
-
-    New("TextLabel", {
-        BackgroundTransparency = 1,
-        AutomaticSize = Enum.AutomaticSize.XY,
-        Text = Title,
-        TextSize = 16,
-        TextColor3 = Color3.fromRGB(255, 255, 255),
-        FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.SemiBold),
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Parent = Header,
-    })
-
-    if Description and Description ~= "" then
-        New("TextLabel", {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Text = Description,
-            TextSize = 13,
-            TextTransparency = 0.4,
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextWrapped = true,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            LayoutOrder = 2,
-            Parent = Card,
-        })
+    if typeof(IconPosition) ~= "string" then
+        IconPosition = "left"
     end
+    IconPosition = string.lower(IconPosition)
 
-    New("Frame", {
-        BackgroundColor3 = Color3.fromRGB(60, 60, 65),
-        BackgroundTransparency = 0.6,
-        BorderSizePixel = 0,
-        LayoutOrder = 3,
-        Size = UDim2.new(1, 0, 0, 1),
-        Parent = Card,
-    })
-
-    local ContentHolder = New("Frame", {
-        Name = "Content",
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        LayoutOrder = 4,
-        Parent = Card,
-    })
-
-    New("UIListLayout", {
-        Padding = UDim.new(0, 8),
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Parent = ContentHolder,
-    })
-
-    local ButtonsHolder = New("Frame", {
-        Name = "FooterButtons",
-        BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 26),
-        LayoutOrder = 5,
-        Parent = Card,
-    })
-
-    New("UIListLayout", {
-        FillDirection = Enum.FillDirection.Horizontal,
-        HorizontalAlignment = Enum.HorizontalAlignment.Right,
-        Padding = UDim.new(0, 8),
-        Parent = ButtonsHolder,
-    })
-
-    local OverlayUI = {
+    local DraggableLabel = {
+        Connections = {},
         Destroyed = false,
-        Elements = {},
-        DependencyBoxes = {},
-        Container = ContentHolder,
     }
 
-    function OverlayUI:Resize() end
+    local TargetParent = self.ScreenGui or game:GetService("CoreGui"):FindFirstChild("WindUI") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 
-    function OverlayUI:Close()
-        if OverlayUI.Destroyed then return end
-        OverlayUI.Destroyed = true
+    local Label = Instance.new("TextLabel")
+    Label.Name = "WindUI_DraggableLabel"
+    Label.AutomaticSize = Enum.AutomaticSize.XY
+    Label.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+    Label.BackgroundTransparency = 0.15
+    Label.Size = UDim2.fromOffset(0, 0)
+    Label.Position = UDim2.fromOffset(50, 50)
+    Label.Text = Text
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.TextSize = 14
+    Label.FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium)
+    Label.ZIndex = 9999
+    Label.Active = true
+    Label.Parent = TargetParent
 
-        TweenService:Create(OverlayMask, DefaultTween, { BackgroundTransparency = 1 }):Play()
-        local Tween = TweenService:Create(CardScale, DefaultTween, { Scale = 0.94 })
-        Tween:Play()
-        Tween.Completed:Once(function()
-            OverlayMask:Destroy()
-        end)
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Label
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(60, 60, 65)
+    Stroke.Thickness = 1
+    Stroke.Transparency = 0.5
+    Stroke.Parent = Label
+
+    local Padding = Instance.new("UIPadding")
+    Padding.PaddingTop = UDim.new(0, 6)
+    Padding.PaddingBottom = UDim.new(0, 6)
+    Padding.PaddingLeft = UDim.new(0, 12)
+    Padding.PaddingRight = UDim.new(0, 12)
+    Padding.Parent = Label
+
+    local IconImage = nil
+
+    local DragController = self.Creator.Drag(Label, { Label })
+
+    function DraggableLabel:SetText(NewText)
+        Label.Text = tostring(NewText or "")
     end
-    OverlayUI.Dismiss = OverlayUI.Close
 
-    function OverlayUI:AddFooterButton(Id, BtnInfo)
-        BtnInfo = BtnInfo or {}
-        local Variant = BtnInfo.Variant or "Secondary"
+    function DraggableLabel:SetIcon(NewIcon)
+        Icon = NewIcon
+        local hasIcon = Icon and tostring(Icon):gsub("%s+", "") ~= ""
 
-        local TextBtn = New("TextButton", {
-            Name = Id,
-            BackgroundColor3 = Variant == "Primary" and "AccentColor" or "MainColor",
-            Size = UDim2.fromOffset(0, 26),
-            AutomaticSize = Enum.AutomaticSize.X,
-            Text = BtnInfo.Title or Id,
-            TextColor3 = Variant == "Primary" and Color3.new(1, 1, 1) or "FontColor",
-            TextSize = 13,
-            FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium),
-            Parent = ButtonsHolder,
-        })
-        New("UICorner", {
-            CornerRadius = UDim.new(0, 6),
-            Parent = TextBtn,
-        })
-        New("UIPadding", {
-            PaddingLeft = UDim.new(0, 12),
-            PaddingRight = UDim.new(0, 12),
-            Parent = TextBtn,
-        })
-        if Variant ~= "Primary" then
-            New("UIStroke", {
-                Color = Color3.fromRGB(60, 60, 65),
-                Thickness = 1,
-                Transparency = 0.5,
-                Parent = TextBtn,
-            })
+        if hasIcon then
+            if not IconImage then
+                IconImage = Instance.new("ImageLabel")
+                IconImage.BackgroundTransparency = 1
+                IconImage.Size = UDim2.fromOffset(16, 16)
+                IconImage.ZIndex = Label.ZIndex + 1
+                IconImage.Parent = Label
+            end
+
+            local iconData = self.Creator.Icon(Icon)
+            if iconData then
+                IconImage.Image = iconData[1]
+                if iconData[2] then
+                    IconImage.ImageRectSize = iconData[2].ImageRectSize
+                    IconImage.ImageRectOffset = iconData[2].ImageRectPosition
+                end
+            elseif string.find(tostring(Icon), "rbxassetid://") then
+                IconImage.Image = Icon
+            end
+            IconImage.Visible = true
+        else
+            if IconImage then
+                IconImage.Visible = false
+            end
         end
 
-        TextBtn.MouseButton1Click:Connect(function()
-            if BtnInfo.Callback then
-                BtnInfo.Callback(OverlayUI)
+        DraggableLabel:SetIconPosition(IconPosition)
+    end
+
+    function DraggableLabel:SetIconPosition(NewPosition)
+        IconPosition = string.lower(tostring(NewPosition or "left"))
+        local hasIcon = Icon and tostring(Icon):gsub("%s+", "") ~= ""
+
+        Padding.PaddingLeft = UDim.new(0, (hasIcon and IconPosition == "left") and 32 or 12)
+        Padding.PaddingRight = UDim.new(0, (hasIcon and IconPosition == "right") and 32 or 12)
+
+        if IconImage then
+            if IconPosition == "left" then
+                IconImage.AnchorPoint = Vector2.new(0, 0.5)
+                IconImage.Position = UDim2.new(0, -22, 0.5, 0)
+            else
+                IconImage.AnchorPoint = Vector2.new(1, 0.5)
+                IconImage.Position = UDim2.new(1, 22, 0.5, 0)
             end
-        end)
+        end
     end
 
-    if OutsideClickDismiss then
-        OverlayMask.MouseButton1Click:Connect(function()
-            OverlayUI:Close()
-        end)
+    function DraggableLabel:SetVisible(Visible)
+        Label.Visible = Visible
     end
 
-    return OverlayUI
+    function DraggableLabel:Destroy()
+        if DraggableLabel.Destroyed then return end
+        DraggableLabel.Destroyed = true
+
+        if DragController and DragController.Set then
+            DragController:Set(false)
+        end
+
+        if Label then
+            Label:Destroy()
+        end
+    end
+
+    DraggableLabel:SetIcon(Icon)
+    DraggableLabel.Label = Label
+
+    return DraggableLabel
 end
 
 return aa 
