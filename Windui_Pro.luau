@@ -15941,146 +15941,178 @@ end
 return h
 end
 
-function aa:AddDraggableLabel(...)
-    local Params = select(1, ...)
-    local Text = ""
-    local Icon
-    local IconPosition = "left"
+local Players = game:GetService("Players")
+local Stats = game:GetService("Stats")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
 
-    if typeof(Params) == "table" then
-        Text = Params.Text or ""
-        Icon = Params.Icon
-        IconPosition = Params.IconPosition or "left"
-    elseif typeof(Params) == "string" then
-        Text = Params
-        Icon = select(2, ...)
-        IconPosition = select(3, ...) or "left"
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local WindUI = getgenv().WindUI or {}
+
+function WindUI:OverlaysUi(Info)
+    Info = Info or {}
+    local Title = Info.Title or "WindUI"
+    local AutoPing = if Info.AutoPing ~= nil then Info.AutoPing else true
+    local PingPrefix = Info.PingPrefix or "延迟: "
+    local PingSuffix = Info.PingSuffix or "ms"
+    local PingFormat = Info.Format or Info.PingFormat
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "WindUI_WatermarkOverlay"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.DisplayOrder = 999
+    
+    local parentSuccess = pcall(function()
+        ScreenGui.Parent = (gethui and gethui()) or CoreGui
+    end)
+    if not parentSuccess or not ScreenGui.Parent then
+        ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
     end
 
-    if typeof(IconPosition) ~= "string" then
-        IconPosition = "left"
-    end
-    IconPosition = string.lower(IconPosition)
-
-    local DraggableLabel = {
-        Connections = {},
-        Destroyed = false,
-    }
-
-    local TargetParent = self.ScreenGui or game:GetService("CoreGui"):FindFirstChild("WindUI") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-
-    local Label = Instance.new("TextLabel")
-    Label.Name = "WindUI_DraggableLabel"
-    Label.AutomaticSize = Enum.AutomaticSize.XY
-    Label.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
-    Label.BackgroundTransparency = 0.15
-    Label.Size = UDim2.fromOffset(0, 0)
-    Label.Position = UDim2.fromOffset(50, 50)
-    Label.Text = Text
-    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.TextSize = 14
-    Label.FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium)
-    Label.ZIndex = 9999
-    Label.Active = true
-    Label.Parent = TargetParent
+    local Pill = Instance.new("TextButton")
+    Pill.Name = "WatermarkPill"
+    Pill.AutomaticSize = Enum.AutomaticSize.XY
+    Pill.BackgroundColor3 = Color3.fromRGB(20, 20, 22)
+    Pill.BackgroundTransparency = 0.2
+    Pill.Position = UDim2.fromOffset(20, 20)
+    Pill.Size = UDim2.fromOffset(0, 0)
+    Pill.Text = ""
+    Pill.AutoButtonColor = false
+    Pill.Active = true
+    Pill.Parent = ScreenGui
 
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 8)
-    Corner.Parent = Label
+    Corner.CornerRadius = UDim.new(1, 0)
+    Corner.Parent = Pill
 
     local Stroke = Instance.new("UIStroke")
-    Stroke.Color = Color3.fromRGB(60, 60, 65)
-    Stroke.Thickness = 1
+    Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    Stroke.Color = Color3.fromRGB(75, 75, 82)
     Stroke.Transparency = 0.5
-    Stroke.Parent = Label
+    Stroke.Thickness = 1
+    Stroke.Parent = Pill
 
     local Padding = Instance.new("UIPadding")
     Padding.PaddingTop = UDim.new(0, 6)
     Padding.PaddingBottom = UDim.new(0, 6)
-    Padding.PaddingLeft = UDim.new(0, 12)
-    Padding.PaddingRight = UDim.new(0, 12)
-    Padding.Parent = Label
+    Padding.PaddingLeft = UDim.new(0, 14)
+    Padding.PaddingRight = UDim.new(0, 14)
+    Padding.Parent = Pill
 
-    local IconImage = nil
+    local Label = Instance.new("TextLabel")
+    Label.Name = "Content"
+    Label.BackgroundTransparency = 1
+    Label.AutomaticSize = Enum.AutomaticSize.XY
+    Label.Size = UDim2.fromOffset(0, 0)
+    Label.Font = Enum.Font.GothamMedium
+    Label.TextSize = 13
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.Text = Title .. " | " .. PingPrefix .. "0" .. PingSuffix
+    Label.Parent = Pill
 
-    local DragController = self.Creator.Drag(Label, { Label })
+    local Dragging = false
+    local DragStart, StartPos
 
-    function DraggableLabel:SetText(NewText)
-        Label.Text = tostring(NewText or "")
+    Pill.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = input.Position
+            StartPos = Pill.Position
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if Dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - DragStart
+            Pill.Position = UDim2.new(
+                StartPos.X.Scale,
+                StartPos.X.Offset + delta.X,
+                StartPos.Y.Scale,
+                StartPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    local OverlayObj = {
+        Pill = Pill,
+        Label = Label,
+        ScreenGui = ScreenGui,
+        Destroyed = false,
+    }
+
+    local function getRenderedText(currentPing)
+        if typeof(PingFormat) == "function" then
+            return PingFormat(currentPing, Title)
+        elseif typeof(PingFormat) == "string" then
+            local ok, res = pcall(string.format, PingFormat, Title, currentPing)
+            if ok then
+                return res
+            end
+            return PingFormat:gsub("{title}", Title):gsub("{ping}", tostring(currentPing))
+        end
+        return string.format("%s | %s%d%s", Title, PingPrefix, currentPing, PingSuffix)
     end
 
-    function DraggableLabel:SetIcon(NewIcon)
-        Icon = NewIcon
-        local hasIcon = Icon and tostring(Icon):gsub("%s+", "") ~= ""
+    function OverlayObj:SetText(newText)
+        Label.Text = newText
+    end
 
-        if hasIcon then
-            if not IconImage then
-                IconImage = Instance.new("ImageLabel")
-                IconImage.BackgroundTransparency = 1
-                IconImage.Size = UDim2.fromOffset(16, 16)
-                IconImage.ZIndex = Label.ZIndex + 1
-                IconImage.Parent = Label
-            end
+    function OverlayObj:SetTitle(newTitle)
+        Title = newTitle
+    end
 
-            local iconData = self.Creator.Icon(Icon)
-            if iconData then
-                IconImage.Image = iconData[1]
-                if iconData[2] then
-                    IconImage.ImageRectSize = iconData[2].ImageRectSize
-                    IconImage.ImageRectOffset = iconData[2].ImageRectPosition
+    function OverlayObj:SetFormat(newFormat)
+        PingFormat = newFormat
+    end
+
+    function OverlayObj:SetPingPrefix(prefix)
+        PingPrefix = prefix
+    end
+
+    function OverlayObj:SetPingSuffix(suffix)
+        PingSuffix = suffix
+    end
+
+    function OverlayObj:SetVisible(visible)
+        Pill.Visible = visible
+    end
+
+    function OverlayObj:Destroy()
+        if OverlayObj.Destroyed then return end
+        OverlayObj.Destroyed = true
+        ScreenGui:Destroy()
+    end
+
+    if AutoPing then
+        task.spawn(function()
+            while not OverlayObj.Destroyed do
+                local ping = 0
+                pcall(function()
+                    if LocalPlayer and LocalPlayer.GetNetworkPing then
+                        ping = math.round(LocalPlayer:GetNetworkPing() * 1000)
+                    end
+                end)
+                if ping <= 0 then
+                    pcall(function()
+                        ping = math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())
+                    end)
                 end
-            elseif string.find(tostring(Icon), "rbxassetid://") then
-                IconImage.Image = Icon
+                Label.Text = getRenderedText(ping)
+                task.wait(0.5)
             end
-            IconImage.Visible = true
-        else
-            if IconImage then
-                IconImage.Visible = false
-            end
-        end
-
-        DraggableLabel:SetIconPosition(IconPosition)
+        end)
     end
 
-    function DraggableLabel:SetIconPosition(NewPosition)
-        IconPosition = string.lower(tostring(NewPosition or "left"))
-        local hasIcon = Icon and tostring(Icon):gsub("%s+", "") ~= ""
-
-        Padding.PaddingLeft = UDim.new(0, (hasIcon and IconPosition == "left") and 32 or 12)
-        Padding.PaddingRight = UDim.new(0, (hasIcon and IconPosition == "right") and 32 or 12)
-
-        if IconImage then
-            if IconPosition == "left" then
-                IconImage.AnchorPoint = Vector2.new(0, 0.5)
-                IconImage.Position = UDim2.new(0, -22, 0.5, 0)
-            else
-                IconImage.AnchorPoint = Vector2.new(1, 0.5)
-                IconImage.Position = UDim2.new(1, 22, 0.5, 0)
-            end
-        end
-    end
-
-    function DraggableLabel:SetVisible(Visible)
-        Label.Visible = Visible
-    end
-
-    function DraggableLabel:Destroy()
-        if DraggableLabel.Destroyed then return end
-        DraggableLabel.Destroyed = true
-
-        if DragController and DragController.Set then
-            DragController:Set(false)
-        end
-
-        if Label then
-            Label:Destroy()
-        end
-    end
-
-    DraggableLabel:SetIcon(Icon)
-    DraggableLabel.Label = Label
-
-    return DraggableLabel
+    return OverlayObj
 end
+
+getgenv().WindUI = WindUI
+return WindUI
 
 return aa 
