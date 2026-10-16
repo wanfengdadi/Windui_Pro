@@ -15941,4 +15941,247 @@ end
 return h
 end
 
+function aa:OverlaysUi(Info)
+    Info = Info or {}
+    local Title = Info.Title or "Overlay"
+    local Description = Info.Description or ""
+    local Icon = Info.Icon
+    local OutsideClickDismiss = if Info.OutsideClickDismiss ~= nil then Info.OutsideClickDismiss else true
+
+    local TweenService = game:GetService("TweenService")
+    local DefaultTween = TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    local TargetParent = self.ScreenGui or (self.Window and self.Window.UIElements and self.Window.UIElements.Main)
+
+    local function New(className, properties)
+        local inst = Instance.new(className)
+        for prop, val in pairs(properties or {}) do
+            if prop == "BackgroundColor3" or prop == "TextColor3" or prop == "ImageColor3" then
+                if typeof(val) == "string" then
+                    if val == "DarkColor" then val = Color3.fromRGB(0, 0, 0)
+                    elseif val == "BackgroundColor" then val = Color3.fromRGB(24, 24, 27)
+                    elseif val == "AccentColor" then val = Color3.fromRGB(0, 145, 255)
+                    elseif val == "MainColor" then val = Color3.fromRGB(39, 39, 42)
+                    elseif val == "FontColor" then val = Color3.fromRGB(240, 240, 240)
+                    else val = Color3.fromRGB(255, 255, 255) end
+                end
+            end
+            pcall(function() inst[prop] = val end)
+        end
+        return inst
+    end
+
+    local OverlayMask = New("TextButton", {
+        Name = "OverlayMask",
+        AutoButtonColor = false,
+        BackgroundColor3 = "DarkColor",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        Text = "",
+        Active = true,
+        ZIndex = 9000,
+        Parent = TargetParent,
+    })
+
+    TweenService:Create(OverlayMask, DefaultTween, {
+        BackgroundTransparency = 0.55,
+    }):Play()
+
+    local Card = New("TextButton", {
+        Name = "OverlayCard",
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = "BackgroundColor",
+        Position = UDim2.fromScale(0.5, 0.5),
+        Size = UDim2.fromOffset(400, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Text = "",
+        AutoButtonColor = false,
+        ZIndex = 9001,
+        Parent = OverlayMask,
+    })
+
+    New("UICorner", {
+        CornerRadius = UDim.new(0, 12),
+        Parent = Card,
+    })
+    New("UIStroke", {
+        Color = Color3.fromRGB(60, 60, 65),
+        Thickness = 1,
+        Transparency = 0.5,
+        Parent = Card,
+    })
+
+    local CardScale = New("UIScale", {
+        Scale = 0.94,
+        Parent = Card,
+    })
+    TweenService:Create(CardScale, DefaultTween, {
+        Scale = 1,
+    }):Play()
+
+    New("UIPadding", {
+        PaddingTop = UDim.new(0, 14),
+        PaddingBottom = UDim.new(0, 14),
+        PaddingLeft = UDim.new(0, 16),
+        PaddingRight = UDim.new(0, 16),
+        Parent = Card,
+    })
+
+    New("UIListLayout", {
+        Padding = UDim.new(0, 10),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = Card,
+    })
+
+    local Header = New("Frame", {
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 22),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        LayoutOrder = 1,
+        Parent = Card,
+    })
+
+    New("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        VerticalAlignment = Enum.VerticalAlignment.Center,
+        Padding = UDim.new(0, 8),
+        Parent = Header,
+    })
+
+    New("TextLabel", {
+        BackgroundTransparency = 1,
+        AutomaticSize = Enum.AutomaticSize.XY,
+        Text = Title,
+        TextSize = 16,
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.SemiBold),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        Parent = Header,
+    })
+
+    if Description and Description ~= "" then
+        New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            Text = Description,
+            TextSize = 13,
+            TextTransparency = 0.4,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextWrapped = true,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            LayoutOrder = 2,
+            Parent = Card,
+        })
+    end
+
+    New("Frame", {
+        BackgroundColor3 = Color3.fromRGB(60, 60, 65),
+        BackgroundTransparency = 0.6,
+        BorderSizePixel = 0,
+        LayoutOrder = 3,
+        Size = UDim2.new(1, 0, 0, 1),
+        Parent = Card,
+    })
+
+    local ContentHolder = New("Frame", {
+        Name = "Content",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        LayoutOrder = 4,
+        Parent = Card,
+    })
+
+    New("UIListLayout", {
+        Padding = UDim.new(0, 8),
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Parent = ContentHolder,
+    })
+
+    local ButtonsHolder = New("Frame", {
+        Name = "FooterButtons",
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 26),
+        LayoutOrder = 5,
+        Parent = Card,
+    })
+
+    New("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        HorizontalAlignment = Enum.HorizontalAlignment.Right,
+        Padding = UDim.new(0, 8),
+        Parent = ButtonsHolder,
+    })
+
+    local OverlayUI = {
+        Destroyed = false,
+        Elements = {},
+        DependencyBoxes = {},
+        Container = ContentHolder,
+    }
+
+    function OverlayUI:Resize() end
+
+    function OverlayUI:Close()
+        if OverlayUI.Destroyed then return end
+        OverlayUI.Destroyed = true
+
+        TweenService:Create(OverlayMask, DefaultTween, { BackgroundTransparency = 1 }):Play()
+        local Tween = TweenService:Create(CardScale, DefaultTween, { Scale = 0.94 })
+        Tween:Play()
+        Tween.Completed:Once(function()
+            OverlayMask:Destroy()
+        end)
+    end
+    OverlayUI.Dismiss = OverlayUI.Close
+
+    function OverlayUI:AddFooterButton(Id, BtnInfo)
+        BtnInfo = BtnInfo or {}
+        local Variant = BtnInfo.Variant or "Secondary"
+
+        local TextBtn = New("TextButton", {
+            Name = Id,
+            BackgroundColor3 = Variant == "Primary" and "AccentColor" or "MainColor",
+            Size = UDim2.fromOffset(0, 26),
+            AutomaticSize = Enum.AutomaticSize.X,
+            Text = BtnInfo.Title or Id,
+            TextColor3 = Variant == "Primary" and Color3.new(1, 1, 1) or "FontColor",
+            TextSize = 13,
+            FontFace = Font.new("rbxassetid://12187365364", Enum.FontWeight.Medium),
+            Parent = ButtonsHolder,
+        })
+        New("UICorner", {
+            CornerRadius = UDim.new(0, 6),
+            Parent = TextBtn,
+        })
+        New("UIPadding", {
+            PaddingLeft = UDim.new(0, 12),
+            PaddingRight = UDim.new(0, 12),
+            Parent = TextBtn,
+        })
+        if Variant ~= "Primary" then
+            New("UIStroke", {
+                Color = Color3.fromRGB(60, 60, 65),
+                Thickness = 1,
+                Transparency = 0.5,
+                Parent = TextBtn,
+            })
+        end
+
+        TextBtn.MouseButton1Click:Connect(function()
+            if BtnInfo.Callback then
+                BtnInfo.Callback(OverlayUI)
+            end
+        end)
+    end
+
+    if OutsideClickDismiss then
+        OverlayMask.MouseButton1Click:Connect(function()
+            OverlayUI:Close()
+        end)
+    end
+
+    return OverlayUI
+end
+
 return aa 
