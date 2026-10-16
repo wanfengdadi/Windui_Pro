@@ -8349,22 +8349,69 @@ ind.Position=UDim2.new(0,0,0,tY)
 end
 end)
 
-ap.UIElements.MenuCanvas=al("Frame",{
-Size=UDim2.new(0,ap.MenuWidth,0,300),
-BackgroundTransparency=1,
-Position=UDim2.new(-10,0,-10,0),
-Visible=false,
-Active=false,
+function as.Open(au)
+if not ap.Locked then
+ap.UIElements.Menu.Visible=true
+ap.UIElements.MenuCanvas.Visible=true
+ap.UIElements.MenuCanvas.Active=true
+ap.UIElements.Menu.Size=UDim2.new(1,0,0,0)
+am(ap.UIElements.Menu,0.1,{
+Size=UDim2.new(1,0,1,0),
+ImageTransparency=0,
+},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
 
-Parent=ao.WindUI.DropdownGui,
-AnchorPoint=Vector2.new(1,0),
-},{
-ap.UIElements.Menu,
-al("UISizeConstraint",{
-MinSize=Vector2.new(170,0),
-MaxSize=Vector2.new(300,400),
-}),
-})
+task.spawn(function()
+task.wait(0.12)
+if ap.Locked then
+return
+end
+ap.Opened=true
+
+local ind=ap.UIElements.Indicator
+local mf=ap.UIElements.Menu.Frame
+if ind and mf and not ap.Multi then
+local cur=ap.CurrentSelectedTab
+if cur and cur.UIElements and cur.UIElements.TabItem then
+local targetY=cur.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
+local targetH=cur.UIElements.TabItem.AbsoluteSize.Y
+if targetH>0 then
+ind.Position=UDim2.new(0,0,0,targetY)
+ind.Size=UDim2.new(1,0,0,targetH)
+ind.Visible=true
+am(ind,0.15,{ImageTransparency=an}):Play()
+end
+end
+end
+end)
+
+UpdatePosition()
+end
+end
+
+function as.Close(au)
+ap.Opened=false
+
+if ap.UIElements.Indicator then
+ap.UIElements.Indicator.Visible=false
+ap.UIElements.Indicator.ImageTransparency=1
+end
+
+am(ap.UIElements.Menu,0.25,{
+Size=UDim2.new(1,0,0,0),
+ImageTransparency=1,
+},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
+
+task.spawn(function()
+task.wait(0.1)
+ap.UIElements.Menu.Visible=false
+end)
+
+task.spawn(function()
+task.wait(0.25)
+ap.UIElements.MenuCanvas.Visible=false
+ap.UIElements.MenuCanvas.Active=false
+end)
+end
 
 local function RecalculateCanvasSize()
 ap.UIElements.Menu.Frame.ScrollingFrame.CanvasSize=
