@@ -12285,33 +12285,10 @@ function ao.SelectTab(ap,aq)
 if not ao.Tabs[aq].Locked then
 ao.SelectedTab=aq
 
-local sb=Window and Window.UIElements and Window.UIElements.SideBar
-local targetTab=ao.Tabs[aq]
-local targetObj=targetTab and targetTab.UIElements and targetTab.UIElements.Main
-
-if not ao.TabIndicator and sb then
-local indCorner=Window.UICorner-(Window.UIPadding/2)
-ao.TabIndicator=ak.NewRoundFrame(indCorner,"Squircle",{
-Size=UDim2.new(0,0,0,0),
-Position=UDim2.new(0,0,0,0),
-ThemeTag={
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},
-Active=false,
-Visible=false,
-ZIndex=1,
-Parent=sb,
-})
-if sb.Frame then
-sb.Frame.ZIndex=2
-end
-end
-
 for ar,as in next,ao.Tabs do
 if not as.Locked then
 ak.SetThemeTag(as.UIElements.Main,{
-ImageTransparency=1,
+ImageTransparency="TabBorderTransparency",
 },0.15)
 if as.Border then
 ak.SetThemeTag(as.UIElements.Main.Outline,{
@@ -12335,7 +12312,10 @@ end)
 as.Selected=false
 end
 end
-
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
+ImageColor3="TabBackgroundActive",
+ImageTransparency="TabBackgroundActiveTransparency",
+},0.15)
 if ao.Tabs[aq].Border then
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
@@ -12356,41 +12336,6 @@ ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.
 end
 end)
 ao.Tabs[aq].Selected=true
-
-if ao.TabIndicator and targetObj and sb then
-local function calcFrame()
-local tPos=targetObj.AbsolutePosition
-local sPos=sb.AbsolutePosition
-local cPos=sb.CanvasPosition
-local padObj=sb:FindFirstChildOfClass"UIPadding"
-local padX=padObj and padObj.PaddingLeft.Offset or 0
-local relX=tPos.X-sPos.X-padX+cPos.X
-local relY=tPos.Y-sPos.Y+cPos.Y
-return UDim2.fromOffset(relX,relY),UDim2.fromOffset(targetObj.AbsoluteSize.X,targetObj.AbsoluteSize.Y)
-end
-
-local pos,size=calcFrame()
-if size.Y.Offset>0 then
-ao.TabIndicator.Visible=true
-if not ao.HasSelectedBefore then
-ao.HasSelectedBefore=true
-ao.TabIndicator.Position=pos
-ao.TabIndicator.Size=size
-task.defer(function()
-local p2,s2=calcFrame()
-if s2.Y.Offset>0 then
-ao.TabIndicator.Position=p2
-ao.TabIndicator.Size=s2
-end
-end)
-else
-ak.Tween(ao.TabIndicator,0.26,{
-Position=pos,
-Size=size,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end
-end
 
 task.spawn(function()
 for ar,as in next,ao.Containers do
