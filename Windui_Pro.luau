@@ -8371,24 +8371,7 @@ ap.UIElements.Menu.Frame.ScrollingFrame.CanvasSize=
 UDim2.fromOffset(0,ap.UIElements.UIListLayout.AbsoluteContentSize.Y)
 end
 
-local function RecalculateListSize()
-local at=ao.WindUI.DropdownGui.AbsoluteSize.Y
-
-local au=ap.UIElements.UIListLayout.AbsoluteContentSize.Y/ao.UIScale
-local av=ap.SearchBarEnabled and(aq.SearchBarHeight+(aq.MenuPadding*3))
-or(aq.MenuPadding*2)
-local aw=au+av
-
-if aw>at then
-ap.UIElements.MenuCanvas.Size=
-UDim2.fromOffset(ap.UIElements.MenuCanvas.AbsoluteSize.X,at)
-else
-ap.UIElements.MenuCanvas.Size=
-UDim2.fromOffset(ap.UIElements.MenuCanvas.AbsoluteSize.X,aw)
-end
-end
-
-function UpdatePosition()
+local function UpdatePosition(animate)
 local at=ap.UIElements.Dropdown or ap.DropdownFrame.UIElements.Main
 local au=ap.UIElements.MenuCanvas
 
@@ -8403,12 +8386,36 @@ if av<aw then
 ax=aw-av-54
 end
 
-au.Position=UDim2.new(
+local targetPos=UDim2.new(
 0,
 at.AbsolutePosition.X+at.AbsoluteSize.X,
 0,
 at.AbsolutePosition.Y+at.AbsoluteSize.Y-ax+(aq.MenuPadding*2)
 )
+
+if animate then
+am(au,0.22,{Position=targetPos},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+else
+au.Position=targetPos
+end
+end
+
+local function RecalculateListSize(animate)
+local at=ao.WindUI.DropdownGui.AbsoluteSize.Y
+
+local au=ap.UIElements.UIListLayout.AbsoluteContentSize.Y/ao.UIScale
+local av=ap.SearchBarEnabled and(aq.SearchBarHeight+(aq.MenuPadding*3))
+or(aq.MenuPadding*2)
+local aw=math.min(au+av,at)
+local targetSize=UDim2.fromOffset(ap.UIElements.MenuCanvas.AbsoluteSize.X,aw)
+
+if animate then
+am(ap.UIElements.MenuCanvas,0.22,{Size=targetSize},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+UpdatePosition(true)
+else
+ap.UIElements.MenuCanvas.Size=targetSize
+UpdatePosition(false)
+end
 end
 
 local at
@@ -8552,8 +8559,15 @@ if not match and ay.Selected and ind then
 ind.Visible=false
 end
 end
-RecalculateListSize()
+task.defer(function()
+RecalculateListSize(true)
 RecalculateCanvasSize()
+if ind and ind.Visible and ap.CurrentSelectedTab and ap.CurrentSelectedTab.UIElements and ap.CurrentSelectedTab.UIElements.TabItem and ap.CurrentSelectedTab.UIElements.TabItem.Visible then
+local mf=ap.UIElements.Menu.Frame
+local targetY=ap.CurrentSelectedTab.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
+am(ind,0.18,{Position=UDim2.new(0,0,0,targetY)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end)
 end,true)
 at.Size=UDim2.new(1,0,0,aq.SearchBarHeight)
 at.Position=UDim2.new(0,0,0,0)
