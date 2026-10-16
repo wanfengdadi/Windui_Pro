@@ -12285,10 +12285,33 @@ function ao.SelectTab(ap,aq)
 if not ao.Tabs[aq].Locked then
 ao.SelectedTab=aq
 
+local sb=Window and Window.UIElements and Window.UIElements.SideBar
+local targetTab=ao.Tabs[aq]
+local targetObj=targetTab and targetTab.UIElements and targetTab.UIElements.Main
+
+if not ao.TabIndicator and sb then
+local indCorner=Window.UICorner-(Window.UIPadding/2)
+ao.TabIndicator=ak.NewRoundFrame(indCorner,"Squircle",{
+Size=UDim2.new(0,0,0,0),
+Position=UDim2.new(0,0,0,0),
+ThemeTag={
+ImageColor3="TabBackgroundActive",
+},
+ImageTransparency=1,
+Active=false,
+Visible=false,
+ZIndex=1,
+Parent=sb,
+})
+if sb.Frame then
+sb.Frame.ZIndex=2
+end
+end
+
 for ar,as in next,ao.Tabs do
 if not as.Locked then
 ak.SetThemeTag(as.UIElements.Main,{
-ImageTransparency="TabBorderTransparency",
+ImageTransparency=1,
 },0.15)
 if as.Border then
 ak.SetThemeTag(as.UIElements.Main.Outline,{
@@ -12312,10 +12335,7 @@ end)
 as.Selected=false
 end
 end
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
+
 if ao.Tabs[aq].Border then
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
@@ -12337,6 +12357,41 @@ end
 end)
 ao.Tabs[aq].Selected=true
 
+if ao.TabIndicator and targetObj and sb then
+local activeTrans=ak.GetThemeProperty("TabBackgroundActiveTransparency",ak.Theme)or 0.08
+local function updateIndPos(animated)
+local tPos=targetObj.AbsolutePosition
+local sPos=sb.AbsolutePosition
+local cPos=sb.CanvasPosition
+local relX=tPos.X-sPos.X
+local relY=(tPos.Y-sPos.Y)+cPos.Y
+local tW=targetObj.AbsoluteSize.X
+local tH=targetObj.AbsoluteSize.Y
+if tW>0 and tH>0 then
+ao.TabIndicator.Visible=true
+if animated then
+ak.Tween(ao.TabIndicator,0.28,{
+Position=UDim2.new(0,relX,0,relY),
+Size=UDim2.new(0,tW,0,tH),
+ImageTransparency=activeTrans,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+else
+ao.TabIndicator.Position=UDim2.new(0,relX,0,relY)
+ao.TabIndicator.Size=UDim2.new(0,tW,0,tH)
+ao.TabIndicator.ImageTransparency=activeTrans
+end
+end
+end
+
+if not ao.HasSelectedBefore then
+ao.HasSelectedBefore=true
+updateIndPos(false)
+task.defer(function()updateIndPos(false)end)
+else
+updateIndPos(true)
+end
+end
+
 task.spawn(function()
 for ar,as in next,ao.Containers do
 as.AnchorPoint=Vector2.new(0,0.05)
@@ -12344,7 +12399,6 @@ as.Visible=false
 end
 ao.Containers[aq].Visible=true
 local ar=game:GetService"TweenService"
-
 local as=TweenInfo.new(0.15,Enum.EasingStyle.Quart,Enum.EasingDirection.Out)
 local at=ar:Create(ao.Containers[aq],as,{
 AnchorPoint=Vector2.new(0,0),
@@ -15753,21 +15807,6 @@ makefolder(aA.Folder)
 else
 makefolder(aA.Title)
 end
-end
-
-local isMobile=an.TouchEnabled and not an.KeyboardEnabled
-pcall(function()
-if an:GetPlatform()==Enum.Platform.Android or an:GetPlatform()==Enum.Platform.IOS then
-isMobile=true
-end
-end)
-
-if isMobile then
-aA.Acrylic=true
-end
-
-if aA.Acrylic then
-aa.UseAcrylic=true
 end
 
 aA.WindUI=aa
