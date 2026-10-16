@@ -8354,18 +8354,17 @@ Name="Shadow",
 Image="rbxassetid://8992230677",
 ScaleType="Slice",
 SliceCenter=Rect.new(99,99,99,99),
-Size=UDim2.new(1,40,1,40),
+Size=UDim2.new(1,90,1,90),
 Position=UDim2.new(0.5,0,0.5,4),
 AnchorPoint=Vector2.new(0.5,0.5),
 BackgroundTransparency=1,
-ThemeTag={
-ImageColor3="WindowShadow",
-},
 ImageColor3=Color3.new(0,0,0),
 ImageTransparency=1,
-ZIndex=-1,
+ZIndex=1,
+Visible=false,
 })
 ap.UIElements.Shadow=shadow
+ap.UIElements.Menu.ZIndex=2
 
 ap.UIElements.MenuCanvas=al("Frame",{
 Size=UDim2.new(0,ap.MenuWidth,0,300),
@@ -8925,10 +8924,9 @@ ImageTransparency=0,
 
 if ap.UIElements.Shadow then
 ap.UIElements.Shadow.Visible=true
-ap.UIElements.Shadow.Size=UDim2.new(1,40,0,0)
-am(ap.UIElements.Shadow,0.12,{
-Size=UDim2.new(1,40,1,40),
-ImageTransparency=0.5,
+ap.UIElements.Shadow.ImageTransparency=1
+am(ap.UIElements.Shadow,0.18,{
+ImageTransparency=0.3,
 },Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
 end
 
@@ -8975,7 +8973,6 @@ ImageTransparency=1,
 
 if ap.UIElements.Shadow then
 am(ap.UIElements.Shadow,0.2,{
-Size=UDim2.new(1,40,0,0),
 ImageTransparency=1,
 },Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
 task.delay(0.2,function()
