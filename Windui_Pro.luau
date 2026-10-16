@@ -12284,6 +12284,10 @@ end
 function ao.SelectTab(ap,aq)
 if not ao.Tabs[aq].Locked then
 local prevTab=ao.SelectedTab
+if prevTab==aq and ao.TabHighlight then
+return
+end
+
 local isUp=prevTab and(aq<prevTab)
 local isDown=prevTab and(aq>prevTab)
 ao.SelectedTab=aq
@@ -12344,20 +12348,15 @@ curTab.Selected=true
 local sBar=Window and Window.UIElements and Window.UIElements.SideBar
 if sBar then
 local scale=WindUI and WindUI.UIScale or 1
+local targetW=curMain.AbsoluteSize.X>0 and(curMain.AbsoluteSize.X/scale)or(sBar.AbsoluteSize.X/scale-14)
+local targetH=curMain.AbsoluteSize.Y>0 and(curMain.AbsoluteSize.Y/scale)or 36
 local targetX=(curMain.AbsolutePosition.X-sBar.AbsolutePosition.X)/scale
 local targetY=(curMain.AbsolutePosition.Y-sBar.AbsolutePosition.Y+sBar.CanvasPosition.Y)/scale
-local targetW=curMain.AbsoluteSize.X/scale
-local targetH=curMain.AbsoluteSize.Y/scale
 
 if not ao.TabHighlight then
-ao.TabHighlight=ak.New("ImageLabel",{
+local hFrame,hMod=ak.NewRoundFrame(curTab.UICorner,"Squircle",{
 Size=UDim2.new(0,targetW,0,targetH),
 Position=UDim2.new(0,targetX,0,targetY),
-Image=curMain.Image,
-SliceCenter=curMain.SliceCenter,
-SliceScale=curMain.SliceScale,
-ScaleType=curMain.ScaleType,
-BackgroundTransparency=1,
 ThemeTag={
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
@@ -12367,26 +12366,36 @@ Active=false,
 Visible=true,
 Parent=sBar,
 })
+ao.TabHighlight=hFrame
+ao.TabHighlightMod=hMod
+if hMod and hMod.SetRadius then
+hMod:SetRadius(curTab.UICorner)
+end
 else
+if ao.TabHighlightTween then
+ao.TabHighlightTween:Cancel()
+ao.TabHighlightTween=nil
+end
+if ao.TabHighlightMod and ao.TabHighlightMod.SetRadius then
+ao.TabHighlightMod:SetRadius(curTab.UICorner)
+end
 ao.TabHighlight.Visible=true
-ao.TabHighlight.Image=curMain.Image
-ao.TabHighlight.SliceCenter=curMain.SliceCenter
-ao.TabHighlight.SliceScale=curMain.SliceScale
-ao.TabHighlight.ScaleType=curMain.ScaleType
-ak.Tween(ao.TabHighlight,0.26,{
+local tw=ak.Tween(ao.TabHighlight,0.24,{
 Position=UDim2.new(0,targetX,0,targetY),
 Size=UDim2.new(0,targetW,0,targetH),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
+ao.TabHighlightTween=tw
+tw:Play()
 end
 end
 
 task.spawn(function()
 local targetContainer=ao.Containers[aq]
-local startAnchorY=0.04
+local startAnchorY=0.03
 if isUp then
-startAnchorY=-0.05
+startAnchorY=-0.04
 elseif isDown then
-startAnchorY=0.05
+startAnchorY=0.04
 end
 
 for ar,as in next,ao.Containers do
@@ -12399,7 +12408,7 @@ targetContainer.Visible=true
 targetContainer.AnchorPoint=Vector2.new(0,startAnchorY)
 
 local ar=game:GetService"TweenService"
-local as=TweenInfo.new(0.25,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
+local as=TweenInfo.new(0.24,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
 local at=ar:Create(targetContainer,as,{
 AnchorPoint=Vector2.new(0,0),
 })
