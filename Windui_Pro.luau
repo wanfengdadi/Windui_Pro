@@ -11997,11 +11997,14 @@ ao.TabCount=ao.TabCount+1
 local as=ao.TabCount
 ar.Index=as
 
+local isHidden = ap.Hidden or false
+
 ar.UIElements.Main=ak.NewRoundFrame(ar.UICorner,"Squircle",{
 BackgroundTransparency=1,
 Size=UDim2.new(1,-7,0,0),
 AutomaticSize="Y",
-Parent=ap.Parent,
+Parent=isHidden and nil or ap.Parent,
+Visible=not isHidden,
 ThemeTag={
 ImageColor3="TabBackground",
 },
