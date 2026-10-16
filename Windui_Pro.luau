@@ -15755,6 +15755,21 @@ makefolder(aA.Title)
 end
 end
 
+local isMobile=an.TouchEnabled and not an.KeyboardEnabled
+pcall(function()
+if an:GetPlatform()==Enum.Platform.Android or an:GetPlatform()==Enum.Platform.IOS then
+isMobile=true
+end
+end)
+
+if isMobile then
+aA.Acrylic=true
+end
+
+if aA.Acrylic then
+aa.UseAcrylic=true
+end
+
 aA.WindUI=aa
 aA.Window=aa.Window
 aA.Parent=aa.ScreenGui.Window
