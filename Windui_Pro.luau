@@ -12290,9 +12290,8 @@ ao.SelectedTab=aq
 
 for ar,as in next,ao.Tabs do
 if not as.Locked then
-ak.SetThemeTag(as.UIElements.Main,{
-ImageTransparency="TabBorderTransparency",
-},0.15)
+as.UIElements.Main.ZIndex=2
+as.UIElements.Main.ImageTransparency=1
 if as.Border then
 ak.SetThemeTag(as.UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparency",
@@ -12318,26 +12317,9 @@ end
 
 local curTab=ao.Tabs[aq]
 local curMain=curTab.UIElements.Main
-local bgScale=curMain:FindFirstChild"TabScale"
-if not bgScale then
-bgScale=Instance.new"UIScale"
-bgScale.Name="TabScale"
-bgScale.Parent=curMain
-end
-bgScale.Scale=0.94
-ak.Tween(bgScale,0.26,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+curMain.ZIndex=2
+curMain.ImageTransparency=1
 
-local curFrame=curMain:FindFirstChild"Frame"
-if curFrame then
-local startY=isUp and 4 or(isDown and-4 or 0)
-curFrame.Position=UDim2.new(0,0,0,startY)
-ak.Tween(curFrame,0.25,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-
-ak.SetThemeTag(curMain,{
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
 if curTab.Border then
 ak.SetThemeTag(curMain.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
@@ -12358,6 +12340,36 @@ ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.
 end
 end)
 curTab.Selected=true
+
+local sBar=Window and Window.UIElements and Window.UIElements.SideBar
+if sBar then
+local scale=WindUI and WindUI.UIScale or 1
+local targetX=(curMain.AbsolutePosition.X-sBar.AbsolutePosition.X)/scale
+local targetY=(curMain.AbsolutePosition.Y-sBar.AbsolutePosition.Y+sBar.CanvasPosition.Y)/scale
+local targetW=curMain.AbsoluteSize.X/scale
+local targetH=curMain.AbsoluteSize.Y/scale
+
+if not ao.TabHighlight then
+ao.TabHighlight=ak.NewRoundFrame(curTab.UICorner,"Squircle",{
+Size=UDim2.new(0,targetW,0,targetH),
+Position=UDim2.new(0,targetX,0,targetY),
+ThemeTag={
+ImageColor3="TabBackgroundActive",
+ImageTransparency="TabBackgroundActiveTransparency",
+},
+ZIndex=1,
+Active=false,
+Visible=true,
+Parent=sBar,
+})
+else
+ao.TabHighlight.Visible=true
+ak.Tween(ao.TabHighlight,0.26,{
+Position=UDim2.new(0,targetX,0,targetY),
+Size=UDim2.new(0,targetW,0,targetH),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
 
 task.spawn(function()
 local targetContainer=ao.Containers[aq]
