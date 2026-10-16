@@ -12350,9 +12350,14 @@ local targetW=curMain.AbsoluteSize.X/scale
 local targetH=curMain.AbsoluteSize.Y/scale
 
 if not ao.TabHighlight then
-ao.TabHighlight=ak.NewRoundFrame(curTab.UICorner,"Squircle",{
+ao.TabHighlight=ak.New("ImageLabel",{
 Size=UDim2.new(0,targetW,0,targetH),
 Position=UDim2.new(0,targetX,0,targetY),
+Image=curMain.Image,
+SliceCenter=curMain.SliceCenter,
+SliceScale=curMain.SliceScale,
+ScaleType=curMain.ScaleType,
+BackgroundTransparency=1,
 ThemeTag={
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
@@ -12364,6 +12369,10 @@ Parent=sBar,
 })
 else
 ao.TabHighlight.Visible=true
+ao.TabHighlight.Image=curMain.Image
+ao.TabHighlight.SliceCenter=curMain.SliceCenter
+ao.TabHighlight.SliceScale=curMain.SliceScale
+ao.TabHighlight.ScaleType=curMain.ScaleType
 ak.Tween(ao.TabHighlight,0.26,{
 Position=UDim2.new(0,targetX,0,targetY),
 Size=UDim2.new(0,targetW,0,targetH),
