@@ -8371,15 +8371,16 @@ ap.UIElements.Menu.Frame.ScrollingFrame.CanvasSize=
 UDim2.fromOffset(0,ap.UIElements.UIListLayout.AbsoluteContentSize.Y)
 end
 
-local function UpdatePosition(animate)
+local function UpdatePosition(customH,animate)
 local at=ap.UIElements.Dropdown or ap.DropdownFrame.UIElements.Main
 local au=ap.UIElements.MenuCanvas
 
+local menuH=customH or au.AbsoluteSize.Y
 local av=ah.ViewportSize.Y
 -(at.AbsolutePosition.Y+at.AbsoluteSize.Y)
 -aq.MenuPadding
 -54
-local aw=au.AbsoluteSize.Y+aq.MenuPadding
+local aw=menuH+aq.MenuPadding
 
 local ax=-54
 if av<aw then
@@ -8404,17 +8405,16 @@ local function RecalculateListSize(animate)
 local at=ao.WindUI.DropdownGui.AbsoluteSize.Y
 
 local au=ap.UIElements.UIListLayout.AbsoluteContentSize.Y/ao.UIScale
-local av=ap.SearchBarEnabled and(aq.SearchBarHeight+(aq.MenuPadding*3))
-or(aq.MenuPadding*2)
-local aw=math.min(au+av,at)
+local minH=ap.SearchBarEnabled and(aq.SearchBarHeight+(aq.MenuPadding*3))or(aq.MenuPadding*2)
+local aw=math.clamp(au+minH,minH,at)
 local targetSize=UDim2.fromOffset(ap.UIElements.MenuCanvas.AbsoluteSize.X,aw)
 
 if animate then
 am(ap.UIElements.MenuCanvas,0.22,{Size=targetSize},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-UpdatePosition(true)
+UpdatePosition(aw,true)
 else
 ap.UIElements.MenuCanvas.Size=targetSize
-UpdatePosition(false)
+UpdatePosition(aw,false)
 end
 end
 
@@ -8552,20 +8552,35 @@ ap.Tabs={}
 if ap.SearchBarEnabled then
 if not at then
 at=aj("Search...","search",ap.UIElements.Menu,nil,function(aw)
+local query=tostring(aw or"")
+local isClear=(query=="")
+
 for ax,ay in next,ap.Tabs do
-local match=string.find(string.lower(ay.Name),string.lower(aw),1,true)
-ay.UIElements.TabItem.Visible=match and true or false
+local match=isClear or(string.find(string.lower(ay.Name),string.lower(query),1,true)~=nil)
+ay.UIElements.TabItem.Visible=match
 if not match and ay.Selected and ind then
 ind.Visible=false
 end
 end
+
+if ap.UIElements.Menu and ap.UIElements.Menu.Frame and ap.UIElements.Menu.Frame:FindFirstChild"ScrollingFrame" then
+ap.UIElements.Menu.Frame.ScrollingFrame.CanvasPosition=Vector2.new(0,0)
+end
+
 task.defer(function()
-RecalculateListSize(true)
 RecalculateCanvasSize()
-if ind and ind.Visible and ap.CurrentSelectedTab and ap.CurrentSelectedTab.UIElements and ap.CurrentSelectedTab.UIElements.TabItem and ap.CurrentSelectedTab.UIElements.TabItem.Visible then
+RecalculateListSize(true)
+
+if ind and not ap.Multi and ap.CurrentSelectedTab and ap.CurrentSelectedTab.UIElements and ap.CurrentSelectedTab.UIElements.TabItem and ap.CurrentSelectedTab.UIElements.TabItem.Visible then
 local mf=ap.UIElements.Menu.Frame
 local targetY=ap.CurrentSelectedTab.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
-am(ind,0.18,{Position=UDim2.new(0,0,0,targetY)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local targetH=ap.CurrentSelectedTab.UIElements.TabItem.AbsoluteSize.Y
+if targetH>0 then
+ind.Position=UDim2.new(0,0,0,targetY)
+ind.Size=UDim2.new(1,0,0,targetH)
+ind.Visible=true
+am(ind,0.2,{ImageTransparency=an},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 end)
 end,true)
