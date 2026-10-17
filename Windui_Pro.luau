@@ -8616,29 +8616,38 @@ end
 local targetText=(aw==""and"--"or aw)
 
 if ap.UIElements.Dropdown then
-local textLabel=ap.UIElements.Dropdown.Frame.Frame.TextLabel
+local oldLabel=ap.UIElements.Dropdown.Frame.Frame.TextLabel
 local parentFrame=ap.UIElements.Dropdown.Frame.Frame
 parentFrame.ClipsDescendants=true
 
-if textLabel.Text~=targetText then
-if textLabel.Text=="" or textLabel.Text=="--" then
-textLabel.Text=targetText
-textLabel.Position=UDim2.new(0,0,0,0)
-textLabel.TextTransparency=0
+if oldLabel.Text~=targetText then
+if oldLabel.Text=="" or oldLabel.Text=="--" then
+oldLabel.Text=targetText
+oldLabel.Position=UDim2.new(0,0,0,0)
 else
 local tweenService=game:GetService("TweenService")
-local outTween=tweenService:Create(textLabel,TweenInfo.new(0.14,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{
-Position=UDim2.new(0,0,1,0),
-TextTransparency=1
-})
-outTween:Play()
-outTween.Completed:Connect(function()
-textLabel.Text=targetText
-textLabel.Position=UDim2.new(0,0,-1,0)
-tweenService:Create(textLabel,TweenInfo.new(0.22,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
-Position=UDim2.new(0,0,0,0),
-TextTransparency=0
+
+local newLabel=oldLabel:Clone()
+newLabel.Name="RollingNewLabel"
+newLabel.Text=targetText
+newLabel.Position=UDim2.new(0,0,1.2,0)
+newLabel.Parent=parentFrame
+
+local animInfo=TweenInfo.new(0.25,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
+
+tweenService:Create(oldLabel,animInfo,{
+Position=UDim2.new(0,0,-1.2,0)
 }):Play()
+
+local moveInTween=tweenService:Create(newLabel,animInfo,{
+Position=UDim2.new(0,0,0,0)
+})
+moveInTween:Play()
+
+moveInTween.Completed:Connect(function()
+oldLabel.Text=targetText
+oldLabel.Position=UDim2.new(0,0,0,0)
+newLabel:Destroy()
 end)
 end
 end
