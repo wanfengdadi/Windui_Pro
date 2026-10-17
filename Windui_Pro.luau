@@ -11952,85 +11952,20 @@ local al=ak.New
 local am=a.load'B'.New
 local an=a.load'x'.New
 
-function ao.SelectTab(ap,aq)
-if not ao.Tabs[aq] then return end
-if not ao.Tabs[aq].Locked then
-ao.SelectedTab=aq
+local ao={
+Tabs={},
+Containers={},
+SelectedTab=nil,
+TabCount=0,
+ToolTipParent=nil,
+TabHighlight=nil,
+Indicator=nil,
 
-for ar,as in next,ao.Tabs do
-if not as.Locked and as.UIElements.Main and as.UIElements.Main.Parent then
-pcall(function()
-ak.SetThemeTag(as.UIElements.Main,{
-ImageTransparency="TabBorderTransparency",
-},0.15)
-if as.Border then
-ak.SetThemeTag(as.UIElements.Main.Outline,{
-ImageTransparency="TabBorderTransparency",
-},0.15)
-end
-ak.SetThemeTag(as.UIElements.Main.Frame.TextLabel,{
-TextTransparency="TabTextTransparency",
-},0.15)
-if as.UIElements.Icon and not as.IconColor then
-ak.SetThemeTag(as.UIElements.Icon.ImageLabel,{
-ImageTransparency="TabIconTransparency",
-},0.15)
-end
-local textPad=as.UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
-if textPad then
-ak.Tween(textPad,0.2,{PaddingLeft=UDim.new(0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end)
-as.Selected=false
-end
-end
+OnChangeFunc=function(ao)end,
+}
 
-if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
-pcall(function()
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
-if ao.Tabs[aq].Border then
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
-ImageTransparency="TabBorderTransparencyActive",
-},0.15)
-end
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Frame.TextLabel,{
-TextTransparency="TabTextTransparencyActive",
-},0.15)
-if ao.Tabs[aq].UIElements.Icon and not ao.Tabs[aq].IconColor then
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Icon.ImageLabel,{
-ImageTransparency="TabIconTransparencyActive",
-},0.15)
-end
-local activePad=ao.Tabs[aq].UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
-if activePad then
-ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end)
-end
-ao.Tabs[aq].Selected=true
-
-task.spawn(function()
-for ar,as in next,ao.Containers do
-as.AnchorPoint=Vector2.new(0,0.05)
-as.Visible=false
-end
-if ao.Containers[aq] then
-ao.Containers[aq].Visible=true
-local ar=game:GetService"TweenService"
-local as=TweenInfo.new(0.15,Enum.EasingStyle.Quart,Enum.EasingDirection.Out)
-local at=ar:Create(ao.Containers[aq],as,{
-AnchorPoint=Vector2.new(0,0),
-})
-at:Play()
-end
-end)
-
-ao.OnChangeFunc(aq)
-end
-end
+local Window
+local WindUI
 
 function ao.Init(ap,aq,ar,as)
 Window=ap
@@ -12093,6 +12028,7 @@ ThemeTag={
 ImageColor3="TabBackground",
 },
 ImageTransparency=1,
+ZIndex=2,
 },{
 ak.NewRoundFrame(ar.UICorner-1,"Glass-1.4",{
 Size=UDim2.new(1,1,1,1),
@@ -12549,7 +12485,7 @@ end
 
 local curTab=ao.Tabs[aq]
 if curTab.UIElements.Main and curTab.UIElements.Main.Parent then
-local sideBar=Window.UIElements.SideBar
+local sideBar=(Window and Window.UIElements and Window.UIElements.SideBar) or curTab.UIElements.Main.Parent.Parent
 if not ao.Indicator and sideBar then
 ao.Indicator=ak.NewRoundFrame(curTab.UICorner,"Squircle",{
 Size=UDim2.new(0,curTab.UIElements.Main.AbsoluteSize.X,0,curTab.UIElements.Main.AbsoluteSize.Y),
