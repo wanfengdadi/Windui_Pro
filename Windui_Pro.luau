@@ -11959,13 +11959,9 @@ SelectedTab=nil,
 TabCount=0,
 ToolTipParent=nil,
 TabHighlight=nil,
-Indicator=nil,
 
 OnChangeFunc=function(ao)end,
 }
-
-local Window
-local WindUI
 
 function ao.Init(ap,aq,ar,as)
 Window=ap
@@ -12028,7 +12024,6 @@ ThemeTag={
 ImageColor3="TabBackground",
 },
 ImageTransparency=1,
-ZIndex=2,
 },{
 ak.NewRoundFrame(ar.UICorner-1,"Glass-1.4",{
 Size=UDim2.new(1,1,1,1),
@@ -12452,14 +12447,13 @@ end
 function ao.SelectTab(ap,aq)
 if not ao.Tabs[aq] then return end
 if not ao.Tabs[aq].Locked then
-local prevTab=ao.SelectedTab
 ao.SelectedTab=aq
 
 for ar,as in next,ao.Tabs do
 if not as.Locked and as.UIElements.Main and as.UIElements.Main.Parent then
 pcall(function()
 ak.SetThemeTag(as.UIElements.Main,{
-ImageTransparency=1,
+ImageTransparency="TabBorderTransparency",
 },0.15)
 if as.Border then
 ak.SetThemeTag(as.UIElements.Main.Outline,{
@@ -12483,80 +12477,32 @@ as.Selected=false
 end
 end
 
-local curTab=ao.Tabs[aq]
-if curTab.UIElements.Main and curTab.UIElements.Main.Parent then
-local sideBar=(Window and Window.UIElements and Window.UIElements.SideBar) or curTab.UIElements.Main.Parent.Parent
-if not ao.Indicator and sideBar then
-ao.Indicator=ak.NewRoundFrame(curTab.UICorner,"Squircle",{
-Size=UDim2.new(0,curTab.UIElements.Main.AbsoluteSize.X,0,curTab.UIElements.Main.AbsoluteSize.Y),
-Position=UDim2.new(0,curTab.UIElements.Main.AbsolutePosition.X-sideBar.AbsolutePosition.X,0,curTab.UIElements.Main.AbsolutePosition.Y-sideBar.AbsolutePosition.Y+sideBar.CanvasPosition.Y),
-ImageTransparency=1,
-ThemeTag={
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},
-ZIndex=1,
-Parent=sideBar,
-})
-end
-
-curTab.UIElements.Main.ZIndex=2
-
-if ao.Indicator and sideBar then
-local function updateIndicatorAnim()
-local targetX=curTab.UIElements.Main.AbsolutePosition.X-sideBar.AbsolutePosition.X
-local targetY=curTab.UIElements.Main.AbsolutePosition.Y-sideBar.AbsolutePosition.Y+sideBar.CanvasPosition.Y
-local targetW=curTab.UIElements.Main.AbsoluteSize.X
-local targetH=curTab.UIElements.Main.AbsoluteSize.Y
-
-if not prevTab then
-ao.Indicator.Position=UDim2.new(0,targetX,0,targetY)
-ao.Indicator.Size=UDim2.new(0,targetW,0,targetH)
-ak.SetThemeTag(ao.Indicator,{
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
-else
-ak.Tween(ao.Indicator,0.28,{
-Position=UDim2.new(0,targetX,0,targetY),
-Size=UDim2.new(0,targetW,0,targetH),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-ak.SetThemeTag(ao.Indicator,{
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
-end
-end
-
-if curTab.UIElements.Main.AbsoluteSize.Y<=0 then
-task.defer(updateIndicatorAnim)
-else
-updateIndicatorAnim()
-end
-end
-
+if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
 pcall(function()
-if curTab.Border then
-ak.SetThemeTag(curTab.UIElements.Main.Outline,{
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
+ImageColor3="TabBackgroundActive",
+ImageTransparency="TabBackgroundActiveTransparency",
+},0.15)
+if ao.Tabs[aq].Border then
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
 },0.15)
 end
-ak.SetThemeTag(curTab.UIElements.Main.Frame.TextLabel,{
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Frame.TextLabel,{
 TextTransparency="TabTextTransparencyActive",
 },0.15)
-if curTab.UIElements.Icon and not curTab.IconColor then
-ak.SetThemeTag(curTab.UIElements.Icon.ImageLabel,{
+if ao.Tabs[aq].UIElements.Icon and not ao.Tabs[aq].IconColor then
+ak.SetThemeTag(ao.Tabs[aq].UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparencyActive",
 },0.15)
 end
-local activePad=curTab.UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
+local activePad=ao.Tabs[aq].UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if activePad then
 ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
 end
-curTab.Selected=true
+ao.Tabs[aq].Selected=true
 
 task.spawn(function()
 for ar,as in next,ao.Containers do
@@ -15982,10 +15928,8 @@ aA.Window=aa.Window
 aA.Parent=aa.ScreenGui.Window
 
 if aa.Window then
-pcall(function()
-aa.Window:Destroy()
-end)
-aa.Window=nil
+warn"You cannot create more than one window"
+return
 end
 
 local b=true
