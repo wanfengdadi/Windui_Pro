@@ -15982,8 +15982,10 @@ aA.Window=aa.Window
 aA.Parent=aa.ScreenGui.Window
 
 if aa.Window then
-warn"You cannot create more than one window"
-return
+pcall(function()
+aa.Window:Destroy()
+end)
+aa.Window=nil
 end
 
 local b=true
