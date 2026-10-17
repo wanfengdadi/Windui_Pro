@@ -8613,8 +8613,35 @@ or ap.Value
 or""
 end
 
+local targetText=(aw==""and"--"or aw)
+
 if ap.UIElements.Dropdown then
-ap.UIElements.Dropdown.Frame.Frame.TextLabel.Text=(aw==""and"--"or aw)
+local textLabel=ap.UIElements.Dropdown.Frame.Frame.TextLabel
+local parentFrame=ap.UIElements.Dropdown.Frame.Frame
+parentFrame.ClipsDescendants=true
+
+if textLabel.Text~=targetText then
+if textLabel.Text=="" or textLabel.Text=="--" then
+textLabel.Text=targetText
+textLabel.Position=UDim2.new(0,0,0,0)
+textLabel.TextTransparency=0
+else
+local tweenService=game:GetService("TweenService")
+local outTween=tweenService:Create(textLabel,TweenInfo.new(0.14,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{
+Position=UDim2.new(0,0,1,0),
+TextTransparency=1
+})
+outTween:Play()
+outTween.Completed:Connect(function()
+textLabel.Text=targetText
+textLabel.Position=UDim2.new(0,0,-1,0)
+tweenService:Create(textLabel,TweenInfo.new(0.22,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
+Position=UDim2.new(0,0,0,0),
+TextTransparency=0
+}):Play()
+end)
+end
+end
 end
 end
 
