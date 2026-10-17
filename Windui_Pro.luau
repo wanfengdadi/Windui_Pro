@@ -8613,8 +8613,35 @@ or ap.Value
 or""
 end
 
+local targetText=(aw==""and"--"or aw)
+
 if ap.UIElements.Dropdown then
-ap.UIElements.Dropdown.Frame.Frame.TextLabel.Text=(aw==""and"--"or aw)
+local textLabel=ap.UIElements.Dropdown.Frame.Frame.TextLabel
+local parentFrame=ap.UIElements.Dropdown.Frame.Frame
+parentFrame.ClipsDescendants=true
+
+if textLabel.Text~=targetText then
+if textLabel.Text=="" or textLabel.Text=="--" then
+textLabel.Text=targetText
+textLabel.Position=UDim2.new(0,0,0,0)
+textLabel.TextTransparency=0
+else
+local tweenService=game:GetService("TweenService")
+local outTween=tweenService:Create(textLabel,TweenInfo.new(0.14,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{
+Position=UDim2.new(0,0,1,0),
+TextTransparency=1
+})
+outTween:Play()
+outTween.Completed:Connect(function()
+textLabel.Text=targetText
+textLabel.Position=UDim2.new(0,0,-1,0)
+tweenService:Create(textLabel,TweenInfo.new(0.22,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
+Position=UDim2.new(0,0,0,0),
+TextTransparency=0
+}):Play()
+end)
+end
+end
 end
 end
 
@@ -11925,11 +11952,7 @@ local al=ak.New
 local am=a.load'B'.New
 local an=a.load'x'.New
 
-
-
 local ao={
-
-
 Tabs={},
 Containers={},
 SelectedTab=nil,
@@ -11949,6 +11972,8 @@ return ao
 end
 
 function ao.New(ap,aq)
+local isHidden=ap.Hidden or false
+
 local ar={
 __type="Tab",
 Title=ap.Title or"Tab",
@@ -11978,14 +12003,6 @@ TabPaddingY=3+(Window.UIPadding/2),
 TitlePaddingY=0,
 }
 
-
-
-
-
-
-
-
-
 if ar.IconShape then
 ar.TabPaddingX=2+(Window.UIPadding/4)
 ar.TabPaddingY=2+(Window.UIPadding/4)
@@ -12001,7 +12018,8 @@ ar.UIElements.Main=ak.NewRoundFrame(ar.UICorner,"Squircle",{
 BackgroundTransparency=1,
 Size=UDim2.new(1,-7,0,0),
 AutomaticSize="Y",
-Parent=ap.Parent,
+Parent=isHidden and nil or ap.Parent,
+Visible=not isHidden,
 ThemeTag={
 ImageColor3="TabBackground",
 },
@@ -12016,20 +12034,6 @@ AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 ImageTransparency=1,
 Name="Outline",
-},{
-
-
-
-
-
-
-
-
-
-
-
-
-
 }),
 ak.NewRoundFrame(ar.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
@@ -12064,8 +12068,6 @@ BackgroundTransparency=1,
 },{
 al("UIPadding",{
 PaddingTop=UDim.new(0,ar.TitlePaddingY),
-
-
 PaddingBottom=UDim.new(0,ar.TitlePaddingY),
 }),
 }),
@@ -12124,21 +12126,6 @@ ImageColor3="White",
 },
 ImageTransparency=0,
 Name="Outline",
-},
-{
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 ),
 }
@@ -12151,15 +12138,10 @@ at=-28-(Window.UIPadding/2)
 ar.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,at,0,0)
 end
 
-av=
-ak.Image(ar.Icon,ar.Icon..":"..ar.Title,0,Window.Folder,ar.__type,true,ar.IconThemed)
+av=ak.Image(ar.Icon,ar.Icon..":"..ar.Title,0,Window.Folder,ar.__type,true,ar.IconThemed)
 av.Size=UDim2.new(0,16,0,16)
 av.ImageLabel.ImageTransparency=not ar.Locked and 0 or 0.7
 at=-30
-
-
-
-
 end
 
 ar.UIElements.ContainerFrame=al("ScrollingFrame",{
@@ -12171,7 +12153,6 @@ CanvasSize=UDim2.new(0,0,0,0),
 AnchorPoint=Vector2.new(0,1),
 Position=UDim2.new(0,0,1,0),
 AutomaticCanvasSize="Y",
-
 ScrollingDirection="Y",
 },{
 al("UIPadding",{
@@ -12186,10 +12167,6 @@ Padding=UDim.new(0,ar.Gap),
 HorizontalAlignment="Center",
 }),
 })
-
-
-
-
 
 ar.UIElements.ContainerFrameCanvas=al("Frame",{
 Size=UDim2.new(1,0,1,0),
@@ -12222,7 +12199,6 @@ TextSize=20,
 TextTransparency=0.1,
 Size=UDim2.new(0,0,1,0),
 FontFace=Font.new(ak.Font,Enum.FontWeight.SemiBold),
-
 RichText=true,
 LayoutOrder=2,
 TextXAlignment="Left",
@@ -12279,7 +12255,6 @@ local aw
 local ax
 local ay
 local az=false
-
 
 if ar.Desc then
 ak.AddSignal(ar.UIElements.Main.InputBegan,function()
@@ -12360,8 +12335,6 @@ end)
 return ar
 end
 
-
-
 local aA=a.load'_'
 
 aA.Load(
@@ -12377,7 +12350,6 @@ ar
 )
 
 function ar.LockAll(aB)
-
 for b,d in next,Window.AllElements do
 if d.Tab and d.Tab.Index and d.Tab.Index==ar.Index and d.Lock then
 d:Lock()
@@ -12393,24 +12365,20 @@ end
 end
 function ar.GetLocked(aB)
 local b={}
-
 for d,f in next,Window.AllElements do
 if f.Tab and f.Tab.Index and f.Tab.Index==ar.Index and f.Locked==true then
 table.insert(b,f)
 end
 end
-
 return b
 end
 function ar.GetUnlocked(aB)
 local b={}
-
 for d,f in next,Window.AllElements do
 if f.Tab and f.Tab.Index and f.Tab.Index==ar.Index and f.Locked==false then
 table.insert(b,f)
 end
 end
-
 return b
 end
 
@@ -12421,10 +12389,8 @@ end
 task.spawn(function()
 local aB
 if ar.CustomEmptyPage.Icon then
-aB=
-ak.Image(ar.CustomEmptyPage.Icon,ar.CustomEmptyPage.Icon,0,"Temp","EmptyPage",true)
-aB.Size=
-UDim2.fromOffset(ar.CustomEmptyPage.IconSize or 48,ar.CustomEmptyPage.IconSize or 48)
+aB=ak.Image(ar.CustomEmptyPage.Icon,ar.CustomEmptyPage.Icon,0,"Temp","EmptyPage",true)
+aB.Size=UDim2.fromOffset(ar.CustomEmptyPage.IconSize or 48,ar.CustomEmptyPage.IconSize or 48)
 end
 
 local b=al("Frame",{
@@ -12439,17 +12405,6 @@ VerticalAlignment="Center",
 HorizontalAlignment="Center",
 FillDirection="Vertical",
 }),
-
-
-
-
-
-
-
-
-
-
-
 aB,
 ar.CustomEmptyPage.Title and al("TextLabel",{
 AutomaticSize="XY",
@@ -12475,10 +12430,6 @@ FontFace=Font.new(ak.Font,Enum.FontWeight.Regular),
 })or nil,
 })
 
-
-
-
-
 local d
 d=ak.AddSignal(ar.UIElements.ContainerFrame.ChildAdded,function()
 b.Visible=false
@@ -12494,11 +12445,13 @@ ao.OnChangeFunc=aq
 end
 
 function ao.SelectTab(ap,aq)
+if not ao.Tabs[aq] then return end
 if not ao.Tabs[aq].Locked then
 ao.SelectedTab=aq
 
 for ar,as in next,ao.Tabs do
-if not as.Locked then
+if not as.Locked and as.UIElements.Main and as.UIElements.Main.Parent then
+pcall(function()
 ak.SetThemeTag(as.UIElements.Main,{
 ImageTransparency="TabBorderTransparency",
 },0.15)
@@ -12515,7 +12468,6 @@ ak.SetThemeTag(as.UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparency",
 },0.15)
 end
-pcall(function()
 local textPad=as.UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if textPad then
 ak.Tween(textPad,0.2,{PaddingLeft=UDim.new(0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12524,6 +12476,9 @@ end)
 as.Selected=false
 end
 end
+
+if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
+pcall(function()
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
@@ -12541,12 +12496,12 @@ ak.SetThemeTag(ao.Tabs[aq].UIElements.Icon.ImageLabel,{
 ImageTransparency="TabIconTransparencyActive",
 },0.15)
 end
-pcall(function()
 local activePad=ao.Tabs[aq].UIElements.Main.Frame.TextLabel:FindFirstChildOfClass"UIPadding"
 if activePad then
 ak.Tween(activePad,0.25,{PaddingLeft=UDim.new(0,6)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
+end
 ao.Tabs[aq].Selected=true
 
 task.spawn(function()
@@ -12554,14 +12509,15 @@ for ar,as in next,ao.Containers do
 as.AnchorPoint=Vector2.new(0,0.05)
 as.Visible=false
 end
+if ao.Containers[aq] then
 ao.Containers[aq].Visible=true
 local ar=game:GetService"TweenService"
-
 local as=TweenInfo.new(0.15,Enum.EasingStyle.Quart,Enum.EasingDirection.Out)
 local at=ar:Create(ao.Containers[aq],as,{
 AnchorPoint=Vector2.new(0,0),
 })
 at:Play()
+end
 end)
 
 ao.OnChangeFunc(aq)
