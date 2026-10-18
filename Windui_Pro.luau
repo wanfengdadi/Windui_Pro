@@ -6998,23 +6998,25 @@ local h=math.max(2,math.min(aA+g,au-at-2))
 
 local i=math.clamp((h-2)/(au-at-4),0,1)
 
-local l,m,p=am:GetGlassFrame(i)
-    aq.Frame.Bar.Highlight.Glass.Image=l
-    aq.Frame.Bar.Highlight.Glass.ImageRectSize=m
-    aq.Frame.Bar.Highlight.Glass.ImageRectOffset=p
+local l, m, p = am:GetGlassFrame(i)
 
-    ad(aq.Frame,0.06,{
-    Position=UDim2.new(0,h,0.5,0),
-    },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local glass = aq.Frame.Bar.Highlight.Glass
 
-    ad(aq.Layer,0.06,{
-    ImageTransparency=1-i,
-    }):Play()
+glass.Image = l
+glass.ImageRectSize = m
+glass.ImageRectOffset = p
 
-    ad(aq.Frame.Bar.Highlight.Glass,0.06,{
-    ImageTransparency=0.85*(1-i),
-    }):Play()
-    end)
+ad(aq.Frame, 0.06, {
+    Position = UDim2.new(0, h, 0.5, 0),
+}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+
+ad(aq.Layer, 0.06, {
+    ImageTransparency = math.clamp(1 - i, 0, 1),
+}):Play()
+
+ad(glass, 0.06, {
+    ImageTransparency = math.clamp(0.85 * (1 - i), 0, 1),
+}):Play()
 
 if as then
 as:Disconnect()
