@@ -7000,23 +7000,36 @@ local i=math.clamp((h-2)/(au-at-4),0,1)
 
 local l, m, p = am:GetGlassFrame(i)
 
-local glass = aq.Frame.Bar.Highlight.Glass
+local frame = aq.Frame
+local glass = frame.Bar.Highlight.Glass
+local layer = aq.Layer
 
-glass.Image = l
-glass.ImageRectSize = m
-glass.ImageRectOffset = p
+local alpha = math.clamp(tonumber(i) or 0, 0, 1)
 
-ad(aq.Frame, 0.06, {
+if l ~= nil then
+    glass.Image = l
+end
+
+if typeof(m) == "Vector2" then
+    glass.ImageRectSize = m
+end
+
+if typeof(p) == "Vector2" then
+    glass.ImageRectOffset = p
+end
+
+ad(frame, 0.06, {
     Position = UDim2.new(0, h, 0.5, 0),
 }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
 
-ad(aq.Layer, 0.06, {
-    ImageTransparency = math.clamp(1 - i, 0, 1),
+ad(layer, 0.06, {
+    ImageTransparency = 1 - alpha,
 }):Play()
 
 ad(glass, 0.06, {
-    ImageTransparency = math.clamp(0.85 * (1 - i), 0, 1),
+    ImageTransparency = 0.85 * (1 - alpha),
 }):Play()
+end)
 
 if as then
 as:Disconnect()
