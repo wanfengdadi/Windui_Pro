@@ -6673,7 +6673,39 @@ local ad=ab.Tween
 local ae=game:GetService"UserInputService"
 
 function aa.New(af,ag,ah,ai,aj,ak,al)
-local am={}
+local am={
+GlassSpritesheet={
+Id="rbxassetid://77297718671545",
+MirroredId="rbxassetid://92258969882244",
+Size=Vector2.new(102,128),
+Total=80,
+Cols=10,
+},
+}
+
+function am.GetGlassFrame(an,ao:number):(string,Vector2,Vector2)
+local ap=am.GlassSpritesheet
+local aq:number
+
+if ao<=0.4 then
+aq=math.floor((ao/0.4)*(ap.Total-1))
+elseif ao<0.6 then
+aq=ap.Total-1
+else
+aq=math.floor(((ao-0.6)/0.4)*(ap.Total-1))
+end
+
+aq=math.clamp(aq,0,ap.Total-1)
+
+local ar=ao>=0.6
+if ar then
+aq=(ap.Total-1)-aq
+end
+
+local as=ar and ap.MirroredId or ap.Id
+
+return as,ap.Size,Vector2.new((aq%ap.Cols)*ap.Size.X,math.floor(aq/ap.Cols)*ap.Size.Y)
+end
 
 local an=12
 local ao
@@ -6703,7 +6735,7 @@ ThemeTag={
 ImageColor3="Text",
 },
 Parent=ap,
-Size=UDim2.new(0,ak and 52 or 40.8,0,24),
+Size=UDim2.new(0,ak and(52)or(40.8),0,24),
 AnchorPoint=Vector2.new(1,0.5),
 Position=UDim2.new(0,0,0.5,0),
 Name="ToggleFrame",
@@ -6720,8 +6752,18 @@ ab.NewRoundFrame(an,"SquircleOutline",{
 Size=UDim2.new(1,0,1,0),
 Name="Stroke",
 ImageColor3=Color3.new(1,1,1),
-ImageTransparency=0.9,
+ImageTransparency=1,
+},{
+ac("UIGradient",{
+Rotation=90,
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,0),
+NumberSequenceKeypoint.new(1,1),
+},
 }),
+}),
+
+
 ab.NewRoundFrame(an,"Squircle",{
 Size=UDim2.new(0,ak and 30 or 20,0,20),
 Position=UDim2.new(0,2,0.5,0),
@@ -6735,12 +6777,59 @@ ImageTransparency=0,
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 Name="Bar",
+},{
+ab.New("Frame",{
+Size=UDim2.new(1,0,1,0),
+BackgroundColor3=Color3.new(1,1,1),
+Name="Highlight",
+BackgroundTransparency=1,
+},{
+ab.NewRoundFrame(9999,"SquircleGlass",{
+Size=UDim2.new(1,1,1,1),
+ImageColor3=Color3.new(1,1,1),
+Name="SquircleGlass",
+ImageTransparency=0.5,
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0.5,0,0.5,0),
+}),
+ab.NewRoundFrame(an,"Squircle",{
+Size=UDim2.new(1,0,1,0),
+Name="GlassBackground",
+ImageTransparency=0,
+ThemeTag={
+ImageColor3="ElementBackground",
+},
+ZIndex=-1,
+}),
+ac("ImageLabel",{
+Size=UDim2.new(1,0,1,0),
+BackgroundTransparency=1,
+Name="Glass",
+ImageTransparency=0,
+},{
+ac("UICorner",{
+CornerRadius=UDim.new(1,0),
+}),
+}),
+
+
+
+
+
+
+ab.NewRoundFrame(an,"Squircle",{
+Size=UDim2.new(1,0,1,0),
+Name="BarOverlay",
 ThemeTag={
 ImageColor3="ToggleBar",
 },
-ImageColor3=Color3.new(1,1,1),
-},{
+ZIndex=999,
+}),
+}),
 ao,
+ac("UIScale",{
+Scale=1,
+}),
 }),
 }),
 ac("TextButton",{
@@ -6758,31 +6847,91 @@ local as
 
 local at=ak and 30 or 20
 local au=aq.Size.X.Offset
-local maxTravel=au-at-4
 
 function am.Set(av,aw,ax,ay)
-local targetX=aw and(au-at-2)or 2
-local targetTrans=aw and 0 or 1
-
 if not ay then
-ad(aq.Frame,0.25,{
-Position=UDim2.new(0,targetX,0.5,0),
-Size=UDim2.new(0,at,0,20),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if aw then
+ad(aq.Frame,0.35,{
+Position=UDim2.new(0,au-at-2,0.5,0),
+},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Toggle"},0.15)
 
-ad(aq.Layer,0.2,{
-ImageTransparency=targetTrans,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(
+aq.Frame.Bar.Highlight.Glass,
+0.15,
+{ImageTransparency=0},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
 else
-aq.Frame.Position=UDim2.new(0,targetX,0.5,0)
-aq.Frame.Size=UDim2.new(0,at,0,20)
-aq.Layer.ImageTransparency=targetTrans
+ad(aq.Frame,0.35,{
+Position=UDim2.new(0,2,0.5,0),
+},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Text"},0.15)
+ad(
+aq.Frame.Bar.Highlight.Glass,
+0.15,
+{ImageTransparency=0.85},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+end
+else
+if aw then
+aq.Frame.Position=UDim2.new(0,au-at-2,0.5,0)
+else
+aq.Frame.Position=UDim2.new(0,2,0.5,0)
+end
 end
 
-if ao then
-ad(ao,0.15,{
-ImageTransparency=targetTrans,
+if aw then
+ad(aq.Layer,0.1,{
+ImageTransparency=0,
 }):Play()
+ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Toggle"},0.1)
+ad(
+aq.Frame.Bar.Highlight.Glass,
+0.1,
+{ImageTransparency=0},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+
+if ao then
+ad(ao,0.1,{
+ImageTransparency=0,
+}):Play()
+end
+
+local az,aA,aB=am:GetGlassFrame(1)
+
+aq.Frame.Bar.Highlight.Glass.Image=az
+aq.Frame.Bar.Highlight.Glass.ImageRectSize=aA
+aq.Frame.Bar.Highlight.Glass.ImageRectOffset=aB
+else
+ad(aq.Layer,0.1,{
+ImageTransparency=1,
+}):Play()
+ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Text"},0.1)
+ad(
+aq.Frame.Bar.Highlight.Glass,
+0.1,
+{ImageTransparency=0.85},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+
+if ao then
+ad(ao,0.1,{
+ImageTransparency=1,
+}):Play()
+end
+
+local az,aA,aB=am:GetGlassFrame(0)
+
+aq.Frame.Bar.Highlight.Glass.Image=az
+aq.Frame.Bar.Highlight.Glass.ImageRectSize=aA
+aq.Frame.Bar.Highlight.Glass.ImageRectOffset=aB
 end
 
 ax=ax~=false
@@ -6798,13 +6947,26 @@ function am.Animate(av,aw,ax)
 if not al.Window.IsToggleDragging then
 al.Window.IsToggleDragging=true
 
-local startX=aw.Position.X
-local initOffset=aq.Frame.Position.X.Offset
-local hasMoved=false
+local ay=aw.Position.X
+local az=aw.Position.Y
+local aA=aq.Frame.Position.X.Offset
+local aB=false
+local b=false
 
-ad(aq.Frame,0.15,{
-Size=UDim2.new(0,at+4,0,20),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(
+aq.Frame.Bar.UIScale,
+0.28,
+{Scale=1.5},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+ad(
+aq.Frame.Bar.Highlight.BarOverlay,
+0.28,
+{ImageTransparency=0.86},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
 
 if ar then
 ar:Disconnect()
@@ -6814,24 +6976,36 @@ ar=ae.InputChanged:Connect(function(d)
 if not al.Window.IsToggleDragging then
 return
 end
-if d.UserInputType~=Enum.UserInputType.MouseMovement and d.UserInputType~=Enum.UserInputType.Touch then
+if
+d.UserInputType~=Enum.UserInputType.MouseMovement
+and d.UserInputType~=Enum.UserInputType.Touch
+then
+return
+end
+if aB then
 return
 end
 
-local deltaX=d.Position.X-startX
-if not hasMoved and math.abs(deltaX)>3 then
-hasMoved=true
+local f=math.abs(d.Position.X-ay)
+math.abs(d.Position.Y-az)
+
+if not b and f>8 then
+b=true
 end
 
-local currentH=math.clamp(initOffset+deltaX,2,au-at-2)
-local ratio=math.clamp((currentH-2)/maxTravel,0,1)
+local g=d.Position.X-ay
+local h=math.max(2,math.min(aA+g,au-at-2))
 
-aq.Frame.Position=UDim2.new(0,currentH,0.5,0)
-aq.Layer.ImageTransparency=1-ratio
+local i=math.clamp((h-2)/(au-at-4),0,1)
 
-if ao then
-ao.ImageTransparency=1-ratio
-end
+local l,m,p=am:GetGlassFrame(i)
+aq.Frame.Bar.Highlight.Glass.Image=l
+aq.Frame.Bar.Highlight.Glass.ImageRectSize=m
+aq.Frame.Bar.Highlight.Glass.ImageRectOffset=p
+
+ad(aq.Frame,0.12,{
+Position=UDim2.new(0,h,0.5,0),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end)
 
 if as then
@@ -6842,7 +7016,10 @@ as=ae.InputEnded:Connect(function(d)
 if not al.Window.IsToggleDragging then
 return
 end
-if d.UserInputType~=Enum.UserInputType.MouseButton1 and d.UserInputType~=Enum.UserInputType.Touch then
+if
+d.UserInputType~=Enum.UserInputType.MouseButton1
+and d.UserInputType~=Enum.UserInputType.Touch
+then
 return
 end
 
@@ -6859,17 +7036,33 @@ end
 
 al.WindUI.CurrentInput=nil
 
-if not hasMoved then
-ax:Set(not ax.Value,true,false)
-else
-local currentH=aq.Frame.Position.X.Offset
-local shouldBeOn=(currentH-2)>(maxTravel/2)
-ax:Set(shouldBeOn,true,false)
+if aB then
+return
 end
 
-ad(aq.Frame,0.2,{
-Size=UDim2.new(0,at,0,20),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if not b then
+ax:Set(not ax.Value,true,false)
+else
+local f=aq.Frame.Position.X.Offset
+local g=f+at/2
+local h=g>au/2
+ax:Set(h,true,false)
+end
+
+ad(
+aq.Frame.Bar.UIScale,
+0.23,
+{Scale=1},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
+ad(
+aq.Frame.Bar.Highlight.BarOverlay,
+0.23,
+{ImageTransparency=0},
+Enum.EasingStyle.Quint,
+Enum.EasingDirection.Out
+):Play()
 end)
 end
 end
