@@ -7391,7 +7391,7 @@ end
 end
 
 local au,av
-local aw=32
+local aw=50
 if al.Icons then
 if al.Icons.From then
 au=ae.Image(
@@ -7487,7 +7487,7 @@ BackgroundTransparency=1,
 Parent=al.SliderFrame.UIElements.Main,
 },{
 af("UIListLayout",{
-Padding=UDim.new(0,al.Title~=nil and 8 or 12),
+Padding=UDim.new(0,al.Title~=nil and 12 or 20),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
 HorizontalAlignment=al.Icons
@@ -11997,18 +11997,6 @@ ImageColor3="TabBackground",
 },
 ImageTransparency=1,
 },{
-al("UIGradient",{
-Name="TabGradient",
-Rotation=90,
-Color=ColorSequence.new{
-ColorSequenceKeypoint.new(0,Color3.fromRGB(110,150,255)),
-ColorSequenceKeypoint.new(1,Color3.fromRGB(40,75,190)),
-},
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0,0.35),
-NumberSequenceKeypoint.new(1,0.75),
-},
-}),
 ak.NewRoundFrame(ar.UICorner-1,"Glass-1.4",{
 Size=UDim2.new(1,1,1,1),
 ThemeTag={
@@ -12463,17 +12451,10 @@ end
 
 if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
 pcall(function()
-local grad=ao.Tabs[aq].UIElements.Main:FindFirstChild"TabGradient"
-if grad then
-grad.Enabled=true
-ao.Tabs[aq].UIElements.Main.ImageColor3=Color3.new(1,1,1)
-ak.Tween(ao.Tabs[aq].UIElements.Main,0.2,{ImageTransparency=0},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
-else
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
 },0.15)
-end
 if ao.Tabs[aq].Border then
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
