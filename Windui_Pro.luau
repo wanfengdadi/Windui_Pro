@@ -6763,7 +6763,6 @@ NumberSequenceKeypoint.new(1,1),
 }),
 }),
 
-
 ab.NewRoundFrame(an,"Squircle",{
 Size=UDim2.new(0,ak and 30 or 20,0,20),
 Position=UDim2.new(0,2,0.5,0),
@@ -6812,11 +6811,6 @@ CornerRadius=UDim.new(1,0),
 }),
 }),
 
-
-
-
-
-
 ab.NewRoundFrame(an,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 Name="BarOverlay",
@@ -6851,11 +6845,10 @@ local au=aq.Size.X.Offset
 function am.Set(av,aw,ax,ay)
 if not ay then
 if aw then
-ad(aq.Frame,0.35,{
+ad(aq.Frame,0.28,{
 Position=UDim2.new(0,au-at-2,0.5,0),
 },Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Toggle"},0.15)
-
 ad(
 aq.Frame.Bar.Highlight.Glass,
 0.15,
@@ -6864,7 +6857,7 @@ Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
 else
-ad(aq.Frame,0.35,{
+ad(aq.Frame,0.28,{
 Position=UDim2.new(0,2,0.5,0),
 },Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Text"},0.15)
@@ -6885,7 +6878,7 @@ end
 end
 
 if aw then
-ad(aq.Layer,0.1,{
+ad(aq.Layer,0.2,{
 ImageTransparency=0,
 }):Play()
 ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Toggle"},0.1)
@@ -6904,12 +6897,11 @@ ImageTransparency=0,
 end
 
 local az,aA,aB=am:GetGlassFrame(1)
-
 aq.Frame.Bar.Highlight.Glass.Image=az
 aq.Frame.Bar.Highlight.Glass.ImageRectSize=aA
 aq.Frame.Bar.Highlight.Glass.ImageRectOffset=aB
 else
-ad(aq.Layer,0.1,{
+ad(aq.Layer,0.2,{
 ImageTransparency=1,
 }):Play()
 ab.SetThemeTag(aq.Frame.Bar.Highlight.Glass,{ImageColor3="Text"},0.1)
@@ -6928,7 +6920,6 @@ ImageTransparency=1,
 end
 
 local az,aA,aB=am:GetGlassFrame(0)
-
 aq.Frame.Bar.Highlight.Glass.Image=az
 aq.Frame.Bar.Highlight.Glass.ImageRectSize=aA
 aq.Frame.Bar.Highlight.Glass.ImageRectOffset=aB
@@ -6955,14 +6946,14 @@ local b=false
 
 ad(
 aq.Frame.Bar.UIScale,
-0.28,
-{Scale=1.5},
+0.24,
+{Scale=1.25},
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
 ad(
 aq.Frame.Bar.Highlight.BarOverlay,
-0.28,
+0.24,
 {ImageTransparency=0.86},
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
@@ -6987,15 +6978,12 @@ return
 end
 
 local f=math.abs(d.Position.X-ay)
-math.abs(d.Position.Y-az)
-
-if not b and f>8 then
+if not b and f>3 then
 b=true
 end
 
 local g=d.Position.X-ay
 local h=math.max(2,math.min(aA+g,au-at-2))
-
 local i=math.clamp((h-2)/(au-at-4),0,1)
 
 local l,m,p=am:GetGlassFrame(i)
@@ -7003,9 +6991,23 @@ aq.Frame.Bar.Highlight.Glass.Image=l
 aq.Frame.Bar.Highlight.Glass.ImageRectSize=m
 aq.Frame.Bar.Highlight.Glass.ImageRectOffset=p
 
-ad(aq.Frame,0.12,{
+ad(aq.Frame,0.06,{
 Position=UDim2.new(0,h,0.5,0),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+ad(aq.Layer,0.06,{
+ImageTransparency=1-i,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+ad(aq.Frame.Bar.Highlight.Glass,0.06,{
+ImageTransparency=0.85*(1-i),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+if ao then
+ad(ao,0.06,{
+ImageTransparency=1-i,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end)
 
 if as then
@@ -7051,14 +7053,14 @@ end
 
 ad(
 aq.Frame.Bar.UIScale,
-0.23,
+0.2,
 {Scale=1},
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
 ):Play()
 ad(
 aq.Frame.Bar.Highlight.BarOverlay,
-0.23,
+0.2,
 {ImageTransparency=0},
 Enum.EasingStyle.Quint,
 Enum.EasingDirection.Out
