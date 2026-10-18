@@ -7548,73 +7548,50 @@ local ay=ak.Tab.UIElements.ContainerFrame
 
 function al.Set(az,aA,aB)
 if as then
-if
-not al.IsFocusing
-and not ai
-and(
-not aB
-or(
-aB.UserInputType==Enum.UserInputType.MouseButton1
-or aB.UserInputType==Enum.UserInputType.Touch
-)
-)
-then
+if not al.IsFocusing and not ai and(not aB or(aB.UserInputType==Enum.UserInputType.MouseButton1 or aB.UserInputType==Enum.UserInputType.Touch)) then
 if aB then
 am=(aB.UserInputType==Enum.UserInputType.Touch)
 ay.ScrollingEnabled=false
 ai=true
 
-local b=am and aB.Position.X or ac:GetMouseLocation().X
-local d=math.clamp(
-(b-al.UIElements.SliderIcon.AbsolutePosition.X)
-/al.UIElements.SliderIcon.AbsoluteSize.X,
-0,
-1
-)
-aA=CalculateValue(al.Value.Min+d*(al.Value.Max-al.Value.Min))
-aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
-
-if aA~=aq then
-ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(d,0,1,0)}):Play()
-al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
-al.Value.Default=FormatValue(aA)
-aq=aA
-ae.SafeCallback(al.Callback,FormatValue(aA))
-end
-
-an=ad.RenderStepped:Connect(function()
-local f=am and aB.Position.X or ac:GetMouseLocation().X
-local g=math.clamp(
-(f-al.UIElements.SliderIcon.AbsolutePosition.X)
-/al.UIElements.SliderIcon.AbsoluteSize.X,
-0,
-1
-)
-aA=CalculateValue(al.Value.Min+g*(al.Value.Max-al.Value.Min))
-
-if aA~=aq then
-ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(g,0,1,0)}):Play()
-al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
-al.Value.Default=FormatValue(aA)
-aq=aA
-ae.SafeCallback(al.Callback,FormatValue(aA))
+local currentTouchPos=aB.Position
+local moveConn
+moveConn=ac.InputChanged:Connect(function(input)
+if input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch then
+currentTouchPos=input.Position
 end
 end)
 
+local function updatePosition()
+local f=am and currentTouchPos.X or ac:GetMouseLocation().X
+local g=math.clamp((f-al.UIElements.SliderIcon.AbsolutePosition.X)/al.UIElements.SliderIcon.AbsoluteSize.X,0,1)
+local rawVal=al.Value.Min+g*(al.Value.Max-al.Value.Min)
+aA=CalculateValue(rawVal)
+aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
+
+local ratio=math.clamp((aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),0,1)
+ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(ratio,0,1,0)}):Play()
+
+if aA~=aq then
+al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
+if ax then
+ax.TitleFrame.Text=FormatValue(aA)
+end
+al.Value.Default=FormatValue(aA)
+aq=aA
+ae.SafeCallback(al.Callback,FormatValue(aA))
+end
+end
+
+updatePosition()
+
+an=ad.RenderStepped:Connect(updatePosition)
 
 ao=ac.InputEnded:Connect(function(f)
-if
-(
-f.UserInputType==Enum.UserInputType.MouseButton1
-or f.UserInputType==Enum.UserInputType.Touch
-)and aB==f
-then
+if(f.UserInputType==Enum.UserInputType.MouseButton1 or f.UserInputType==Enum.UserInputType.Touch)and aB==f then
+if moveConn then
+moveConn:Disconnect()
+end
 an:Disconnect()
 ao:Disconnect()
 ai=false
@@ -7640,16 +7617,11 @@ end
 end)
 else
 aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
-
-local b=math.clamp(
-(aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),
-0,
-1
-)
+local b=math.clamp((aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),0,1)
 aA=CalculateValue(al.Value.Min+b*(al.Value.Max-al.Value.Min))
 
-if aA~=aq then
 ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(b,0,1,0)}):Play()
+if aA~=aq then
 al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
 if ax then
 ax.TitleFrame.Text=FormatValue(aA)
@@ -12025,6 +11997,18 @@ ImageColor3="TabBackground",
 },
 ImageTransparency=1,
 },{
+al("UIGradient",{
+Name="TabGradient",
+Rotation=90,
+Color=ColorSequence.new{
+ColorSequenceKeypoint.new(0,Color3.fromRGB(110,150,255)),
+ColorSequenceKeypoint.new(1,Color3.fromRGB(40,75,190)),
+},
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,0.35),
+NumberSequenceKeypoint.new(1,0.75),
+},
+}),
 ak.NewRoundFrame(ar.UICorner-1,"Glass-1.4",{
 Size=UDim2.new(1,1,1,1),
 ThemeTag={
@@ -12479,10 +12463,17 @@ end
 
 if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
 pcall(function()
+local grad=ao.Tabs[aq].UIElements.Main:FindFirstChild"TabGradient"
+if grad then
+grad.Enabled=true
+ao.Tabs[aq].UIElements.Main.ImageColor3=Color3.new(1,1,1)
+ak.Tween(ao.Tabs[aq].UIElements.Main,0.2,{ImageTransparency=0},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
+else
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
 ImageColor3="TabBackgroundActive",
 ImageTransparency="TabBackgroundActiveTransparency",
 },0.15)
+end
 if ao.Tabs[aq].Border then
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
