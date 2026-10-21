@@ -2792,11 +2792,10 @@ return aa end function a.o()
             })
         end
 
-        aj.UIElements.Main = ab("CanvasGroup", {
+        aj.UIElements.Main = ab("Frame", {
             Size = UDim2.new(0, 280, 0, 0),
             AutomaticSize = "Y",
             BackgroundTransparency = 1,
-            GroupTransparency = 1,
             Visible = true,
             ZIndex = 99999,
         }, {
@@ -2808,15 +2807,11 @@ return aa end function a.o()
             }),
         })
 
-        local cardScale = ab("UIScale", {
-            Scale = 0.92,
-        })
-
         aj.UIElements.MainContainer = aa.NewRoundFrame(aj.UICorner, "Squircle", {
             Visible = false,
             ImageTransparency = 1,
             Parent = ai or aj.UIElements.FullScreen,
-            Position = UDim2.new(0.5, 0, 0.5, 18),
+            Position = UDim2.new(0.5, 0, 0.5, 16),
             AnchorPoint = Vector2.new(0.5, 0.5),
             AutomaticSize = "XY",
             ThemeTag = {
@@ -2825,7 +2820,6 @@ return aa end function a.o()
             },
             ZIndex = 9999,
         }, {
-            cardScale,
             aj.UIElements.Main,
         })
 
@@ -2839,22 +2833,12 @@ return aa end function a.o()
             end
 
             aj.UIElements.MainContainer.Visible = true
-            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 18)
+            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 16)
             aj.UIElements.MainContainer.ImageTransparency = 1
-            aj.UIElements.Main.GroupTransparency = 1
-            cardScale.Scale = 0.92
 
-            ac(aj.UIElements.MainContainer, 0.42, {
+            ac(aj.UIElements.MainContainer, 0.38, {
                 Position = UDim2.new(0.5, 0, 0.5, 0),
                 ImageTransparency = 0,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-
-            ac(aj.UIElements.Main, 0.35, {
-                GroupTransparency = 0,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-
-            ac(cardScale, 0.42, {
-                Scale = 1.0,
             }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
         end
 
@@ -2863,30 +2847,18 @@ return aa end function a.o()
             aj._isClosing = true
 
             if not ae and aj.UIElements.FullScreen and aj.UIElements.FullScreen.Parent then
-                ac(aj.UIElements.FullScreen, 0.28, { BackgroundTransparency = 1 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+                ac(aj.UIElements.FullScreen, 0.25, { BackgroundTransparency = 1 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
                 aj.UIElements.FullScreen.Active = false
             end
 
             if aj.UIElements.MainContainer and aj.UIElements.MainContainer.Parent then
-                ac(aj.UIElements.MainContainer, 0.28, {
+                ac(aj.UIElements.MainContainer, 0.25, {
                     Position = UDim2.new(0.5, 0, 0.5, 14),
                     ImageTransparency = 1,
                 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
             end
 
-            if aj.UIElements.Main and aj.UIElements.Main.Parent then
-                ac(aj.UIElements.Main, 0.25, {
-                    GroupTransparency = 1,
-                }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-            end
-
-            if cardScale and cardScale.Parent then
-                ac(cardScale, 0.28, {
-                    Scale = 0.92,
-                }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-            end
-
-            task.delay(0.3, function()
+            task.delay(0.26, function()
                 if aj.UIElements.MainContainer then
                     aj.UIElements.MainContainer.Visible = false
                     pcall(function() aj.UIElements.MainContainer:Destroy() end)
