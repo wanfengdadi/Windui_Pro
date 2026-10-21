@@ -2862,29 +2862,41 @@ return aa end function a.o()
             if aj._isClosing then return function() end end
             aj._isClosing = true
 
-            if not ae and aj.UIElements.FullScreen then
+            if not ae and aj.UIElements.FullScreen and aj.UIElements.FullScreen.Parent then
                 ac(aj.UIElements.FullScreen, 0.28, { BackgroundTransparency = 1 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
                 aj.UIElements.FullScreen.Active = false
             end
 
-            ac(aj.UIElements.MainContainer, 0.28, {
-                Position = UDim2.new(0.5, 0, 0.5, 14),
-                ImageTransparency = 1,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+            if aj.UIElements.MainContainer and aj.UIElements.MainContainer.Parent then
+                ac(aj.UIElements.MainContainer, 0.28, {
+                    Position = UDim2.new(0.5, 0, 0.5, 14),
+                    ImageTransparency = 1,
+                }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+            end
 
-            ac(aj.UIElements.Main, 0.25, {
-                GroupTransparency = 1,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+            if aj.UIElements.Main and aj.UIElements.Main.Parent then
+                ac(aj.UIElements.Main, 0.25, {
+                    GroupTransparency = 1,
+                }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+            end
 
-            ac(cardScale, 0.28, {
-                Scale = 0.92,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+            if cardScale and cardScale.Parent then
+                ac(cardScale, 0.28, {
+                    Scale = 0.92,
+                }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+            end
 
             task.delay(0.3, function()
-                if not ae and aj.UIElements.FullScreen then
-                    aj.UIElements.FullScreen:Destroy()
-                else
-                    aj.UIElements.MainContainer:Destroy()
+                if aj.UIElements.MainContainer then
+                    aj.UIElements.MainContainer.Visible = false
+                    pcall(function() aj.UIElements.MainContainer:Destroy() end)
+                    aj.UIElements.MainContainer = nil
+                end
+
+                if aj.UIElements.FullScreen then
+                    aj.UIElements.FullScreen.Visible = false
+                    pcall(function() aj.UIElements.FullScreen:Destroy() end)
+                    aj.UIElements.FullScreen = nil
                 end
             end)
 
