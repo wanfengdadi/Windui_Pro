@@ -1714,6 +1714,7 @@ Position=g.Position or"BottomRight",
 UIElements={},
 Closed=false,
 DurationThread=nil,
+DurationTween=nil,
 }
 
 f.NotificationIndex=f.NotificationIndex+1
@@ -1895,11 +1896,20 @@ h.ContentLabel=contentLabel
 function h.Close(v)
 if not h.Closed then
 h.Closed=true
-if h.DurationThread then
-task.cancel(h.DurationThread)
-h.DurationThread=nil
+
+if h.DurationTween then
+pcall(function() h.DurationTween:Cancel() end)
+h.DurationTween=nil
 end
+
+local curThread=coroutine.running()
+if h.DurationThread and h.DurationThread~=curThread then
+pcall(task.cancel,h.DurationThread)
+end
+h.DurationThread=nil
+
 local exitX=isLeft and -2 or 2
+if u and u.Parent then
 e(
 u,
 0.35,
@@ -1907,30 +1917,53 @@ u,
 Enum.EasingStyle.Exponential,
 Enum.EasingDirection.Out
 ):Play()
+end
+if r and r.Parent then
 e(r,0.35,{Position=UDim2.new(exitX,0,startY,0)},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
-task.wait(0.35)
+end
+
+task.delay(0.36,function()
+if u and u.Parent then
 u:Destroy()
+end
+end)
 end
 end
 
 local function runTimer(seconds)
-if h.DurationThread then
-task.cancel(h.DurationThread)
+local curThread=coroutine.running()
+if h.DurationThread and h.DurationThread~=curThread then
+pcall(task.cancel,h.DurationThread)
 h.DurationThread=nil
 end
+
+if h.DurationTween then
+pcall(function() h.DurationTween:Cancel() end)
+h.DurationTween=nil
+end
+
 if seconds and seconds>0 then
 h.DurationThread=task.spawn(function()
-m.Size=UDim2.new(0,r.DurationFrame.AbsoluteSize.X,1,0)
+local barWidth=r and r.DurationFrame and r.DurationFrame.AbsoluteSize.X or 300
+if barWidth<=0 then barWidth=300 end
+
+m.Size=UDim2.new(0,barWidth,1,0)
 r.DurationFrame.Frame.Size=UDim2.new(1,0,1,0)
-e(
+
+h.DurationTween=e(
 r.DurationFrame.Frame,
 seconds,
 {Size=UDim2.new(0,0,1,0)},
 Enum.EasingStyle.Linear,
 Enum.EasingDirection.InOut
-):Play()
+)
+h.DurationTween:Play()
+
 task.wait(seconds)
+
+if not h.Closed then
 h:Close()
+end
 end)
 end
 end
