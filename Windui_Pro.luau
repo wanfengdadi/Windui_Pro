@@ -1713,6 +1713,7 @@ CanClose=g.CanClose~=false,
 Position=g.Position or"BottomRight",
 UIElements={},
 Closed=false,
+DurationThread=nil,
 }
 
 f.NotificationIndex=f.NotificationIndex+1
@@ -1772,20 +1773,7 @@ ImageColor3="NotificationDuration",
 },
 })
 
-local p=d("Frame",{
-Size=UDim2.new(1,h.Icon and-28-f.UIPadding or 0,1,0),
-Position=UDim2.new(1,0,0,0),
-AnchorPoint=Vector2.new(1,0),
-BackgroundTransparency=1,
-AutomaticSize="Y",
-},{
-d("UIPadding",{
-PaddingTop=UDim.new(0,f.UIPadding),
-PaddingLeft=UDim.new(0,f.UIPadding),
-PaddingRight=UDim.new(0,f.UIPadding),
-PaddingBottom=UDim.new(0,f.UIPadding),
-}),
-d("TextLabel",{
+local titleLabel=d("TextLabel",{
 AutomaticSize="Y",
 Size=UDim2.new(1,-30-f.UIPadding,0,0),
 TextWrapped=true,
@@ -1799,14 +1787,30 @@ TextTransparency="NotificationTitleTransparency",
 },
 Text=h.Title,
 FontFace=Font.new(b.Font,Enum.FontWeight.SemiBold),
+})
+
+local p=d("Frame",{
+Size=UDim2.new(1,h.Icon and-28-f.UIPadding or 0,1,0),
+Position=UDim2.new(1,0,0,0),
+AnchorPoint=Vector2.new(1,0),
+BackgroundTransparency=1,
+AutomaticSize="Y",
+},{
+d("UIPadding",{
+PaddingTop=UDim.new(0,f.UIPadding),
+PaddingLeft=UDim.new(0,f.UIPadding),
+PaddingRight=UDim.new(0,f.UIPadding),
+PaddingBottom=UDim.new(0,f.UIPadding),
 }),
+titleLabel,
 d("UIListLayout",{
 Padding=UDim.new(0,f.UIPadding/3),
 }),
 })
 
+local contentLabel
 if h.Content then
-d("TextLabel",{
+contentLabel=d("TextLabel",{
 AutomaticSize="Y",
 Size=UDim2.new(1,0,0,0),
 TextWrapped=true,
@@ -1883,20 +1887,114 @@ Parent=targetHolder,
 r,
 })
 
+h.Card=r
+h.Outer=u
+h.TitleLabel=titleLabel
+h.ContentLabel=contentLabel
+
 function h.Close(v)
 if not h.Closed then
 h.Closed=true
+if h.DurationThread then
+task.cancel(h.DurationThread)
+h.DurationThread=nil
+end
 local exitX=isLeft and -2 or 2
 e(
 u,
-0.45,
+0.35,
 {Size=UDim2.new(1,0,0,-8)},
-Enum.EasingStyle.Quint,
+Enum.EasingStyle.Exponential,
 Enum.EasingDirection.Out
 ):Play()
-e(r,0.55,{Position=UDim2.new(exitX,0,startY,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-task.wait(0.45)
+e(r,0.35,{Position=UDim2.new(exitX,0,startY,0)},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+task.wait(0.35)
 u:Destroy()
+end
+end
+
+local function runTimer(seconds)
+if h.DurationThread then
+task.cancel(h.DurationThread)
+h.DurationThread=nil
+end
+if seconds and seconds>0 then
+h.DurationThread=task.spawn(function()
+m.Size=UDim2.new(0,r.DurationFrame.AbsoluteSize.X,1,0)
+r.DurationFrame.Frame.Size=UDim2.new(1,0,1,0)
+e(
+r.DurationFrame.Frame,
+seconds,
+{Size=UDim2.new(0,0,1,0)},
+Enum.EasingStyle.Linear,
+Enum.EasingDirection.InOut
+):Play()
+task.wait(seconds)
+h:Close()
+end)
+end
+end
+
+function h.Update(v,newOpts,optContent,optDuration)
+if h.Closed then return end
+local nTitle,nContent,nDuration
+if type(newOpts)=="table" then
+nTitle=newOpts.Title
+nContent=newOpts.Content
+nDuration=newOpts.Duration
+else
+nTitle=newOpts
+nContent=optContent
+nDuration=optDuration
+end
+
+if nTitle then
+h.Title=nTitle
+titleLabel.Text=nTitle
+end
+
+if nContent then
+h.Content=nContent
+if not contentLabel then
+contentLabel=d("TextLabel",{
+AutomaticSize="Y",
+Size=UDim2.new(1,0,0,0),
+TextWrapped=true,
+TextXAlignment="Left",
+RichText=true,
+BackgroundTransparency=1,
+TextSize=15,
+ThemeTag={
+TextColor3="NotificationContent",
+TextTransparency="NotificationContentTransparency",
+},
+Text=nContent,
+FontFace=Font.new(b.Font,Enum.FontWeight.Medium),
+Parent=p,
+})
+h.ContentLabel=contentLabel
+else
+contentLabel.Text=nContent
+contentLabel.Visible=true
+end
+end
+
+task.defer(function()
+task.wait()
+if not h.Closed and u and u.Parent and r and r.Parent then
+e(
+u,
+0.38,
+{Size=UDim2.new(1,0,0,r.AbsoluteSize.Y)},
+Enum.EasingStyle.Exponential,
+Enum.EasingDirection.Out
+):Play()
+end
+end)
+
+if nDuration then
+h.Duration=nDuration
+runTimer(nDuration)
 end
 end
 
@@ -1906,22 +2004,11 @@ e(
 u,
 0.45,
 {Size=UDim2.new(1,0,0,r.AbsoluteSize.Y)},
-Enum.EasingStyle.Quint,
+Enum.EasingStyle.Exponential,
 Enum.EasingDirection.Out
 ):Play()
-e(r,0.45,{Position=UDim2.new(0,0,startY,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-if h.Duration then
-m.Size=UDim2.new(0,r.DurationFrame.AbsoluteSize.X,1,0)
-e(
-r.DurationFrame.Frame,
-h.Duration,
-{Size=UDim2.new(0,0,1,0)},
-Enum.EasingStyle.Linear,
-Enum.EasingDirection.InOut
-):Play()
-task.wait(h.Duration)
-h:Close()
-end
+e(r,0.45,{Position=UDim2.new(0,0,startY,0)},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+runTimer(h.Duration)
 end)
 
 if l then
