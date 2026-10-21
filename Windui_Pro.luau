@@ -2809,14 +2809,14 @@ return aa end function a.o()
         })
 
         local cardScale = ab("UIScale", {
-            Scale = 0.94,
+            Scale = 0.92,
         })
 
         aj.UIElements.MainContainer = aa.NewRoundFrame(aj.UICorner, "Squircle", {
             Visible = false,
             ImageTransparency = 1,
             Parent = ai or aj.UIElements.FullScreen,
-            Position = UDim2.new(0.5, 0, 0.5, 16),
+            Position = UDim2.new(0.5, 0, 0.5, 18),
             AnchorPoint = Vector2.new(0.5, 0.5),
             AutomaticSize = "XY",
             ThemeTag = {
@@ -2832,48 +2832,53 @@ return aa end function a.o()
         function aj.Open(ak)
             aj._isClosing = false
 
-            local tOpen = TweenInfo.new(0.42, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
-            local tFade = TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
-
             if not ae and aj.UIElements.FullScreen then
                 aj.UIElements.FullScreen.Visible = true
                 aj.UIElements.FullScreen.Active = true
-                ac(aj.UIElements.FullScreen, tFade, { BackgroundTransparency = 0.65 }):Play()
+                ac(aj.UIElements.FullScreen, 0.35, { BackgroundTransparency = 0.65 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
             end
 
             aj.UIElements.MainContainer.Visible = true
-            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 16)
+            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 18)
             aj.UIElements.MainContainer.ImageTransparency = 1
             aj.UIElements.Main.GroupTransparency = 1
-            cardScale.Scale = 0.94
+            cardScale.Scale = 0.92
 
-            ac(aj.UIElements.MainContainer, tOpen, {
+            ac(aj.UIElements.MainContainer, 0.42, {
                 Position = UDim2.new(0.5, 0, 0.5, 0),
                 ImageTransparency = 0,
-            }):Play()
+            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
 
-            ac(aj.UIElements.Main, tFade, { GroupTransparency = 0 }):Play()
-            ac(cardScale, tOpen, { Scale = 1.0 }):Play()
+            ac(aj.UIElements.Main, 0.35, {
+                GroupTransparency = 0,
+            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+
+            ac(cardScale, 0.42, {
+                Scale = 1.0,
+            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
         end
 
         function aj.Close(ak)
             if aj._isClosing then return function() end end
             aj._isClosing = true
 
-            local tClose = TweenInfo.new(0.28, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
-
             if not ae and aj.UIElements.FullScreen then
-                ac(aj.UIElements.FullScreen, tClose, { BackgroundTransparency = 1 }):Play()
+                ac(aj.UIElements.FullScreen, 0.28, { BackgroundTransparency = 1 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
                 aj.UIElements.FullScreen.Active = false
             end
 
-            ac(aj.UIElements.MainContainer, tClose, {
-                Position = UDim2.new(0.5, 0, 0.5, 12),
+            ac(aj.UIElements.MainContainer, 0.28, {
+                Position = UDim2.new(0.5, 0, 0.5, 14),
                 ImageTransparency = 1,
-            }):Play()
+            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
 
-            ac(aj.UIElements.Main, tClose, { GroupTransparency = 1 }):Play()
-            ac(cardScale, tClose, { Scale = 0.94 }):Play()
+            ac(aj.UIElements.Main, 0.25, {
+                GroupTransparency = 1,
+            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+
+            ac(cardScale, 0.28, {
+                Scale = 0.92,
+            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
 
             task.delay(0.3, function()
                 if not ae and aj.UIElements.FullScreen then
@@ -10470,6 +10475,7 @@ return ai end function a.S()
         local function UpdateHue(N, O)
             local P = N.AbsolutePosition.Y
             local Q = P + N.AbsoluteSize.Y
+
             local R = math.clamp(ap.Y, P, Q)
 
             O.Hue = (R - P) / (Q - P)
@@ -10479,6 +10485,7 @@ return ai end function a.S()
         local function UpdateTransparency(N, O)
             local P = N.AbsolutePosition.Y
             local Q = P + N.AbsoluteSize.Y
+
             local R = math.clamp(ap.Y, P, Q)
 
             O.Transparency = 1 - ((R - P) / (Q - P))
@@ -10677,10 +10684,6 @@ return ai end function a.S()
         aa.AddSignal(aw.UIElements.Colorpicker.MouseButton1Click, function()
             if ax and not aw.IsShowed then
                 aw.IsShowed = true
-                ag(aw.UIElements.Colorpicker, 0.1, { Size = UDim2.new(0, 22, 0, 22) }):Play()
-                task.delay(0.1, function()
-                    ag(aw.UIElements.Colorpicker, 0.15, { Size = UDim2.new(0, 26, 0, 26) }):Play()
-                end)
                 as:Colorpicker(aw, av.Window, av.WindUI, function(ay, az)
                     aw:Update(ay, az)
                     aw.Default = ay
