@@ -2750,187 +2750,146 @@ return ar
 end
 
 return aa end function a.o()
+    local aa = a.load'd'
+    local ab = aa.New
+    local ac = aa.Tween
 
-local aa=a.load'd'
-local ab=aa.New
-local ac=aa.Tween
+    local ad = {
+        Holder = nil,
+        Parent = nil,
+    }
 
+    function ad.Create(ae, af, ag, ah, ai)
+        local aj = {
+            UICorner = 28,
+            UIPadding = 12,
+            Window = ag,
+            WindUI = ah,
+            UIElements = {},
+            _isClosing = false,
+        }
 
+        if ae then
+            aj.UIPadding = 0
+            aj.UICorner = 26
+        end
 
+        af = af or "Dialog"
 
-local ad={
-Holder=nil,
+        if not ae then
+            aj.UIElements.FullScreen = ab("Frame", {
+                ZIndex = 999,
+                BackgroundTransparency = 1,
+                BackgroundColor3 = Color3.fromHex"#000000",
+                Size = UDim2.new(1, 0, 1, 0),
+                Active = true,
+                Visible = false,
+                Parent = ad.Parent or (ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
+            }, {
+                ab("UICorner", {
+                    CornerRadius = UDim.new(0, ag and ag.UICorner or 16),
+                }),
+            })
+        end
 
-Parent=nil,
-}
+        aj.UIElements.Main = ab("CanvasGroup", {
+            Size = UDim2.new(0, 280, 0, 0),
+            AutomaticSize = "Y",
+            BackgroundTransparency = 1,
+            GroupTransparency = 1,
+            Visible = true,
+            ZIndex = 99999,
+        }, {
+            ab("UIPadding", {
+                PaddingTop = UDim.new(0, aj.UIPadding),
+                PaddingLeft = UDim.new(0, aj.UIPadding),
+                PaddingRight = UDim.new(0, aj.UIPadding),
+                PaddingBottom = UDim.new(0, aj.UIPadding),
+            }),
+        })
 
-function ad.Create(ae,af,ag,ah,ai)
-local aj={
-UICorner=28,
-UIPadding=12,
+        local cardScale = ab("UIScale", {
+            Scale = 0.94,
+        })
 
-Window=ag,
-WindUI=ah,
+        aj.UIElements.MainContainer = aa.NewRoundFrame(aj.UICorner, "Squircle", {
+            Visible = false,
+            ImageTransparency = 1,
+            Parent = ai or aj.UIElements.FullScreen,
+            Position = UDim2.new(0.5, 0, 0.5, 16),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            AutomaticSize = "XY",
+            ThemeTag = {
+                ImageColor3 = af .. "Background",
+                ImageTransparency = af .. "BackgroundTransparency",
+            },
+            ZIndex = 9999,
+        }, {
+            cardScale,
+            aj.UIElements.Main,
+        })
 
-UIElements={},
-}
+        function aj.Open(ak)
+            aj._isClosing = false
 
-if ae then
-aj.UIPadding=0
-end
-if ae then
-aj.UICorner=26
-end
+            local tOpen = TweenInfo.new(0.42, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+            local tFade = TweenInfo.new(0.3, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
-af=af or"Dialog"
+            if not ae and aj.UIElements.FullScreen then
+                aj.UIElements.FullScreen.Visible = true
+                aj.UIElements.FullScreen.Active = true
+                ac(aj.UIElements.FullScreen, tFade, { BackgroundTransparency = 0.65 }):Play()
+            end
 
-if not ae then
-aj.UIElements.FullScreen=ab("Frame",{
-ZIndex=999,
-BackgroundTransparency=1,
-BackgroundColor3=Color3.fromHex"#000000",
-Size=UDim2.new(1,0,1,0),
-Active=false,
-Visible=false,
-Parent=ad.Parent
-or(ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
-},{
-ab("UICorner",{
-CornerRadius=UDim.new(0,ag.UICorner),
-}),
-})
-end
+            aj.UIElements.MainContainer.Visible = true
+            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 16)
+            aj.UIElements.MainContainer.ImageTransparency = 1
+            aj.UIElements.Main.GroupTransparency = 1
+            cardScale.Scale = 0.94
 
-ab("ImageLabel",{
-Image="rbxassetid://8992230677",
-ThemeTag={
-ImageColor3="WindowShadow",
+            ac(aj.UIElements.MainContainer, tOpen, {
+                Position = UDim2.new(0.5, 0, 0.5, 0),
+                ImageTransparency = 0,
+            }):Play()
 
-},
-ImageTransparency=1,
-Size=UDim2.new(1,100,1,100),
-Position=UDim2.new(0,-50,0,-50),
-ScaleType="Slice",
-SliceCenter=Rect.new(99,99,99,99),
-BackgroundTransparency=1,
-ZIndex=-999999999999999,
-Name="Blur",
-})
+            ac(aj.UIElements.Main, tFade, { GroupTransparency = 0 }):Play()
+            ac(cardScale, tOpen, { Scale = 1.0 }):Play()
+        end
 
-aj.UIElements.Main=ab("Frame",{
-Size=UDim2.new(0,280,0,0),
-ThemeTag={
-BackgroundColor3=af.."Background",
-},
-AutomaticSize="Y",
-BackgroundTransparency=1,
-Visible=false,
-ZIndex=99999,
-},{
-ab("UIPadding",{
-PaddingTop=UDim.new(0,aj.UIPadding),
-PaddingLeft=UDim.new(0,aj.UIPadding),
-PaddingRight=UDim.new(0,aj.UIPadding),
-PaddingBottom=UDim.new(0,aj.UIPadding),
-}),
-})
+        function aj.Close(ak)
+            if aj._isClosing then return function() end end
+            aj._isClosing = true
 
-aj.UIElements.MainContainer=aa.NewRoundFrame(aj.UICorner,"Squircle",{
-Visible=false,
+            local tClose = TweenInfo.new(0.28, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 
-ImageTransparency=ae and 0.15 or 0,
-Parent=ai or aj.UIElements.FullScreen,
-Position=UDim2.new(0.5,0,0.5,0),
-AnchorPoint=Vector2.new(0.5,0.5),
-AutomaticSize="XY",
-ThemeTag={
-ImageColor3=af.."Background",
-ImageTransparency=af.."BackgroundTransparency",
-},
-ZIndex=9999,
-},{
+            if not ae and aj.UIElements.FullScreen then
+                ac(aj.UIElements.FullScreen, tClose, { BackgroundTransparency = 1 }):Play()
+                aj.UIElements.FullScreen.Active = false
+            end
 
+            ac(aj.UIElements.MainContainer, tClose, {
+                Position = UDim2.new(0.5, 0, 0.5, 12),
+                ImageTransparency = 1,
+            }):Play()
 
+            ac(aj.UIElements.Main, tClose, { GroupTransparency = 1 }):Play()
+            ac(cardScale, tClose, { Scale = 0.94 }):Play()
 
+            task.delay(0.3, function()
+                if not ae and aj.UIElements.FullScreen then
+                    aj.UIElements.FullScreen:Destroy()
+                else
+                    aj.UIElements.MainContainer:Destroy()
+                end
+            end)
 
+            return function() end
+        end
 
+        return aj
+    end
 
-aj.UIElements.Main,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-})
-
-function aj.Open(ak)
-if not ae then
-aj.UIElements.FullScreen.Visible=true
-aj.UIElements.FullScreen.Active=true
-end
-
-task.spawn(function()
-aj.UIElements.MainContainer.Visible=true
-
-if not ae then
-ac(aj.UIElements.FullScreen,0.1,{BackgroundTransparency=0.65}):Play()
-end
-ac(aj.UIElements.MainContainer,0.1,{ImageTransparency=0}):Play()
-
-
-task.spawn(function()
-task.wait(0.05)
-aj.UIElements.Main.Visible=true
-end)
-end)
-end
-function aj.Close(ak)
-if not ae then
-ac(aj.UIElements.FullScreen,0.1,{BackgroundTransparency=1}):Play()
-aj.UIElements.FullScreen.Active=false
-task.spawn(function()
-task.wait(0.1)
-aj.UIElements.FullScreen.Visible=false
-end)
-end
-aj.UIElements.Main.Visible=false
-
-ac(aj.UIElements.MainContainer,0.1,{ImageTransparency=1}):Play()
-
-
-
-task.spawn(function()
-task.wait(0.1)
-if not ae then
-aj.UIElements.FullScreen:Destroy()
-else
-aj.UIElements.MainContainer:Destroy()
-end
-end)
-
-return function()end
-end
-
-
-return aj
-end
-
-return ad end function a.p()
+    return ad end function a.p()
 
 local aa={}
 
@@ -9910,881 +9869,831 @@ return am.__type,am
 end
 
 return ai end function a.S()
-
-local aa=a.load'd'
-local af=aa.New local ag=
-aa.Tween
-
-local ai=(cloneref or clonereference or function(ai)
-return ai
-end)
-
-local ak=ai(game:GetService"UserInputService")
-ai(game:GetService"TouchInputService")
-local al=ai(game:GetService"RunService")
-local am=ai(game:GetService"Players")local an=
-
-al.RenderStepped
-local ao=am.LocalPlayer
-local ap=ao:GetMouse()
-
-local aq=a.load'm'.New
-local ar=a.load'n'.New
-
-local as={
-UICorner=9,
-
-}
-
-local at
-
-function as.Colorpicker(au,av,aw,ax,ay)
-local az={
-__type="Colorpicker",
-Title=av.Title,
-Desc=av.Desc,
-Default=av.Value or av.Default,
-Callback=av.Callback,
-Transparency=av.Transparency,
-UIElements=av.UIElements,
-
-TextPadding=10,
-}
-
-local aA={}
-local aB=az.Transparency~=nil
-
-function az.SetHSVFromRGB(b,d)
-local f,g,h=Color3.toHSV(d)
-az.Hue=f
-az.Sat=g
-az.Vib=h
-end
-
-az:SetHSVFromRGB(az.Default)
-
-local b=a.load'o'
-local d=b.Create(nil,"Dialog",aw,ax,aw.UIElements.Main.Main)
-
-az.ColorpickerFrame=d
-
-d.UIElements.Main.Size=UDim2.new(1,0,0,0)
-
-
-
-local f,g,h=az.Hue,az.Sat,az.Vib
-
-az.UIElements.Title=af("TextLabel",{
-Text=az.Title,
-TextSize=20,
-FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
-TextXAlignment="Left",
-Size=UDim2.new(0,0,0,0),
-AutomaticSize="Y",
-ThemeTag={
-TextColor3="Text",
-},
-BackgroundTransparency=1,
-Parent=d.UIElements.Main,
-},{
-af("UIPadding",{
-PaddingTop=UDim.new(0,az.TextPadding/2),
-PaddingLeft=UDim.new(0,az.TextPadding/2),
-PaddingRight=UDim.new(0,az.TextPadding/2),
-PaddingBottom=UDim.new(0,az.TextPadding/2),
-}),
-})
-
-
-
-
-
-local i=af("Frame",{
-Size=UDim2.new(1,0,1,0),
-Position=UDim2.new(0,0,0,0),
-BackgroundTransparency=1,
-})
-
-local l=af("Frame",{
-Size=UDim2.new(0,14,0,14),
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.new(0.5,0,0,0),
-Parent=i,
-BackgroundColor3=az.Default,
-},{
-af("UIStroke",{
-Thickness=2,
-Transparency=0.1,
-ThemeTag={
-Color="Text",
-},
-}),
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-})
-
-az.UIElements.SatVibMap=af("ImageLabel",{
-Size=UDim2.fromOffset(160,158),
-Position=UDim2.fromOffset(0,40+az.TextPadding),
-Image="rbxassetid://4155801252",
-BackgroundColor3=Color3.fromHSV(f,1,1),
-BackgroundTransparency=0,
-Parent=d.UIElements.Main,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(0,8),
-}),
-aa.NewRoundFrame(8,"SquircleOutline",{
-ThemeTag={
-ImageColor3="Outline",
-},
-Size=UDim2.new(1,0,1,0),
-ImageTransparency=0.85,
-ZIndex=99999,
-},{
-af("UIGradient",{
-Rotation=45,
-Color=ColorSequence.new{
-ColorSequenceKeypoint.new(0.0,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(0.5,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(1.0,Color3.fromRGB(255,255,255)),
-},
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0.0,0.1),
-NumberSequenceKeypoint.new(0.5,1),
-NumberSequenceKeypoint.new(1.0,0.1),
-},
-}),
-}),
-
-l,
-})
-
-az.UIElements.Inputs=af("Frame",{
-AutomaticSize="XY",
-Size=UDim2.new(0,0,0,0),
-Position=UDim2.fromOffset(
-aB and 240 or 210,
-40+az.TextPadding
-),
-BackgroundTransparency=1,
-Parent=d.UIElements.Main,
-},{
-af("UIListLayout",{
-Padding=UDim.new(0,4),
-FillDirection="Vertical",
-}),
-})
-
-
-
-
-
-local m=af("Frame",{
-BackgroundColor3=az.Default,
-Size=UDim2.fromScale(1,1),
-BackgroundTransparency=az.Transparency,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(0,8),
-}),
-})
-
-af("ImageLabel",{
-Image="http://www.roblox.com/asset/?id=14204231522",
-ImageTransparency=0.45,
-ScaleType=Enum.ScaleType.Tile,
-TileSize=UDim2.fromOffset(40,40),
-BackgroundTransparency=1,
-Position=UDim2.fromOffset(85,208+az.TextPadding),
-Size=UDim2.fromOffset(75,24),
-Parent=d.UIElements.Main,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(0,8),
-}),
-aa.NewRoundFrame(8,"SquircleOutline",{
-ThemeTag={
-ImageColor3="Outline",
-},
-Size=UDim2.new(1,0,1,0),
-ImageTransparency=0.85,
-ZIndex=99999,
-},{
-af("UIGradient",{
-Rotation=60,
-Color=ColorSequence.new{
-ColorSequenceKeypoint.new(0.0,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(0.5,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(1.0,Color3.fromRGB(255,255,255)),
-},
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0.0,0.1),
-NumberSequenceKeypoint.new(0.5,1),
-NumberSequenceKeypoint.new(1.0,0.1),
-},
-}),
-}),
-
-
-
-
-
-
-
-m,
-})
-
-local p=af("Frame",{
-BackgroundColor3=az.Default,
-Size=UDim2.fromScale(1,1),
-BackgroundTransparency=0,
-ZIndex=9,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(0,8),
-}),
-})
-
-af("ImageLabel",{
-Image="http://www.roblox.com/asset/?id=14204231522",
-ImageTransparency=0.45,
-ScaleType=Enum.ScaleType.Tile,
-TileSize=UDim2.fromOffset(40,40),
-BackgroundTransparency=1,
-Position=UDim2.fromOffset(0,208+az.TextPadding),
-Size=UDim2.fromOffset(75,24),
-Parent=d.UIElements.Main,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(0,8),
-}),
-
-
-
-
-
-
-
-aa.NewRoundFrame(8,"SquircleOutline",{
-ThemeTag={
-ImageColor3="Outline",
-},
-Size=UDim2.new(1,0,1,0),
-ImageTransparency=0.85,
-ZIndex=99999,
-},{
-af("UIGradient",{
-Rotation=60,
-Color=ColorSequence.new{
-ColorSequenceKeypoint.new(0.0,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(0.5,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(1.0,Color3.fromRGB(255,255,255)),
-},
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0.0,0.1),
-NumberSequenceKeypoint.new(0.5,1),
-NumberSequenceKeypoint.new(1.0,0.1),
-},
-}),
-}),
-p,
-})
-
-local r={}
-
-for u=0,1,0.1 do
-table.insert(r,ColorSequenceKeypoint.new(u,Color3.fromHSV(u,1,1)))
-end
-
-local u=af("UIGradient",{
-Color=ColorSequence.new(r),
-Rotation=90,
-})
-
-local v=af("Frame",{
-Size=UDim2.new(0,14,0,14),
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.new(0.5,0,0,0),
-Parent=i,
-
-
-BackgroundColor3=az.Default,
-},{
-af("UIStroke",{
-Thickness=2,
-Transparency=0.1,
-ThemeTag={
-Color="Text",
-},
-}),
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-})
-
-local x=af("Frame",{
-Size=UDim2.fromOffset(6,192),
-Position=UDim2.fromOffset(180,40+az.TextPadding),
-Parent=d.UIElements.Main,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-u,
-i,
-})
-
-local function CreateNewInput(z,A)
-local B=ar(z,nil,az.UIElements.Inputs,nil,nil,nil,nil,nil,true)
-
-af("TextLabel",{
-BackgroundTransparency=1,
-TextTransparency=0.4,
-TextSize=17,
-FontFace=Font.new(aa.Font,Enum.FontWeight.Regular),
-AutomaticSize="XY",
-ThemeTag={
-TextColor3="Placeholder",
-},
-AnchorPoint=Vector2.new(1,0.5),
-Position=UDim2.new(1,-12,0.5,0),
-Parent=B.Frame,
-Text=z,
-})
-
-af("UIScale",{
-Parent=B,
-Scale=0.85,
-})
-
-B.Frame.Frame.TextBox.Text=A
-B.Size=UDim2.new(0,150,0,42)
-
-return B
-end
-
-local function ToRGB(z)
-return{
-R=math.floor(z.R*255),
-G=math.floor(z.G*255),
-B=math.floor(z.B*255),
-}
-end
-
-local z=CreateNewInput("Hex","#"..az.Default:ToHex())
-
-local A=CreateNewInput("Red",ToRGB(az.Default).R)
-local B=CreateNewInput("Green",ToRGB(az.Default).G)
-local C=CreateNewInput("Blue",ToRGB(az.Default).B)
-local F
-if aB then
-F=CreateNewInput("Alpha",((1-az.Transparency)*100).."%")
-end
-
-local G=af("Frame",{
-Size=UDim2.new(0,0,0,40),
-AutomaticSize="Y",
-Position=UDim2.new(0,0,0,254+az.TextPadding),
-BackgroundTransparency=1,
-Parent=d.UIElements.Main,
-LayoutOrder=4,
-},{
-af("UIListLayout",{
-Padding=UDim.new(0,6),
-FillDirection="Horizontal",
-HorizontalAlignment="Right",
-}),
-
-
-
-
-
-
-})
-
-aa.AddSignal(d.UIElements.Main:GetPropertyChangedSignal"AbsoluteSize",function()
-az.UIElements.Title.Size=UDim2.new(
-0,
-d.UIElements.Main.AbsoluteSize.X/av.UIScale-(d.UIPadding*2),
-0,
-0
-)
-G.Size=UDim2.new(
-0,
-d.UIElements.Main.AbsoluteSize.X/av.UIScale-d.UIPadding*2,
-0,
-40
-)
-end)
-
-local H={
-{
-Title="Cancel",
-Variant="Secondary",
-Callback=function()
-av.IsShowed=false
-for H,J in next,aA do
-J:Disconnect()
-end
-aA={}
-end,
-},
-{
-Title="Apply",
-
-Variant="Primary",
-Callback=function()
-av.IsShowed=false
-for H,J in next,aA do
-J:Disconnect()
-end
-aA={}
-
-ay(Color3.fromHSV(az.Hue,az.Sat,az.Vib),az.Transparency)
-end,
-},
-}
-
-for J,L in next,H do
-local M=aq(
-L.Title,
-L.Icon,
-L.Callback,
-L.Variant,
-G,
-d,
-true
-)
-M.Size=UDim2.new(0.5,-3,0,40)
-M.AutomaticSize="None"
-end
-
-local J,L,M
-if aB then
-local N=af("Frame",{
-Size=UDim2.new(1,0,1,0),
-Position=UDim2.fromOffset(0,0),
-BackgroundTransparency=1,
-})
-
-L=af("ImageLabel",{
-Size=UDim2.new(0,14,0,14),
-AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.new(0.5,0,0,0),
-ThemeTag={
-BackgroundColor3="Text",
-},
-Parent=N,
-},{
-af("UIStroke",{
-Thickness=2,
-Transparency=0.1,
-ThemeTag={
-Color="Text",
-},
-}),
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-})
-
-M=af("Frame",{
-Size=UDim2.fromScale(1,1),
-},{
-af("UIGradient",{
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0,0),
-NumberSequenceKeypoint.new(1,1),
-},
-Rotation=270,
-}),
-af("UICorner",{
-CornerRadius=UDim.new(0,6),
-}),
-})
-
-J=af("Frame",{
-Size=UDim2.fromOffset(6,192),
-Position=UDim2.fromOffset(210,40+az.TextPadding),
-Parent=d.UIElements.Main,
-BackgroundTransparency=1,
-},{
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-af("ImageLabel",{
-Image="rbxassetid://14204231522",
-ImageTransparency=0.45,
-ScaleType=Enum.ScaleType.Tile,
-TileSize=UDim2.fromOffset(40,40),
-BackgroundTransparency=1,
-Size=UDim2.fromScale(1,1),
-},{
-af("UICorner",{
-CornerRadius=UDim.new(1,0),
-}),
-}),
-M,
-N,
-})
-end
-
-function az.Round(N,O,P)
-if P==0 then
-return math.floor(O)
-end
-O=tostring(O)
-return O:find"%."and tonumber(O:sub(1,O:find"%."+P))or O
-end
-
-function az.Update(N,O,P)
-if O then
-f,g,h=Color3.toHSV(O)
-else
-f,g,h=az.Hue,az.Sat,az.Vib
-end
-
-az.UIElements.SatVibMap.BackgroundColor3=Color3.fromHSV(f,1,1)
-l.Position=UDim2.new(g,0,1-h,0)
-l.BackgroundColor3=Color3.fromHSV(f,g,h)
-p.BackgroundColor3=Color3.fromHSV(f,g,h)
-v.BackgroundColor3=Color3.fromHSV(f,1,1)
-v.Position=UDim2.new(0.5,0,f,0)
-
-z.Frame.Frame.TextBox.Text="#"..Color3.fromHSV(f,g,h):ToHex()
-A.Frame.Frame.TextBox.Text=ToRGB(Color3.fromHSV(f,g,h)).R
-B.Frame.Frame.TextBox.Text=ToRGB(Color3.fromHSV(f,g,h)).G
-C.Frame.Frame.TextBox.Text=ToRGB(Color3.fromHSV(f,g,h)).B
-
-if P or aB then
-p.BackgroundTransparency=az.Transparency or P
-M.BackgroundColor3=Color3.fromHSV(f,g,h)
-L.BackgroundColor3=Color3.fromHSV(f,g,h)
-L.BackgroundTransparency=az.Transparency or P
-L.Position=UDim2.new(0.5,0,1-az.Transparency or P,0)
-F.Frame.Frame.TextBox.Text=az:Round(
-(1-az.Transparency or P)*100,
-0
-).."%"
-end
-end
-
-az:Update(az.Default,az.Transparency)
-
-local function GetRGB()
-local N=Color3.fromHSV(az.Hue,az.Sat,az.Vib)
-return{R=math.floor(N.r*255),G=math.floor(N.g*255),B=math.floor(N.b*255)}
-end
-
-
-
-local function clamp(N,O,P)
-return math.clamp(tonumber(N)or 0,O,P)
-end
-
-table.insert(
-aA,
-aa.AddSignal(z.Frame.Frame.TextBox.FocusLost,function(N)
-if N then
-local O=z.Frame.Frame.TextBox.Text:gsub("#","")
-local P,Q=pcall(Color3.fromHex,O)
-if P and typeof(Q)=="Color3"then
-az.Hue,az.Sat,az.Vib=Color3.toHSV(Q)
-az:Update()
-az.Default=Q
-end
-end
-end)
-)
-
-local function updateColorFromInput(N,O)
-aa.AddSignal(N.Frame.Frame.TextBox.FocusLost,function(P)
-if P then
-local Q=N.Frame.Frame.TextBox
-local R=GetRGB()
-local S=clamp(Q.Text,0,255)
-Q.Text=tostring(S)
-
-R[O]=S
-local T=Color3.fromRGB(R.R,R.G,R.B)
-az.Hue,az.Sat,az.Vib=Color3.toHSV(T)
-az:Update()
-end
-end)
-end
-
-updateColorFromInput(A,"R")
-updateColorFromInput(B,"G")
-updateColorFromInput(C,"B")
-
-if aB then
-aa.AddSignal(F.Frame.Frame.TextBox.FocusLost,function(N)
-if N then
-local O=F.Frame.Frame.TextBox
-local P=clamp(O.Text,0,100)
-O.Text=tostring(P)
-
-az.Transparency=1-P*0.01
-az:Update(nil,az.Transparency)
-end
-end)
-end
-
-
-
-local function UpdateSatVib(N,O)
-local P=N.AbsolutePosition.X
-local Q=P+N.AbsoluteSize.X
-local R=N.AbsolutePosition.Y
-local S=R+N.AbsoluteSize.Y
-
-local T=math.clamp(ap.X,P,Q)
-local U=math.clamp(ap.Y,R,S)
-
-O.Sat=(T-P)/(Q-P)
-O.Vib=1-((U-R)/(S-R))
-
-O:Update()
-end
-
-local function UpdateHue(N,O)
-local P=N.AbsolutePosition.Y
-local Q=P+N.AbsoluteSize.Y
-
-local R=math.clamp(ap.Y,P,Q)
-
-O.Hue=(R-P)/(Q-P)
-
-O:Update()
-end
-
-local function UpdateTransparency(N,O)
-local P=N.AbsolutePosition.Y
-local Q=P+N.AbsoluteSize.Y
-
-local R=math.clamp(ap.Y,P,Q)
-
-O.Transparency=1-((R-P)/(Q-P))
-
-O:Update()
-end
-
-local N=ax.GenerateGUID()
-
-table.insert(
-aA,
-ak.InputChanged:Connect(function(O)
-if
-O.UserInputType~=Enum.UserInputType.MouseMovement
-and O.UserInputType~=Enum.UserInputType.Touch
-then
-return
-end
-
-if at=="SatVib"then
-UpdateSatVib(az.UIElements.SatVibMap,az)
-elseif at=="Hue"then
-UpdateHue(x,az)
-elseif at=="Transparency"then
-UpdateTransparency(J,az)
-end
-end)
-)
-
-table.insert(
-aA,
-az.UIElements.SatVibMap.InputBegan:Connect(function(O)
-if
-O.UserInputType~=Enum.UserInputType.MouseButton1
-and O.UserInputType~=Enum.UserInputType.Touch
-then
-return
-end
-
-if ax.CurrentInput and ax.CurrentInput~=N then
-return
-end
-ax.CurrentInput=N
-
-if at and at~="SatVib"then
-return
-end
-
-at="SatVib"
-
-UpdateSatVib(az.UIElements.SatVibMap,az)
-end)
-)
-
-table.insert(
-aA,
-x.InputBegan:Connect(function(O)
-if
-O.UserInputType~=Enum.UserInputType.MouseButton1
-and O.UserInputType~=Enum.UserInputType.Touch
-then
-return
-end
-
-if ax.CurrentInput and ax.CurrentInput~=N then
-return
-end
-ax.CurrentInput=N
-
-if at and at~="Hue"then
-return
-end
-
-at="Hue"
-
-UpdateHue(x,az)
-end)
-)
-
-if J then
-table.insert(
-aA,
-J.InputBegan:Connect(function(O)
-if
-O.UserInputType~=Enum.UserInputType.MouseButton1
-and O.UserInputType~=Enum.UserInputType.Touch
-then
-return
-end
-
-if ax.CurrentInput and ax.CurrentInput~=N then
-return
-end
-ax.CurrentInput=N
-
-if at and at~="Transparency"then
-return
-end
-
-at="Transparency"
-
-UpdateTransparency(J,az)
-end)
-)
-end
-
-table.insert(
-aA,
-ak.InputEnded:Connect(function(O)
-at=nil
-
-if ax.CurrentInput and ax.CurrentInput~=N then
-return
-end
-ax.CurrentInput=nil
-end)
-)
-
-return az
-end
-
-function as.New(au,av)
-local aw={
-__type="Colorpicker",
-Title=av.Title or"Colorpicker",
-Desc=av.Desc or nil,
-Locked=av.Locked or false,
-LockedTitle=av.LockedTitle,
-Default=av.Default or Color3.new(1,1,1),
-Callback=av.Callback or function()end,
-
-UIScale=av.UIScale,
-Transparency=av.Transparency,
-UIElements={},
-
-IsShowed=false,
-}
-
-local ax=true
-
-
-
-aw.ColorpickerFrame=a.load'C'{
-Title=aw.Title,
-Desc=aw.Desc,
-Parent=av.Parent,
-TextOffset=40,
-Hover=false,
-Tab=av.Tab,
-Index=av.Index,
-Window=av.Window,
-ElementTable=aw,
-ParentConfig=av,
-Tags=av.Tags,
-}
-
-aw.UIElements.Colorpicker=aa.NewRoundFrame(as.UICorner,"Squircle",{
-ImageTransparency=0,
-Active=true,
-ImageColor3=aw.Default,
-Parent=aw.ColorpickerFrame.UIElements.Main,
-Size=UDim2.new(0,26,0,26),
-AnchorPoint=Vector2.new(1,0),
-Position=UDim2.new(1,0,0,0),
-ZIndex=2,
-},{
-aa.NewRoundFrame(as.UICorner,"SquircleGlass",{
-Size=UDim2.new(1,0,1,0),
-ThemeTag={
-ImageColor3="Outline",
-},
-ImageTransparency=0.55,
-}),
-},true)
-
-function aw.Lock(ay)
-aw.Locked=true
-ax=false
-return aw.ColorpickerFrame:Lock(aw.LockedTitle)
-end
-function aw.Unlock(ay)
-aw.Locked=false
-ax=true
-return aw.ColorpickerFrame:Unlock()
-end
-
-if aw.Locked then
-aw:Lock()
-end
-
-function aw.Update(ay,az,aA)
-aw.UIElements.Colorpicker.ImageTransparency=aA or 0
-aw.UIElements.Colorpicker.ImageColor3=az
-aw.Default=az
-if aA then
-aw.Transparency=aA
-end
-end
-
-function aw.Set(ay,az,aA)
-return aw:Update(az,aA)
-end
-
-aa.AddSignal(aw.UIElements.Colorpicker.MouseButton1Click,function()
-if ax and not aw.IsShowed then
-aw.IsShowed=true
-
-as:Colorpicker(aw,av.Window,av.WindUI,function(ay,az)
-aw:Update(ay,az)
-aw.Default=ay
-aw.Transparency=az
-aa.SafeCallback(aw.Callback,ay,az)
-end).ColorpickerFrame
-:Open()
-end
-end)
-
-return aw.__type,aw
-end
-
-return as end function a.T()
+    local aa = a.load'd'
+    local af = aa.New
+    local ag = aa.Tween
+
+    local ai = (cloneref or clonereference or function(ai)
+        return ai
+    end)
+
+    local ak = ai(game:GetService"UserInputService")
+    ai(game:GetService"TouchInputService")
+    local al = ai(game:GetService"RunService")
+    local am = ai(game:GetService"Players")
+    local an = al.RenderStepped
+    local ao = am.LocalPlayer
+    local ap = ao:GetMouse()
+
+    local aq = a.load'm'.New
+    local ar = a.load'n'.New
+
+    local as = {
+        UICorner = 9,
+    }
+
+    local at
+
+    function as.Colorpicker(au, av, aw, ax, ay)
+        local az = {
+            __type = "Colorpicker",
+            Title = av.Title,
+            Desc = av.Desc,
+            Default = av.Value or av.Default,
+            Callback = av.Callback,
+            Transparency = av.Transparency,
+            UIElements = av.UIElements,
+            TextPadding = 10,
+        }
+
+        local aA = {}
+        local aB = az.Transparency ~= nil
+
+        function az.SetHSVFromRGB(b, d)
+            local f, g, h = Color3.toHSV(d)
+            az.Hue = f
+            az.Sat = g
+            az.Vib = h
+        end
+
+        az:SetHSVFromRGB(az.Default)
+
+        local b = a.load'o'
+        local d = b.Create(nil, "Dialog", aw, ax, aw.UIElements.Main.Main)
+
+        az.ColorpickerFrame = d
+        d.UIElements.Main.Size = UDim2.new(1, 0, 0, 0)
+
+        local origClose = d.Close
+        function d.Close(ak)
+            av.IsShowed = false
+            for _, conn in next, aA do
+                pcall(function() conn:Disconnect() end)
+            end
+            aA = {}
+            return origClose(ak)
+        end
+
+        local f, g, h = az.Hue, az.Sat, az.Vib
+
+        az.UIElements.Title = af("TextLabel", {
+            Text = az.Title,
+            TextSize = 20,
+            FontFace = Font.new(aa.Font, Enum.FontWeight.SemiBold),
+            TextXAlignment = "Left",
+            Size = UDim2.new(0, 0, 0, 0),
+            AutomaticSize = "Y",
+            ThemeTag = {
+                TextColor3 = "Text",
+            },
+            BackgroundTransparency = 1,
+            Parent = d.UIElements.Main,
+        }, {
+            af("UIPadding", {
+                PaddingTop = UDim.new(0, az.TextPadding / 2),
+                PaddingLeft = UDim.new(0, az.TextPadding / 2),
+                PaddingRight = UDim.new(0, az.TextPadding / 2),
+                PaddingBottom = UDim.new(0, az.TextPadding / 2),
+            }),
+        })
+
+        local i = af("Frame", {
+            Size = UDim2.new(1, 0, 1, 0),
+            Position = UDim2.new(0, 0, 0, 0),
+            BackgroundTransparency = 1,
+        })
+
+        local l = af("Frame", {
+            Size = UDim2.new(0, 14, 0, 14),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0, 0),
+            Parent = i,
+            BackgroundColor3 = az.Default,
+        }, {
+            af("UIStroke", {
+                Thickness = 2,
+                Transparency = 0.1,
+                ThemeTag = {
+                    Color = "Text",
+                },
+            }),
+            af("UICorner", {
+                CornerRadius = UDim.new(1, 0),
+            }),
+        })
+
+        az.UIElements.SatVibMap = af("ImageLabel", {
+            Size = UDim2.fromOffset(160, 158),
+            Position = UDim2.fromOffset(0, 40 + az.TextPadding),
+            Image = "rbxassetid://4155801252",
+            BackgroundColor3 = Color3.fromHSV(f, 1, 1),
+            BackgroundTransparency = 0,
+            Parent = d.UIElements.Main,
+        }, {
+            af("UICorner", {
+                CornerRadius = UDim.new(0, 8),
+            }),
+            aa.NewRoundFrame(8, "SquircleOutline", {
+                ThemeTag = {
+                    ImageColor3 = "Outline",
+                },
+                Size = UDim2.new(1, 0, 1, 0),
+                ImageTransparency = 0.85,
+                ZIndex = 99999,
+            }, {
+                af("UIGradient", {
+                    Rotation = 45,
+                    Color = ColorSequence.new{
+                        ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 255)),
+                    },
+                    Transparency = NumberSequence.new{
+                        NumberSequenceKeypoint.new(0.0, 0.1),
+                        NumberSequenceKeypoint.new(0.5, 1),
+                        NumberSequenceKeypoint.new(1.0, 0.1),
+                    },
+                }),
+            }),
+            l,
+        })
+
+        az.UIElements.Inputs = af("Frame", {
+            AutomaticSize = "XY",
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.fromOffset(aB and 240 or 210, 40 + az.TextPadding),
+            BackgroundTransparency = 1,
+            Parent = d.UIElements.Main,
+        }, {
+            af("UIListLayout", {
+                Padding = UDim.new(0, 4),
+                FillDirection = "Vertical",
+            }),
+        })
+
+        local m = af("Frame", {
+            BackgroundColor3 = az.Default,
+            Size = UDim2.fromScale(1, 1),
+            BackgroundTransparency = az.Transparency,
+        }, {
+            af("UICorner", {
+                CornerRadius = UDim.new(0, 8),
+            }),
+        })
+
+        af("ImageLabel", {
+            Image = "http://www.roblox.com/asset/?id=14204231522",
+            ImageTransparency = 0.45,
+            ScaleType = Enum.ScaleType.Tile,
+            TileSize = UDim2.fromOffset(40, 40),
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(85, 208 + az.TextPadding),
+            Size = UDim2.fromOffset(75, 24),
+            Parent = d.UIElements.Main,
+        }, {
+            af("UICorner", {
+                CornerRadius = UDim.new(0, 8),
+            }),
+            aa.NewRoundFrame(8, "SquircleOutline", {
+                ThemeTag = {
+                    ImageColor3 = "Outline",
+                },
+                Size = UDim2.new(1, 0, 1, 0),
+                ImageTransparency = 0.85,
+                ZIndex = 99999,
+            }, {
+                af("UIGradient", {
+                    Rotation = 60,
+                    Color = ColorSequence.new{
+                        ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 255)),
+                    },
+                    Transparency = NumberSequence.new{
+                        NumberSequenceKeypoint.new(0.0, 0.1),
+                        NumberSequenceKeypoint.new(0.5, 1),
+                        NumberSequenceKeypoint.new(1.0, 0.1),
+                    },
+                }),
+            }),
+            m,
+        })
+
+        local p = af("Frame", {
+            BackgroundColor3 = az.Default,
+            Size = UDim2.fromScale(1, 1),
+            BackgroundTransparency = 0,
+            ZIndex = 9,
+        }, {
+            af("UICorner", {
+                CornerRadius = UDim.new(0, 8),
+            }),
+        })
+
+        af("ImageLabel", {
+            Image = "http://www.roblox.com/asset/?id=14204231522",
+            ImageTransparency = 0.45,
+            ScaleType = Enum.ScaleType.Tile,
+            TileSize = UDim2.fromOffset(40, 40),
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(0, 208 + az.TextPadding),
+            Size = UDim2.fromOffset(75, 24),
+            Parent = d.UIElements.Main,
+        }, {
+            af("UICorner", {
+                CornerRadius = UDim.new(0, 8),
+            }),
+            aa.NewRoundFrame(8, "SquircleOutline", {
+                ThemeTag = {
+                    ImageColor3 = "Outline",
+                },
+                Size = UDim2.new(1, 0, 1, 0),
+                ImageTransparency = 0.85,
+                ZIndex = 99999,
+            }, {
+                af("UIGradient", {
+                    Rotation = 60,
+                    Color = ColorSequence.new{
+                        ColorSequenceKeypoint.new(0.0, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(1.0, Color3.fromRGB(255, 255, 255)),
+                    },
+                    Transparency = NumberSequence.new{
+                        NumberSequenceKeypoint.new(0.0, 0.1),
+                        NumberSequenceKeypoint.new(0.5, 1),
+                        NumberSequenceKeypoint.new(1.0, 0.1),
+                    },
+                }),
+            }),
+            p,
+        })
+
+        local r = {}
+        for u = 0, 1, 0.1 do
+            table.insert(r, ColorSequenceKeypoint.new(u, Color3.fromHSV(u, 1, 1)))
+        end
+
+        local u = af("UIGradient", {
+            Color = ColorSequence.new(r),
+            Rotation = 90,
+        })
+
+        local v = af("Frame", {
+            Size = UDim2.new(0, 14, 0, 14),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.5, 0, 0, 0),
+            Parent = i,
+            BackgroundColor3 = az.Default,
+        }, {
+            af("UIStroke", {
+                Thickness = 2,
+                Transparency = 0.1,
+                ThemeTag = {
+                    Color = "Text",
+                },
+            }),
+            af("UICorner", {
+                CornerRadius = UDim.new(1, 0),
+            }),
+        })
+
+        local x = af("Frame", {
+            Size = UDim2.fromOffset(6, 192),
+            Position = UDim2.fromOffset(180, 40 + az.TextPadding),
+            Parent = d.UIElements.Main,
+        }, {
+            af("UICorner", {
+                CornerRadius = UDim.new(1, 0),
+            }),
+            u,
+            i,
+        })
+
+        local function CreateNewInput(z, A)
+            local B = ar(z, nil, az.UIElements.Inputs, nil, nil, nil, nil, nil, true)
+
+            af("TextLabel", {
+                BackgroundTransparency = 1,
+                TextTransparency = 0.4,
+                TextSize = 17,
+                FontFace = Font.new(aa.Font, Enum.FontWeight.Regular),
+                AutomaticSize = "XY",
+                ThemeTag = {
+                    TextColor3 = "Placeholder",
+                },
+                AnchorPoint = Vector2.new(1, 0.5),
+                Position = UDim2.new(1, -12, 0.5, 0),
+                Parent = B.Frame,
+                Text = z,
+            })
+
+            af("UIScale", {
+                Parent = B,
+                Scale = 0.85,
+            })
+
+            B.Frame.Frame.TextBox.Text = A
+            B.Size = UDim2.new(0, 150, 0, 42)
+
+            return B
+        end
+
+        local function ToRGB(z)
+            return {
+                R = math.floor(z.R * 255),
+                G = math.floor(z.G * 255),
+                B = math.floor(z.B * 255),
+            }
+        end
+
+        local z = CreateNewInput("Hex", "#" .. az.Default:ToHex())
+        local A = CreateNewInput("Red", ToRGB(az.Default).R)
+        local B = CreateNewInput("Green", ToRGB(az.Default).G)
+        local C = CreateNewInput("Blue", ToRGB(az.Default).B)
+        local F
+        if aB then
+            F = CreateNewInput("Alpha", ((1 - az.Transparency) * 100) .. "%")
+        end
+
+        local G = af("Frame", {
+            Size = UDim2.new(0, 0, 0, 40),
+            AutomaticSize = "Y",
+            Position = UDim2.new(0, 0, 0, 254 + az.TextPadding),
+            BackgroundTransparency = 1,
+            Parent = d.UIElements.Main,
+            LayoutOrder = 4,
+        }, {
+            af("UIListLayout", {
+                Padding = UDim.new(0, 6),
+                FillDirection = "Horizontal",
+                HorizontalAlignment = "Right",
+            }),
+        })
+
+        aa.AddSignal(d.UIElements.Main:GetPropertyChangedSignal"AbsoluteSize", function()
+            az.UIElements.Title.Size = UDim2.new(
+                0,
+                d.UIElements.Main.AbsoluteSize.X / av.UIScale - (d.UIPadding * 2),
+                0,
+                0
+            )
+            G.Size = UDim2.new(
+                0,
+                d.UIElements.Main.AbsoluteSize.X / av.UIScale - d.UIPadding * 2,
+                0,
+                40
+            )
+        end)
+
+        local H = {
+            {
+                Title = "Cancel",
+                Variant = "Secondary",
+                Callback = function()
+                    d:Close()()
+                end,
+            },
+            {
+                Title = "Apply",
+                Variant = "Primary",
+                Callback = function()
+                    ay(Color3.fromHSV(az.Hue, az.Sat, az.Vib), az.Transparency)
+                    d:Close()()
+                end,
+            },
+        }
+
+        for J, L in next, H do
+            local M = aq(
+                L.Title,
+                L.Icon,
+                L.Callback,
+                L.Variant,
+                G,
+                d,
+                true
+            )
+            M.Size = UDim2.new(0.5, -3, 0, 40)
+            M.AutomaticSize = "None"
+        end
+
+        local J, L, M
+        if aB then
+            local N = af("Frame", {
+                Size = UDim2.new(1, 0, 1, 0),
+                Position = UDim2.fromOffset(0, 0),
+                BackgroundTransparency = 1,
+            })
+
+            L = af("ImageLabel", {
+                Size = UDim2.new(0, 14, 0, 14),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0, 0),
+                ThemeTag = {
+                    BackgroundColor3 = "Text",
+                },
+                Parent = N,
+            }, {
+                af("UIStroke", {
+                    Thickness = 2,
+                    Transparency = 0.1,
+                    ThemeTag = {
+                        Color = "Text",
+                    },
+                }),
+                af("UICorner", {
+                    CornerRadius = UDim.new(1, 0),
+                }),
+            })
+
+            M = af("Frame", {
+                Size = UDim2.fromScale(1, 1),
+            }, {
+                af("UIGradient", {
+                    Transparency = NumberSequence.new{
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    },
+                    Rotation = 270,
+                }),
+                af("UICorner", {
+                    CornerRadius = UDim.new(0, 6),
+                }),
+            })
+
+            J = af("Frame", {
+                Size = UDim2.fromOffset(6, 192),
+                Position = UDim2.fromOffset(210, 40 + az.TextPadding),
+                Parent = d.UIElements.Main,
+                BackgroundTransparency = 1,
+            }, {
+                af("UICorner", {
+                    CornerRadius = UDim.new(1, 0),
+                }),
+                af("ImageLabel", {
+                    Image = "rbxassetid://14204231522",
+                    ImageTransparency = 0.45,
+                    ScaleType = Enum.ScaleType.Tile,
+                    TileSize = UDim2.fromOffset(40, 40),
+                    BackgroundTransparency = 1,
+                    Size = UDim2.fromScale(1, 1),
+                }, {
+                    af("UICorner", {
+                        CornerRadius = UDim.new(1, 0),
+                    }),
+                }),
+                M,
+                N,
+            })
+        end
+
+        function az.Round(N, O, P)
+            if P == 0 then
+                return math.floor(O)
+            end
+            O = tostring(O)
+            return O:find"%." and tonumber(O:sub(1, O:find"%." + P)) or O
+        end
+
+        function az.Update(N, O, P)
+            if O then
+                f, g, h = Color3.toHSV(O)
+            else
+                f, g, h = az.Hue, az.Sat, az.Vib
+            end
+
+            az.UIElements.SatVibMap.BackgroundColor3 = Color3.fromHSV(f, 1, 1)
+            l.Position = UDim2.new(g, 0, 1 - h, 0)
+            l.BackgroundColor3 = Color3.fromHSV(f, g, h)
+            p.BackgroundColor3 = Color3.fromHSV(f, g, h)
+            v.BackgroundColor3 = Color3.fromHSV(f, 1, 1)
+            v.Position = UDim2.new(0.5, 0, f, 0)
+
+            z.Frame.Frame.TextBox.Text = "#" .. Color3.fromHSV(f, g, h):ToHex()
+            A.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(f, g, h)).R
+            B.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(f, g, h)).G
+            C.Frame.Frame.TextBox.Text = ToRGB(Color3.fromHSV(f, g, h)).B
+
+            if P or aB then
+                p.BackgroundTransparency = az.Transparency or P
+                M.BackgroundColor3 = Color3.fromHSV(f, g, h)
+                L.BackgroundColor3 = Color3.fromHSV(f, g, h)
+                L.BackgroundTransparency = az.Transparency or P
+                L.Position = UDim2.new(0.5, 0, 1 - az.Transparency or P, 0)
+                F.Frame.Frame.TextBox.Text = az:Round(
+                    (1 - az.Transparency or P) * 100,
+                    0
+                ) .. "%"
+            end
+        end
+
+        az:Update(az.Default, az.Transparency)
+
+        local function GetRGB()
+            local N = Color3.fromHSV(az.Hue, az.Sat, az.Vib)
+            return {R = math.floor(N.r * 255), G = math.floor(N.g * 255), B = math.floor(N.b * 255)}
+        end
+
+        local function clamp(N, O, P)
+            return math.clamp(tonumber(N) or 0, O, P)
+        end
+
+        table.insert(
+            aA,
+            aa.AddSignal(z.Frame.Frame.TextBox.FocusLost, function(N)
+                if N then
+                    local O = z.Frame.Frame.TextBox.Text:gsub("#", "")
+                    local P, Q = pcall(Color3.fromHex, O)
+                    if P and typeof(Q) == "Color3" then
+                        az.Hue, az.Sat, az.Vib = Color3.toHSV(Q)
+                        az:Update()
+                        az.Default = Q
+                    end
+                end
+            end)
+        )
+
+        local function updateColorFromInput(N, O)
+            table.insert(
+                aA,
+                aa.AddSignal(N.Frame.Frame.TextBox.FocusLost, function(P)
+                    if P then
+                        local Q = N.Frame.Frame.TextBox
+                        local R = GetRGB()
+                        local S = clamp(Q.Text, 0, 255)
+                        Q.Text = tostring(S)
+
+                        R[O] = S
+                        local T = Color3.fromRGB(R.R, R.G, R.B)
+                        az.Hue, az.Sat, az.Vib = Color3.toHSV(T)
+                        az:Update()
+                    end
+                end)
+            )
+        end
+
+        updateColorFromInput(A, "R")
+        updateColorFromInput(B, "G")
+        updateColorFromInput(C, "B")
+
+        if aB then
+            table.insert(
+                aA,
+                aa.AddSignal(F.Frame.Frame.TextBox.FocusLost, function(N)
+                    if N then
+                        local O = F.Frame.Frame.TextBox
+                        local P = clamp(O.Text, 0, 100)
+                        O.Text = tostring(P)
+
+                        az.Transparency = 1 - P * 0.01
+                        az:Update(nil, az.Transparency)
+                    end
+                end)
+            )
+        end
+
+        local function UpdateSatVib(N, O)
+            local P = N.AbsolutePosition.X
+            local Q = P + N.AbsoluteSize.X
+            local R = N.AbsolutePosition.Y
+            local S = R + N.AbsoluteSize.Y
+
+            local T = math.clamp(ap.X, P, Q)
+            local U = math.clamp(ap.Y, R, S)
+
+            O.Sat = (T - P) / (Q - P)
+            O.Vib = 1 - ((U - R) / (S - R))
+
+            O:Update()
+        end
+
+        local function UpdateHue(N, O)
+            local P = N.AbsolutePosition.Y
+            local Q = P + N.AbsoluteSize.Y
+            local R = math.clamp(ap.Y, P, Q)
+
+            O.Hue = (R - P) / (Q - P)
+            O:Update()
+        end
+
+        local function UpdateTransparency(N, O)
+            local P = N.AbsolutePosition.Y
+            local Q = P + N.AbsoluteSize.Y
+            local R = math.clamp(ap.Y, P, Q)
+
+            O.Transparency = 1 - ((R - P) / (Q - P))
+            O:Update()
+        end
+
+        local N = ax.GenerateGUID()
+
+        table.insert(
+            aA,
+            ak.InputChanged:Connect(function(O)
+                if
+                    O.UserInputType ~= Enum.UserInputType.MouseMovement
+                    and O.UserInputType ~= Enum.UserInputType.Touch
+                then
+                    return
+                end
+
+                if at == "SatVib" then
+                    UpdateSatVib(az.UIElements.SatVibMap, az)
+                elseif at == "Hue" then
+                    UpdateHue(x, az)
+                elseif at == "Transparency" then
+                    UpdateTransparency(J, az)
+                end
+            end)
+        )
+
+        table.insert(
+            aA,
+            az.UIElements.SatVibMap.InputBegan:Connect(function(O)
+                if
+                    O.UserInputType ~= Enum.UserInputType.MouseButton1
+                    and O.UserInputType ~= Enum.UserInputType.Touch
+                then
+                    return
+                end
+
+                if ax.CurrentInput and ax.CurrentInput ~= N then
+                    return
+                end
+                ax.CurrentInput = N
+
+                if at and at ~= "SatVib" then
+                    return
+                end
+
+                at = "SatVib"
+                UpdateSatVib(az.UIElements.SatVibMap, az)
+            end)
+        )
+
+        table.insert(
+            aA,
+            x.InputBegan:Connect(function(O)
+                if
+                    O.UserInputType ~= Enum.UserInputType.MouseButton1
+                    and O.UserInputType ~= Enum.UserInputType.Touch
+                then
+                    return
+                end
+
+                if ax.CurrentInput and ax.CurrentInput ~= N then
+                    return
+                end
+                ax.CurrentInput = N
+
+                if at and at ~= "Hue" then
+                    return
+                end
+
+                at = "Hue"
+                UpdateHue(x, az)
+            end)
+        )
+
+        if J then
+            table.insert(
+                aA,
+                J.InputBegan:Connect(function(O)
+                    if
+                        O.UserInputType ~= Enum.UserInputType.MouseButton1
+                        and O.UserInputType ~= Enum.UserInputType.Touch
+                    then
+                        return
+                    end
+
+                    if ax.CurrentInput and ax.CurrentInput ~= N then
+                        return
+                    end
+                    ax.CurrentInput = N
+
+                    if at and at ~= "Transparency" then
+                        return
+                    end
+
+                    at = "Transparency"
+                    UpdateTransparency(J, az)
+                end)
+            )
+        end
+
+        table.insert(
+            aA,
+            ak.InputEnded:Connect(function(O)
+                at = nil
+                if ax.CurrentInput and ax.CurrentInput ~= N then
+                    return
+                end
+                ax.CurrentInput = nil
+            end)
+        )
+
+        return az
+    end
+
+    function as.New(au, av)
+        local aw = {
+            __type = "Colorpicker",
+            Title = av.Title or "Colorpicker",
+            Desc = av.Desc or nil,
+            Locked = av.Locked or false,
+            LockedTitle = av.LockedTitle,
+            Default = av.Default or Color3.new(1, 1, 1),
+            Callback = av.Callback or function() end,
+            UIScale = av.UIScale,
+            Transparency = av.Transparency,
+            UIElements = {},
+            IsShowed = false,
+        }
+
+        local ax = true
+
+        aw.ColorpickerFrame = a.load'C'{
+            Title = aw.Title,
+            Desc = aw.Desc,
+            Parent = av.Parent,
+            TextOffset = 40,
+            Hover = false,
+            Tab = av.Tab,
+            Index = av.Index,
+            Window = av.Window,
+            ElementTable = aw,
+            ParentConfig = av,
+            Tags = av.Tags,
+        }
+
+        aw.UIElements.Colorpicker = aa.NewRoundFrame(as.UICorner, "Squircle", {
+            ImageTransparency = 0,
+            Active = true,
+            ImageColor3 = aw.Default,
+            Parent = aw.ColorpickerFrame.UIElements.Main,
+            Size = UDim2.new(0, 26, 0, 26),
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(1, 0, 0, 0),
+            ZIndex = 2,
+        }, {
+            aa.NewRoundFrame(as.UICorner, "SquircleGlass", {
+                Size = UDim2.new(1, 0, 1, 0),
+                ThemeTag = {
+                    ImageColor3 = "Outline",
+                },
+                ImageTransparency = 0.55,
+            }),
+        }, true)
+
+        function aw.Lock(ay)
+            aw.Locked = true
+            ax = false
+            return aw.ColorpickerFrame:Lock(aw.LockedTitle)
+        end
+
+        function aw.Unlock(ay)
+            aw.Locked = false
+            ax = true
+            return aw.ColorpickerFrame:Unlock()
+        end
+
+        if aw.Locked then
+            aw:Lock()
+        end
+
+        function aw.Update(ay, az, aA)
+            aw.UIElements.Colorpicker.ImageTransparency = aA or 0
+            aw.UIElements.Colorpicker.ImageColor3 = az
+            aw.Default = az
+            if aA then
+                aw.Transparency = aA
+            end
+        end
+
+        function aw.Set(ay, az, aA)
+            return aw:Update(az, aA)
+        end
+
+        aa.AddSignal(aw.UIElements.Colorpicker.MouseButton1Click, function()
+            if ax and not aw.IsShowed then
+                aw.IsShowed = true
+                ag(aw.UIElements.Colorpicker, 0.1, { Size = UDim2.new(0, 22, 0, 22) }):Play()
+                task.delay(0.1, function()
+                    ag(aw.UIElements.Colorpicker, 0.15, { Size = UDim2.new(0, 26, 0, 26) }):Play()
+                end)
+                as:Colorpicker(aw, av.Window, av.WindUI, function(ay, az)
+                    aw:Update(ay, az)
+                    aw.Default = ay
+                    aw.Transparency = az
+                    aa.SafeCallback(aw.Callback, ay, az)
+                end).ColorpickerFrame:Open()
+            end
+        end)
+
+        return aw.__type, aw
+    end
+
+    return as end function a.T()
 
 local aa=a.load'd'
 local af=aa.New
