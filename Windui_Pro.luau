@@ -8535,58 +8535,6 @@ end
 
 local itemCorner = aq.MenuCorner - aq.MenuPadding
 
-local topFade = al("Frame", {
-    Name = "TopFade",
-    Size = UDim2.new(1, 0, 0, 26),
-    Position = UDim2.new(0, 0, 0, 0),
-    AnchorPoint = Vector2.new(0, 0),
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-    BackgroundTransparency = 0,
-    BorderSizePixel = 0,
-    ZIndex = 15,
-    Active = false,
-    Interactable = false,
-}, {
-    al("UIGradient", {
-        Rotation = 90,
-        Color = ColorSequence.new(Color3.fromRGB(0, 0, 0)),
-        Transparency = NumberSequence.new{
-            NumberSequenceKeypoint.new(0, 0.20),
-            NumberSequenceKeypoint.new(0.65, 0.70),
-            NumberSequenceKeypoint.new(1, 1),
-        },
-    }),
-    al("UICorner", {
-        CornerRadius = UDim.new(0, itemCorner),
-    }),
-})
-
-local bottomFade = al("Frame", {
-    Name = "BottomFade",
-    Size = UDim2.new(1, 0, 0, 26),
-    Position = UDim2.new(0, 0, 1, 0),
-    AnchorPoint = Vector2.new(0, 1),
-    BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-    BackgroundTransparency = 0,
-    BorderSizePixel = 0,
-    ZIndex = 15,
-    Active = false,
-    Interactable = false,
-}, {
-    al("UIGradient", {
-        Rotation = 90,
-        Color = ColorSequence.new(Color3.fromRGB(0, 0, 0)),
-        Transparency = NumberSequence.new{
-            NumberSequenceKeypoint.new(0, 1),
-            NumberSequenceKeypoint.new(0.35, 0.70),
-            NumberSequenceKeypoint.new(1, 0.20),
-        },
-    }),
-    al("UICorner", {
-        CornerRadius = UDim.new(0, itemCorner),
-    }),
-})
-
 ap.UIElements.UIListLayout=al("UIListLayout",{
 Padding=UDim.new(0,aq.MenuPadding/1.5),
 FillDirection="Vertical",
@@ -8634,8 +8582,6 @@ ZIndex=2,
 },{
 ap.UIElements.UIListLayout,
 }),
-topFade,
-bottomFade,
 }),
 })
 
