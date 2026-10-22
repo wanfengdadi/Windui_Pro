@@ -8613,7 +8613,12 @@ ap.Tabs={}
 
 if ap.SearchBarEnabled then
 if not at then
-at=aj("Search...","search",ap.UIElements.Menu,nil,function(aw)
+at=aj(
+"Search...",
+"search",
+ap.UIElements.Menu,
+nil,
+function(aw)
 local query=tostring(aw or"")
 local isClear=(query=="")
 
@@ -8645,7 +8650,10 @@ am(ind,0.35,{ImageTransparency=an},Enum.EasingStyle.Exponential,Enum.EasingDirec
 end
 end
 end)
-end,true)
+end,
+true,
+itemCorner
+)
 at.Size=UDim2.new(1,0,0,aq.SearchBarHeight)
 at.Position=UDim2.new(0,0,0,0)
 at.Name="SearchBar"
