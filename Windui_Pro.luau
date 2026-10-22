@@ -8377,6 +8377,8 @@ if not ap.Callback then
 ar="Menu"
 end
 
+local itemCorner = aq.MenuCorner - aq.MenuPadding
+
 ap.UIElements.UIListLayout=al("UIListLayout",{
 Padding=UDim.new(0,aq.MenuPadding/1.5),
 FillDirection="Vertical",
@@ -8405,13 +8407,12 @@ Padding=UDim.new(0,aq.MenuPadding),
 al("Frame",{
 BackgroundTransparency=1,
 Size=UDim2.new(1,0,1,ap.SearchBarEnabled and-aq.MenuPadding-aq.SearchBarHeight),
-
 ClipsDescendants=true,
 LayoutOrder=999,
 Name="Frame",
 },{
 al("UICorner",{
-CornerRadius=UDim.new(0,aq.MenuCorner-aq.MenuPadding),
+CornerRadius=UDim.new(0,itemCorner),
 }),
 al("ScrollingFrame",{
 Size=UDim2.new(1,0,1,0),
@@ -8428,7 +8429,7 @@ ap.UIElements.UIListLayout,
 }),
 })
 
-local ind=ak.NewRoundFrame(aq.MenuCorner-aq.MenuPadding,"Squircle",{
+local ind=ak.NewRoundFrame(itemCorner,"Squircle",{
 Size=UDim2.new(1,0,0,36),
 Position=UDim2.new(0,0,0,0),
 ImageTransparency=1,
@@ -8470,7 +8471,6 @@ BackgroundTransparency=1,
 Position=UDim2.new(-10,0,-10,0),
 Visible=false,
 Active=false,
-
 Parent=ao.WindUI.DropdownGui,
 AnchorPoint=Vector2.new(1,0),
 },{
@@ -8511,7 +8511,7 @@ at.AbsolutePosition.Y+at.AbsoluteSize.Y-ax+(aq.MenuPadding*2)
 )
 
 if animate then
-am(au,0.22,{Position=targetPos},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(au,0.35,{Position=targetPos},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 else
 au.Position=targetPos
 end
@@ -8526,7 +8526,7 @@ local aw=math.clamp(au+minH,minH,at)
 local targetSize=UDim2.fromOffset(ap.UIElements.MenuCanvas.AbsoluteSize.X,aw)
 
 if animate then
-am(ap.UIElements.MenuCanvas,0.22,{Size=targetSize},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(ap.UIElements.MenuCanvas,0.35,{Size=targetSize},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 UpdatePosition(aw,true)
 else
 ap.UIElements.MenuCanvas.Size=targetSize
@@ -8568,31 +8568,9 @@ end
 local targetText=(aw==""and"--"or aw)
 
 if ap.UIElements.Dropdown then
-local textLabel=ap.UIElements.Dropdown.Frame.Frame.TextLabel
-local parentFrame=ap.UIElements.Dropdown.Frame.Frame
-parentFrame.ClipsDescendants=true
-
-if textLabel.Text~=targetText then
-if textLabel.Text=="" or textLabel.Text=="--" then
+local textLabel=ap.UIElements.Dropdown:FindFirstChild("TextLabel",true)
+if textLabel and textLabel.Text~=targetText then
 textLabel.Text=targetText
-textLabel.Position=UDim2.new(0,0,0,0)
-textLabel.TextTransparency=0
-else
-local tweenService=game:GetService("TweenService")
-local outTween=tweenService:Create(textLabel,TweenInfo.new(0.14,Enum.EasingStyle.Quad,Enum.EasingDirection.In),{
-Position=UDim2.new(0,0,1,0),
-TextTransparency=1
-})
-outTween:Play()
-outTween.Completed:Connect(function()
-textLabel.Text=targetText
-textLabel.Position=UDim2.new(0,0,-1,0)
-tweenService:Create(textLabel,TweenInfo.new(0.22,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{
-Position=UDim2.new(0,0,0,0),
-TextTransparency=0
-}):Play()
-end)
-end
 end
 end
 end
@@ -8617,65 +8595,6 @@ return
 end
 ak.SafeCallback(au)
 end)
-end
-end
-
-function as.LockValues(au,av)
-if not av then
-return
-end
-
-for aw,ax in next,ap.Tabs do
-if ax and ax.UIElements and ax.UIElements.TabItem then
-local ay=ax.Name
-local az=false
-
-for aA,aB in next,av do
-if ay==aB then
-az=true
-break
-end
-end
-
-if az then
-am(ax.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
-
-am(ax.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0.6}):Play()
-if ax.UIElements.TabIcon then
-am(ax.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0.6}):Play()
-end
-
-ax.UIElements.TabItem.Active=false
-ax.Locked=true
-else
-if ax.Selected then
-am(ax.UIElements.TabItem,0.1,{ImageTransparency=an}):Play()
-
-am(ax.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0}):Play()
-if ax.UIElements.TabIcon then
-am(ax.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0}):Play()
-end
-else
-am(ax.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
-
-am(
-ax.UIElements.TabItem.Frame.Title.TextLabel,
-0.1,
-{TextTransparency=ar=="Dropdown"and 0.4 or 0.05}
-):Play()
-if ax.UIElements.TabIcon then
-am(
-ax.UIElements.TabIcon.ImageLabel,
-0.1,
-{ImageTransparency=ar=="Dropdown"and 0.2 or 0}
-):Play()
-end
-end
-
-ax.UIElements.TabItem.Active=true
-ax.Locked=false
-end
-end
 end
 end
 
@@ -8722,7 +8641,7 @@ if targetH>0 then
 ind.Position=UDim2.new(0,0,0,targetY)
 ind.Size=UDim2.new(1,0,0,targetH)
 ind.Visible=true
-am(ind,0.2,{ImageTransparency=an},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(ind,0.35,{ImageTransparency=an},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 end
 end)
@@ -8754,7 +8673,7 @@ az.ImageLabel.ImageTransparency=ar=="Dropdown"and 0.2 or 0
 ay.UIElements.TabIcon=az
 end
 ay.UIElements.TabItem=ak.NewRoundFrame(
-aq.MenuCorner-aq.MenuPadding,
+itemCorner,
 "Squircle",
 {
 Size=UDim2.new(1,0,0,36),
@@ -8768,7 +8687,7 @@ ImageColor3="DropdownTabBackground",
 Active=not ay.Locked,
 },
 {
-ak.NewRoundFrame(aq.MenuCorner-aq.MenuPadding,"Glass-1.4",{
+ak.NewRoundFrame(itemCorner,"Glass-1.4",{
 Size=UDim2.new(1,0,1,0),
 ThemeTag={
 ImageColor3="DropdownTabBorder",
@@ -8793,7 +8712,7 @@ PaddingRight=UDim.new(0,aq.TabPadding),
 PaddingBottom=UDim.new(0,aq.TabPadding),
 }),
 al("UICorner",{
-CornerRadius=UDim.new(0,aq.MenuCorner-aq.MenuPadding),
+CornerRadius=UDim.new(0,itemCorner),
 }),
 az,
 al("Frame",{
@@ -8920,13 +8839,15 @@ if not ay.Selected then
 ay.Selected=true
 am(
 ay.UIElements.TabItem,
-0.1,
-{ImageTransparency=an}
+0.35,
+{ImageTransparency=an},
+Enum.EasingStyle.Exponential,
+Enum.EasingDirection.Out
 ):Play()
 
-am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0}):Play()
+am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.35,{TextTransparency=0},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 if ay.UIElements.TabIcon then
-am(ay.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0}):Play()
+am(ay.UIElements.TabIcon.ImageLabel,0.35,{ImageTransparency=0},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 table.insert(ap.Value,ay.Original)
 else
@@ -8934,11 +8855,11 @@ if not ap.AllowNone and#ap.Value==1 then
 return
 end
 ay.Selected=false
-am(ay.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
+am(ay.UIElements.TabItem,0.3,{ImageTransparency=1},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
-am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0.4}):Play()
+am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.3,{TextTransparency=0.4},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 if ay.UIElements.TabIcon then
-am(ay.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0.2}):Play()
+am(ay.UIElements.TabIcon.ImageLabel,0.3,{ImageTransparency=0.2},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 
 for aA,aB in next,ap.Value do
@@ -8951,9 +8872,9 @@ end
 else
 for aA,aB in next,ap.Tabs do
 aB.UIElements.TabItem.ImageTransparency=1
-am(aB.UIElements.TabItem.Frame.Title.TextLabel,0.2,{TextTransparency=0.4},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(aB.UIElements.TabItem.Frame.Title.TextLabel,0.25,{TextTransparency=0.4},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 if aB.UIElements.TabIcon then
-am(aB.UIElements.TabIcon.ImageLabel,0.2,{ImageTransparency=0.2},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(aB.UIElements.TabIcon.ImageLabel,0.25,{ImageTransparency=0.2},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 aB.Selected=false
 end
@@ -8968,16 +8889,16 @@ if ind and mf then
 local targetY=ay.UIElements.TabItem.AbsolutePosition.Y-mf.AbsolutePosition.Y
 local targetH=ay.UIElements.TabItem.AbsoluteSize.Y
 ind.Visible=true
-am(ind,0.26,{
+am(ind,0.35,{
 Position=UDim2.new(0,0,0,targetY),
 Size=UDim2.new(1,0,0,targetH),
 ImageTransparency=an
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 
-am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.35,{TextTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(ay.UIElements.TabItem.Frame.Title.TextLabel,0.35,{TextTransparency=0},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 if ay.UIElements.TabIcon then
-am(ay.UIElements.TabIcon.ImageLabel,0.35,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+am(ay.UIElements.TabIcon.ImageLabel,0.35,{ImageTransparency=0},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 ap.Value=ay.Original
 end
@@ -9042,17 +8963,17 @@ ap.UIElements.Menu.Visible=true
 ap.UIElements.MenuCanvas.Visible=true
 ap.UIElements.MenuCanvas.Active=true
 ap.UIElements.Menu.Size=UDim2.new(1,0,0,0)
-am(ap.UIElements.Menu,0.1,{
+am(ap.UIElements.Menu,0.35,{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=0,
-},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
 if ap.UIElements.Shadow then
 ap.UIElements.Shadow.Visible=true
 ap.UIElements.Shadow.ImageTransparency=1
-am(ap.UIElements.Shadow,0.18,{
+am(ap.UIElements.Shadow,0.35,{
 ImageTransparency=0.3,
-},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 
 task.spawn(function()
@@ -9073,7 +8994,7 @@ if targetH>0 then
 ind.Position=UDim2.new(0,0,0,targetY)
 ind.Size=UDim2.new(1,0,0,targetH)
 ind.Visible=true
-am(ind,0.15,{ImageTransparency=an}):Play()
+am(ind,0.3,{ImageTransparency=an},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 end
 end
@@ -9091,16 +9012,16 @@ ap.UIElements.Indicator.Visible=false
 ap.UIElements.Indicator.ImageTransparency=1
 end
 
-am(ap.UIElements.Menu,0.25,{
+am(ap.UIElements.Menu,0.28,{
 Size=UDim2.new(1,0,0,0),
 ImageTransparency=1,
-},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
 if ap.UIElements.Shadow then
-am(ap.UIElements.Shadow,0.2,{
+am(ap.UIElements.Shadow,0.25,{
 ImageTransparency=1,
-},Enum.EasingStyle.Quart,Enum.EasingDirection.Out):Play()
-task.delay(0.2,function()
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+task.delay(0.25,function()
 if not ap.Opened and ap.UIElements.Shadow then
 ap.UIElements.Shadow.Visible=false
 end
@@ -9113,7 +9034,7 @@ ap.UIElements.Menu.Visible=false
 end)
 
 task.spawn(function()
-task.wait(0.25)
+task.wait(0.28)
 ap.UIElements.MenuCanvas.Visible=false
 ap.UIElements.MenuCanvas.Active=false
 end)
@@ -9187,10 +9108,10 @@ local ak=a.load'N'.New local al=
 workspace.CurrentCamera
 
 local am={
-UICorner=10,
+UICorner=14,
 UIPadding=12,
-MenuCorner=15,
-MenuPadding=5,
+MenuCorner=26,
+MenuPadding=6,
 TabPadding=10,
 SearchBarHeight=39,
 TabIcon=18,
@@ -9242,7 +9163,7 @@ Tags=ao.Tags,
 
 if ap.Callback then
 ap.UIElements.Dropdown=
-ai("",nil,ap.DropdownFrame.UIElements.Main,nil,ao.Window.NewElements and 12 or 10)
+ai("",nil,ap.DropdownFrame.UIElements.Main,nil,ao.Window.NewElements and 14 or 12)
 
 ap.UIElements.Dropdown.Frame.Frame.TextLabel.TextTruncate="AtEnd"
 ap.UIElements.Dropdown.Frame.Frame.TextLabel.Size=
@@ -9251,11 +9172,6 @@ UDim2.new(1,ap.UIElements.Dropdown.Frame.Frame.TextLabel.Size.X.Offset-18-12-12,
 ap.UIElements.Dropdown.Size=UDim2.new(0,ap.Width,0,36)
 ap.UIElements.Dropdown.Position=UDim2.new(1,0,ao.Window.NewElements and 0 or 0.5,0)
 ap.UIElements.Dropdown.AnchorPoint=Vector2.new(1,ao.Window.NewElements and 0 or 0.5)
-
-
-
-
-
 end
 
 ap.DropdownMenu=ak(ao,ap,am,"Dropdown")
