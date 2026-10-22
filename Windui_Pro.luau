@@ -7279,20 +7279,19 @@ return ai.__type,ai
 end
 
 return af end function a.I()
-
 local aa=(cloneref or clonereference or function(aa)
 return aa
 end)
 
 local ac=aa(game:GetService"UserInputService")
 local ad=aa(game:GetService"RunService")
+local atw=aa(game:GetService"TweenService")
 
 local ae=a.load'd'
 local af=ae.New
 local ag=ae.Tween
 
 local ah={}
-
 local ai=false
 
 function ah.New(aj,ak)
@@ -7311,11 +7310,13 @@ Callback=ak.Callback or function()end,
 UIElements={},
 IsFocusing=false,
 
-Width=ak.Width or 130,
+Style=ak.Style or "Default",
+Width=ak.Width or 160,
 TextBoxWidth=ak.Window.NewElements and 40 or 30,
 ThumbSize=13,
 IconSize=26,
 }
+
 if al.Icons=={}then
 al.Icons={
 From="sfsymbols:sunMinFill",
@@ -7332,7 +7333,6 @@ local am
 local an
 local ao
 local ap=al.Value.Default or al.Value.Min or 0
-
 local aq=ap
 local ar=(ap-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0))
 
@@ -7347,45 +7347,24 @@ return math.floor(au+0.5)
 end
 
 local function CalculateValue(au)
-if at then
 return math.floor(au/al.Step+0.5)*al.Step
-else
-return math.floor(au/al.Step+0.5)*al.Step
-end
 end
 
 local au,av
 local aw=50
 if al.Icons then
 if al.Icons.From then
-au=ae.Image(
-al.Icons.From,
-al.Icons.From,
-0,
-ak.Window.Folder,
-"SliderIconFrom",
-true,
-true,
-"SliderIconFrom"
-)
+au=ae.Image(al.Icons.From,al.Icons.From,0,ak.Window.Folder,"SliderIconFrom",true,true,"SliderIconFrom")
 au.Size=UDim2.new(0,al.IconSize,0,al.IconSize)
 aw=aw+al.IconSize-2
 end
 if al.Icons.To then
-av=ae.Image(
-al.Icons.To,
-al.Icons.To,
-0,
-ak.Window.Folder,
-"SliderIconTo",
-true,
-true,
-"SliderIconTo"
-)
+av=ae.Image(al.Icons.To,al.Icons.To,0,ak.Window.Folder,"SliderIconTo",true,true,"SliderIconTo")
 av.Size=UDim2.new(0,al.IconSize,0,al.IconSize)
 aw=aw+al.IconSize-2
 end
 end
+
 al.SliderFrame=a.load'C'{
 Title=al.Title,
 Desc=al.Desc,
@@ -7406,30 +7385,19 @@ Size=UDim2.new(1,not al.IsTextbox and-aw or(-al.TextBoxWidth-8),0,4),
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
 Name="Frame",
-ThemeTag={
-ImageColor3="Text",
-},
+ThemeTag={ImageColor3="Text"},
 },{
 ae.NewRoundFrame(99,"Squircle",{
 Name="Frame",
 Size=UDim2.new(ar,0,1,0),
 ImageTransparency=0.1,
-ThemeTag={
-ImageColor3="Slider",
-},
+ThemeTag={ImageColor3="Slider"},
 },{
 ae.NewRoundFrame(99,"Squircle",{
-Size=UDim2.new(
-0,
-ak.Window.NewElements and(al.ThumbSize*2)or(al.ThumbSize+2),
-0,
-ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)
-),
+Size=UDim2.new(0,ak.Window.NewElements and(al.ThumbSize*2)or(al.ThumbSize+2),0,ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)),
 Position=UDim2.new(1,0,0.5,0),
 AnchorPoint=Vector2.new(0.5,0.5),
-ThemeTag={
-ImageColor3="SliderThumb",
-},
+ThemeTag={ImageColor3="SliderThumb"},
 Name="Thumb",
 },{
 ae.NewRoundFrame(999,"SquircleGlass",{
@@ -7449,14 +7417,13 @@ Position=UDim2.new(1,al.IsTextbox and(ak.Window.NewElements and-16 or 0)or 0,0.5
 AnchorPoint=Vector2.new(1,0.5),
 BackgroundTransparency=1,
 Parent=al.SliderFrame.UIElements.Main,
+Visible=(al.Style == "Default"),
 },{
 af("UIListLayout",{
 Padding=UDim.new(0,al.Title~=nil and 12 or 20),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
-HorizontalAlignment=al.Icons
-and(al.Icons.From and(al.Icons.To and"Center"or"Left")or al.Icons.To and"Right")
-or"Center",
+HorizontalAlignment=al.Icons and(al.Icons.From and(al.Icons.To and"Center"or"Left")or al.Icons.To and"Right")or"Center",
 }),
 au,
 al.UIElements.SliderIcon,
@@ -7465,9 +7432,7 @@ af("TextBox",{
 Size=UDim2.new(0,al.TextBoxWidth,0,0),
 TextXAlignment="Left",
 Text=FormatValue(ap),
-ThemeTag={
-TextColor3="Text",
-},
+ThemeTag={TextColor3="Text"},
 TextTransparency=0.4,
 AutomaticSize="Y",
 TextSize=15,
@@ -7480,24 +7445,161 @@ Visible=al.IsTextbox,
 
 local ax
 if al.IsTooltip then
-ax=a.load'B'.New(
-ap,
-al.UIElements.SliderIcon.Frame.Thumb,
-true,
-"Secondary",
-"Small",
-false
-)
+ax=a.load'B'.New(ap,al.UIElements.SliderIcon.Frame.Thumb,true,"Secondary","Small",false)
 ax.Container.AnchorPoint=Vector2.new(0.5,1)
 ax.Container.Position=UDim2.new(0.5,0,0,-8)
 end
 
-function al.Lock(ay)
+local trackHeight=28
+local idleSize=16
+local activeSize=22
+local scaleTweenInfo=TweenInfo.new(0.15,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+
+local customTrack=af("Frame",{
+Name="CustomSliderTrack",
+Size=UDim2.new(0,al.Width,0,trackHeight),
+Position=UDim2.new(1,0,ak.Window.NewElements and 0 or 0.5,0),
+AnchorPoint=Vector2.new(1,ak.Window.NewElements and 0 or 0.5),
+BackgroundColor3=Color3.fromRGB(48,48,52),
+BorderSizePixel=0,
+Active=true,
+Visible=(al.Style ~= "Default"),
+Parent=al.SliderFrame.UIElements.Main,
+},{
+af("UICorner",{CornerRadius=UDim.new(1,0)}),
+})
+
+local customFill=af("Frame",{
+Name="FillBar",
+Size=UDim2.new(0,trackHeight,1,0),
+BorderSizePixel=0,
+ThemeTag={BackgroundColor3="Slider"},
+Parent=customTrack,
+},{
+af("UICorner",{CornerRadius=UDim.new(1,0)}),
+})
+
+local customKnob=af("Frame",{
+Name="Knob",
+Size=UDim2.new(0,idleSize,0,idleSize),
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0,trackHeight/2,0.5,0),
+BackgroundColor3=Color3.fromRGB(240,245,255),
+BorderSizePixel=0,
+ZIndex=2,
+Parent=customTrack,
+},{
+af("UICorner",{CornerRadius=UDim.new(1,0)}),
+})
+
+al.UIElements.CustomTrack=customTrack
+al.UIElements.CustomFill=customFill
+al.UIElements.CustomKnob=customKnob
+
+local isCustomDragging=false
+local targetPercent=ar
+local currentPercent=ar
+
+local function setKnobScale(isActive)
+local tSize=isActive and activeSize or idleSize
+atw:Create(customKnob,scaleTweenInfo,{Size=UDim2.new(0,tSize,0,tSize)}):Play()
+end
+
+local ay=ak.Tab.UIElements.ContainerFrame
+
+local function updateTargetFromInput(inputX)
+local tAbsX=customTrack.AbsolutePosition.X
+local tWidth=customTrack.AbsoluteSize.X
+local h=customTrack.AbsoluteSize.Y
+local usable=tWidth-h
+local relX=inputX-(tAbsX+h/2)
+local p=math.clamp(relX/usable,0,1)
+
+if p>=0.985 then
+targetPercent=1
+elseif p<=0.015 then
+targetPercent=0
+else
+targetPercent=p
+end
+
+local rawVal=al.Value.Min+targetPercent*(al.Value.Max-al.Value.Min)
+local finalVal=CalculateValue(rawVal)
+finalVal=math.clamp(finalVal,al.Value.Min or 0,al.Value.Max or 100)
+if finalVal~=aq then
+aq=finalVal
+al.Value.Default=FormatValue(finalVal)
+al.UIElements.SliderContainer.TextBox.Text=FormatValue(finalVal)
+ae.SafeCallback(al.Callback,FormatValue(finalVal))
+end
+end
+
+customTrack.InputBegan:Connect(function(input)
+if not as then return end
+if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+isCustomDragging=true
+ay.ScrollingEnabled=false
+setKnobScale(true)
+updateTargetFromInput(input.Position.X)
+end
+end)
+
+ac.InputChanged:Connect(function(input)
+if isCustomDragging and(input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch) then
+updateTargetFromInput(input.Position.X)
+end
+end)
+
+ac.InputEnded:Connect(function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+if isCustomDragging then
+isCustomDragging=false
+ay.ScrollingEnabled=true
+setKnobScale(false)
+end
+end
+end)
+
+ad.RenderStepped:Connect(function(dt)
+if not customTrack.Visible then return end
+if math.abs(targetPercent-currentPercent)<0.002 then
+currentPercent=targetPercent
+else
+currentPercent=currentPercent+(targetPercent-currentPercent)*math.clamp(dt*25,0,1)
+end
+
+local tWidth=customTrack.AbsoluteSize.X
+local h=customTrack.AbsoluteSize.Y
+local usable=tWidth-h
+
+if currentPercent>=0.999 then
+customKnob.Position=UDim2.new(1,-h/2,0.5,0)
+customFill.Size=UDim2.new(1,0,1,0)
+elseif currentPercent<=0.001 then
+customKnob.Position=UDim2.new(0,h/2,0.5,0)
+customFill.Size=UDim2.new(0,h,1,0)
+else
+local curX=(h/2)+(currentPercent*usable)
+customKnob.Position=UDim2.new(0,curX,0.5,0)
+customFill.Size=UDim2.new(0,curX+(h/2),1,0)
+end
+end)
+
+function al.SetStyle(az,newStyle)
+al.Style=newStyle
+local isCustom=(newStyle=="Custom" or newStyle=="Capsule")
+al.UIElements.SliderContainer.Visible=not isCustom
+customTrack.Visible=isCustom
+al:Set(al.Value.Default or al.Value.Min or 0)
+end
+
+function al.Lock(az)
 al.Locked=true
 as=false
 return al.SliderFrame:Lock(al.LockedTitle)
 end
-function al.Unlock(ay)
+
+function al.Unlock(az)
 al.Locked=false
 as=true
 return al.SliderFrame:Unlock()
@@ -7507,168 +7609,80 @@ if al.Locked then
 al:Lock()
 end
 
-
-local ay=ak.Tab.UIElements.ContainerFrame
-
 function al.Set(az,aA,aB)
 if as then
-if not al.IsFocusing and not ai and(not aB or(aB.UserInputType==Enum.UserInputType.MouseButton1 or aB.UserInputType==Enum.UserInputType.Touch)) then
-if aB then
-am=(aB.UserInputType==Enum.UserInputType.Touch)
-ay.ScrollingEnabled=false
-ai=true
-
-local currentTouchPos=aB.Position
-local moveConn
-moveConn=ac.InputChanged:Connect(function(input)
-if input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch then
-currentTouchPos=input.Position
-end
-end)
-
-local function updatePosition()
-local f=am and currentTouchPos.X or ac:GetMouseLocation().X
-local g=math.clamp((f-al.UIElements.SliderIcon.AbsolutePosition.X)/al.UIElements.SliderIcon.AbsoluteSize.X,0,1)
-local rawVal=al.Value.Min+g*(al.Value.Max-al.Value.Min)
-aA=CalculateValue(rawVal)
-aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
-
-local ratio=math.clamp((aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),0,1)
-ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(ratio,0,1,0)}):Play()
-
-if aA~=aq then
-al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
-al.Value.Default=FormatValue(aA)
-aq=aA
-ae.SafeCallback(al.Callback,FormatValue(aA))
-end
-end
-
-updatePosition()
-
-an=ad.RenderStepped:Connect(updatePosition)
-
-ao=ac.InputEnded:Connect(function(f)
-if(f.UserInputType==Enum.UserInputType.MouseButton1 or f.UserInputType==Enum.UserInputType.Touch)and aB==f then
-if moveConn then
-moveConn:Disconnect()
-end
-an:Disconnect()
-ao:Disconnect()
-ai=false
-ay.ScrollingEnabled=true
-
-ak.WindUI.CurrentInput=nil
-
-if ak.Window.NewElements then
-ag(al.UIElements.SliderIcon.Frame.Thumb,0.2,{
-ImageTransparency=0,
-Size=UDim2.new(
-0,
-ak.Window.NewElements and(al.ThumbSize*2)or(al.ThumbSize+2),
-0,
-ak.Window.NewElements and(al.ThumbSize+4)or(al.ThumbSize+2)
-),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
-end
-if ax then
-ax:Close(false)
-end
-end
-end)
-else
 aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
 local b=math.clamp((aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),0,1)
 aA=CalculateValue(al.Value.Min+b*(al.Value.Max-al.Value.Min))
 
+targetPercent=b
+if not isCustomDragging then
+currentPercent=b
+end
+
 ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(b,0,1,0)}):Play()
+
 if aA~=aq then
 al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
-if ax then
-ax.TitleFrame.Text=FormatValue(aA)
-end
+if ax then ax.TitleFrame.Text=FormatValue(aA) end
 al.Value.Default=FormatValue(aA)
 aq=aA
 ae.SafeCallback(al.Callback,FormatValue(aA))
-end
-end
 end
 end
 end
 
 function al.SetMax(az,aA)
 al.Value.Max=aA
-
 local aB=tonumber(al.Value.Default)or aq
 if aB>aA then
 al:Set(aA)
 else
-local b=
-math.clamp((aB-(al.Value.Min or 0))/(aA-(al.Value.Min or 0)),0,1)
+local b=math.clamp((aB-(al.Value.Min or 0))/(aA-(al.Value.Min or 0)),0,1)
 ag(al.UIElements.SliderIcon.Frame,0.1,{Size=UDim2.new(b,0,1,0)}):Play()
+targetPercent=b
+currentPercent=b
 end
 end
 
 function al.SetMin(az,aA)
 al.Value.Min=aA
-
 local aB=tonumber(al.Value.Default)or aq
 if aB<aA then
 al:Set(aA)
 else
 local b=math.clamp((aB-aA)/((al.Value.Max or 100)-aA),0,1)
 ag(al.UIElements.SliderIcon.Frame,0.1,{Size=UDim2.new(b,0,1,0)}):Play()
+targetPercent=b
+currentPercent=b
 end
 end
 
-ae.AddSignal(al.UIElements.SliderContainer.TextBox.FocusLost,function(az)
+ae.AddSignal(al.UIElements.SliderContainer.TextBox.FocusLost,function()
 local aA=tonumber(al.UIElements.SliderContainer.TextBox.Text)
 if aA then
 al:Set(aA)
 else
 al.UIElements.SliderContainer.TextBox.Text=FormatValue(aq)
-if ax then
-ax.TitleFrame.Text=FormatValue(aq)
-end
+if ax then ax.TitleFrame.Text=FormatValue(aq) end
 end
 end)
 
 local az=ak.WindUI.GenerateGUID()
-
 ae.AddSignal(al.UIElements.SliderContainer.InputBegan,function(aA)
-if al.Locked or ai then
-return
-end
-if
-aA.UserInputType==Enum.UserInputType.MouseButton1
-or aA.UserInputType==Enum.UserInputType.Touch
-then
-if ak.WindUI.CurrentInput and ak.WindUI.CurrentInput~=az then
-return
-end
+if al.Locked or ai or al.Style~="Default" then return end
+if aA.UserInputType==Enum.UserInputType.MouseButton1 or aA.UserInputType==Enum.UserInputType.Touch then
+if ak.WindUI.CurrentInput and ak.WindUI.CurrentInput~=az then return end
 ak.WindUI.CurrentInput=az
 
 al:Set(ap,aA)
-
-
 if ak.Window.NewElements then
 ag(al.UIElements.SliderIcon.Frame.Thumb,0.24,{
 ImageTransparency=0.85,
-Size=UDim2.new(
-0,
-(ak.Window.NewElements and(al.ThumbSize*2)or al.ThumbSize)+8,
-0,
-al.ThumbSize+8
-),
+Size=UDim2.new(0,(ak.Window.NewElements and(al.ThumbSize*2)or al.ThumbSize)+8,0,al.ThumbSize+8),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
-if ax then
-ax:Open()
-end
-
+if ax then ax:Open() end
 end
 end)
 
