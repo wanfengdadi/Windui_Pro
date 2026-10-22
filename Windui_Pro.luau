@@ -2767,6 +2767,7 @@ UIPadding=12,
 Window=ag,
 WindUI=ah,
 UIElements={},
+_isClosing=false,
 }
 
 if ae then
@@ -2830,9 +2831,9 @@ PaddingBottom=UDim.new(0,aj.UIPadding),
 
 aj.UIElements.MainContainer=aa.NewRoundFrame(aj.UICorner,"Squircle",{
 Visible=false,
-ImageTransparency=ae and 0.15 or 0,
-Parent=ai or aj.UIElements.FullScreen,
-Position=UDim2.new(0.5,0,0.5,0),
+ImageTransparency=1,
+Parent=(not ae and aj.UIElements.FullScreen) or ai or (ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
+Position=UDim2.new(0.5,0,0.5,16),
 AnchorPoint=Vector2.new(0.5,0.5),
 AutomaticSize="XY",
 ThemeTag={
@@ -2840,61 +2841,61 @@ ImageColor3=af.."Background",
 ImageTransparency=af.."BackgroundTransparency",
 },
 ZIndex=9999,
+Active=true,
 },{
 aj.UIElements.Main,
 })
 
 function aj.Open(ak)
-if not ae then
+aj._isClosing=false
+
+if not ae and aj.UIElements.FullScreen then
 aj.UIElements.FullScreen.Visible=true
 aj.UIElements.FullScreen.Active=true
+ac(aj.UIElements.FullScreen,0.35,{BackgroundTransparency=0.65},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 
-task.spawn(function()
 aj.UIElements.MainContainer.Visible=true
-
-if not ae then
-ac(aj.UIElements.FullScreen,0.1,{BackgroundTransparency=0.65}):Play()
-end
-ac(aj.UIElements.MainContainer,0.1,{ImageTransparency=0}):Play()
-
-task.spawn(function()
-task.wait(0.05)
+aj.UIElements.MainContainer.Position=UDim2.new(0.5,0,0.5,16)
+aj.UIElements.MainContainer.ImageTransparency=1
 aj.UIElements.Main.Visible=true
-end)
-end)
+
+ac(aj.UIElements.MainContainer,0.38,{
+Position=UDim2.new(0.5,0,0.5,0),
+ImageTransparency=ae and 0.15 or 0,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 
 function aj.Close(ak)
-if not ae and aj.UIElements.FullScreen then
-ac(aj.UIElements.FullScreen,0.1,{BackgroundTransparency=1}):Play()
+if aj._isClosing then return function()end end
+aj._isClosing=true
+
+if not ae and aj.UIElements.FullScreen and aj.UIElements.FullScreen.Parent then
+ac(aj.UIElements.FullScreen,0.25,{BackgroundTransparency=1},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 aj.UIElements.FullScreen.Active=false
-task.spawn(function()
-task.wait(0.1)
-if aj.UIElements.FullScreen then
-aj.UIElements.FullScreen.Visible=false
-end
-end)
 end
 
+if aj.UIElements.MainContainer and aj.UIElements.MainContainer.Parent then
+ac(aj.UIElements.MainContainer,0.25,{
+Position=UDim2.new(0.5,0,0.5,14),
+ImageTransparency=1,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+end
+
+task.delay(0.26,function()
 if aj.UIElements.Main then
 aj.UIElements.Main.Visible=false
 end
 
 if aj.UIElements.MainContainer then
-ac(aj.UIElements.MainContainer,0.1,{ImageTransparency=1}):Play()
-end
-
-task.spawn(function()
-task.wait(0.1)
-if aj.UIElements.MainContainer then
 aj.UIElements.MainContainer.Visible=false
-pcall(function() aj.UIElements.MainContainer:Destroy() end)
+pcall(function()aj.UIElements.MainContainer:Destroy()end)
 aj.UIElements.MainContainer=nil
 end
+
 if aj.UIElements.FullScreen then
 aj.UIElements.FullScreen.Visible=false
-pcall(function() aj.UIElements.FullScreen:Destroy() end)
+pcall(function()aj.UIElements.FullScreen:Destroy()end)
 aj.UIElements.FullScreen=nil
 end
 end)
