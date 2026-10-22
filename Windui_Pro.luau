@@ -2831,8 +2831,8 @@ PaddingBottom=UDim.new(0,aj.UIPadding),
 
 aj.UIElements.MainContainer=aa.NewRoundFrame(aj.UICorner,"Squircle",{
 Visible=false,
-ImageTransparency=1,
-Parent=(not ae and aj.UIElements.FullScreen) or ai or (ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
+ImageTransparency=ae and 0.15 or 0,
+Parent=ai or aj.UIElements.FullScreen,
 Position=UDim2.new(0.5,0,0.5,16),
 AnchorPoint=Vector2.new(0.5,0.5),
 AutomaticSize="XY",
@@ -2855,15 +2855,19 @@ aj.UIElements.FullScreen.Active=true
 ac(aj.UIElements.FullScreen,0.35,{BackgroundTransparency=0.65},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 end
 
+task.spawn(function()
 aj.UIElements.MainContainer.Visible=true
 aj.UIElements.MainContainer.Position=UDim2.new(0.5,0,0.5,16)
 aj.UIElements.MainContainer.ImageTransparency=1
-aj.UIElements.Main.Visible=true
 
-ac(aj.UIElements.MainContainer,0.38,{
+ac(aj.UIElements.MainContainer,0.35,{
 Position=UDim2.new(0.5,0,0.5,0),
 ImageTransparency=ae and 0.15 or 0,
 },Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+
+task.wait(0.04)
+aj.UIElements.Main.Visible=true
+end)
 end
 
 function aj.Close(ak)
