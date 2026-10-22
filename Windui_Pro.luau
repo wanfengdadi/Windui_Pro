@@ -2750,144 +2750,162 @@ return ar
 end
 
 return aa end function a.o()
-    local aa = a.load'd'
-    local ab = aa.New
-    local ac = aa.Tween
 
-    local ad = {
-        Holder = nil,
-        Parent = nil,
-    }
+local aa=a.load'd'
+local ab=aa.New
+local ac=aa.Tween
 
-    function ad.Create(ae, af, ag, ah, ai)
-        local aj = {
-            UICorner = 28,
-            UIPadding = 12,
-            Window = ag,
-            WindUI = ah,
-            UIElements = {},
-            _isClosing = false,
-        }
+local ad={
+Holder=nil,
+Parent=nil,
+}
 
-        if ae then
-            aj.UIPadding = 0
-            aj.UICorner = 26
-        end
+function ad.Create(ae,af,ag,ah,ai)
+local aj={
+UICorner=28,
+UIPadding=12,
+Window=ag,
+WindUI=ah,
+UIElements={},
+}
 
-        af = af or "Dialog"
+if ae then
+aj.UIPadding=0
+end
+if ae then
+aj.UICorner=26
+end
 
-        if not ae then
-            aj.UIElements.FullScreen = ab("TextButton", {
-                ZIndex = 999,
-                BackgroundTransparency = 1,
-                BackgroundColor3 = Color3.fromHex"#000000",
-                Size = UDim2.new(1, 0, 1, 0),
-                Active = true,
-                Visible = false,
-                Text = "",
-                AutoButtonColor = false,
-                Parent = ad.Parent or (ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
-            }, {
-                ab("UICorner", {
-                    CornerRadius = UDim.new(0, ag and ag.UICorner or 16),
-                }),
-            })
+af=af or"Dialog"
 
-            aj.UIElements.FullScreen.MouseButton1Click:Connect(function()
-                if not aj._isClosing then
-                    aj:Close()()
-                end
-            end)
-        end
+if not ae then
+aj.UIElements.FullScreen=ab("Frame",{
+ZIndex=999,
+BackgroundTransparency=1,
+BackgroundColor3=Color3.fromHex"#000000",
+Size=UDim2.new(1,0,1,0),
+Active=false,
+Visible=false,
+Parent=ad.Parent
+or(ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
+},{
+ab("UICorner",{
+CornerRadius=UDim.new(0,ag.UICorner),
+}),
+})
+end
 
-        aj.UIElements.Main = ab("Frame", {
-            Size = UDim2.new(0, 280, 0, 0),
-            AutomaticSize = "Y",
-            BackgroundTransparency = 1,
-            Visible = true,
-            ZIndex = 99999,
-        }, {
-            ab("UIPadding", {
-                PaddingTop = UDim.new(0, aj.UIPadding),
-                PaddingLeft = UDim.new(0, aj.UIPadding),
-                PaddingRight = UDim.new(0, aj.UIPadding),
-                PaddingBottom = UDim.new(0, aj.UIPadding),
-            }),
-        })
+ab("ImageLabel",{
+Image="rbxassetid://8992230677",
+ThemeTag={
+ImageColor3="WindowShadow",
+},
+ImageTransparency=1,
+Size=UDim2.new(1,100,1,100),
+Position=UDim2.new(0,-50,0,-50),
+ScaleType="Slice",
+SliceCenter=Rect.new(99,99,99,99),
+BackgroundTransparency=1,
+ZIndex=-999999999999999,
+Name="Blur",
+})
 
-        aj.UIElements.MainContainer = aa.NewRoundFrame(aj.UICorner, "Squircle", {
-            Visible = false,
-            ImageTransparency = 1,
-            Parent = (not ae and aj.UIElements.FullScreen) or ai or (ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
-            Position = UDim2.new(0.5, 0, 0.5, 16),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            AutomaticSize = "XY",
-            ThemeTag = {
-                ImageColor3 = af .. "Background",
-                ImageTransparency = af .. "BackgroundTransparency",
-            },
-            ZIndex = 9999,
-            Active = true,
-        }, {
-            aj.UIElements.Main,
-        })
+aj.UIElements.Main=ab("Frame",{
+Size=UDim2.new(0,280,0,0),
+ThemeTag={
+BackgroundColor3=af.."Background",
+},
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Visible=false,
+ZIndex=99999,
+},{
+ab("UIPadding",{
+PaddingTop=UDim.new(0,aj.UIPadding),
+PaddingLeft=UDim.new(0,aj.UIPadding),
+PaddingRight=UDim.new(0,aj.UIPadding),
+PaddingBottom=UDim.new(0,aj.UIPadding),
+}),
+})
 
-        function aj.Open(ak)
-            aj._isClosing = false
+aj.UIElements.MainContainer=aa.NewRoundFrame(aj.UICorner,"Squircle",{
+Visible=false,
+ImageTransparency=ae and 0.15 or 0,
+Parent=ai or aj.UIElements.FullScreen,
+Position=UDim2.new(0.5,0,0.5,0),
+AnchorPoint=Vector2.new(0.5,0.5),
+AutomaticSize="XY",
+ThemeTag={
+ImageColor3=af.."Background",
+ImageTransparency=af.."BackgroundTransparency",
+},
+ZIndex=9999,
+},{
+aj.UIElements.Main,
+})
 
-            if not ae and aj.UIElements.FullScreen then
-                aj.UIElements.FullScreen.Visible = true
-                aj.UIElements.FullScreen.Active = true
-                ac(aj.UIElements.FullScreen, 0.35, { BackgroundTransparency = 0.65 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-            end
+function aj.Open(ak)
+if not ae then
+aj.UIElements.FullScreen.Visible=true
+aj.UIElements.FullScreen.Active=true
+end
 
-            aj.UIElements.MainContainer.Visible = true
-            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 16)
-            aj.UIElements.MainContainer.ImageTransparency = 1
+task.spawn(function()
+aj.UIElements.MainContainer.Visible=true
 
-            ac(aj.UIElements.MainContainer, 0.38, {
-                Position = UDim2.new(0.5, 0, 0.5, 0),
-                ImageTransparency = 0,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-        end
+if not ae then
+ac(aj.UIElements.FullScreen,0.1,{BackgroundTransparency=0.65}):Play()
+end
+ac(aj.UIElements.MainContainer,0.1,{ImageTransparency=0}):Play()
 
-        function aj.Close(ak)
-            if aj._isClosing then return function() end end
-            aj._isClosing = true
+task.spawn(function()
+task.wait(0.05)
+aj.UIElements.Main.Visible=true
+end)
+end)
+end
 
-            if not ae and aj.UIElements.FullScreen and aj.UIElements.FullScreen.Parent then
-                ac(aj.UIElements.FullScreen, 0.24, { BackgroundTransparency = 1 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-                aj.UIElements.FullScreen.Active = false
-            end
+function aj.Close(ak)
+if not ae and aj.UIElements.FullScreen then
+ac(aj.UIElements.FullScreen,0.1,{BackgroundTransparency=1}):Play()
+aj.UIElements.FullScreen.Active=false
+task.spawn(function()
+task.wait(0.1)
+if aj.UIElements.FullScreen then
+aj.UIElements.FullScreen.Visible=false
+end
+end)
+end
 
-            if aj.UIElements.MainContainer and aj.UIElements.MainContainer.Parent then
-                ac(aj.UIElements.MainContainer, 0.24, {
-                    Position = UDim2.new(0.5, 0, 0.5, 14),
-                    ImageTransparency = 1,
-                }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-            end
+if aj.UIElements.Main then
+aj.UIElements.Main.Visible=false
+end
 
-            task.delay(0.26, function()
-                if aj.UIElements.MainContainer then
-                    aj.UIElements.MainContainer.Visible = false
-                    pcall(function() aj.UIElements.MainContainer:Destroy() end)
-                    aj.UIElements.MainContainer = nil
-                end
+if aj.UIElements.MainContainer then
+ac(aj.UIElements.MainContainer,0.1,{ImageTransparency=1}):Play()
+end
 
-                if aj.UIElements.FullScreen then
-                    aj.UIElements.FullScreen.Visible = false
-                    pcall(function() aj.UIElements.FullScreen:Destroy() end)
-                    aj.UIElements.FullScreen = nil
-                end
-            end)
+task.spawn(function()
+task.wait(0.1)
+if aj.UIElements.MainContainer then
+aj.UIElements.MainContainer.Visible=false
+pcall(function() aj.UIElements.MainContainer:Destroy() end)
+aj.UIElements.MainContainer=nil
+end
+if aj.UIElements.FullScreen then
+aj.UIElements.FullScreen.Visible=false
+pcall(function() aj.UIElements.FullScreen:Destroy() end)
+aj.UIElements.FullScreen=nil
+end
+end)
 
-            return function() end
-        end
+return function()end
+end
 
-        return aj
-    end
+return aj
+end
 
-    return ad end function a.p()
+return ad end function a.p()
 
 local aa={}
 
@@ -10248,23 +10266,15 @@ return ai end function a.S()
                 Title = "Cancel",
                 Variant = "Secondary",
                 Callback = function()
-                    av.IsShowed = false
-                    for _, conn in next, aA do
-                        pcall(function() conn:Disconnect() end)
-                    end
-                    aA = {}
+                    d:Close()()
                 end,
             },
             {
                 Title = "Apply",
                 Variant = "Primary",
                 Callback = function()
-                    av.IsShowed = false
-                    for _, conn in next, aA do
-                        pcall(function() conn:Disconnect() end)
-                    end
-                    aA = {}
                     ay(Color3.fromHSV(az.Hue, az.Sat, az.Vib), az.Transparency)
+                    d:Close()()
                 end,
             },
         }
