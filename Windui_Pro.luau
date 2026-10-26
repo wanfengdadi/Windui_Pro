@@ -11669,6 +11669,244 @@ ao.Main=at
 return ao.__type,ao
 end
 
+return al end function a.ba()
+
+local aa=a.load'd'
+local ab=aa.New
+local ac=aa.NewRoundFrame
+local ad=aa.Tween
+local ae=a.load'm'.New
+
+local af={}
+
+function af.New(ag,ah)
+ah=ah or{}
+local radius=ah.Radius or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UICorner)or 16
+local padding=ah.Padding or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UIPadding)or 14
+
+local card={
+__type="Card",
+Title=ah.Title or"Card",
+Desc=ah.Desc or nil,
+Icon=ah.Icon or nil,
+IconSize=ah.IconSize or 32,
+Radius=radius,
+Buttons=ah.Buttons or{},
+UIElements={},
+}
+
+local canvas=ab("CanvasGroup",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+GroupTransparency=1,
+Position=UDim2.new(0,0,0,8),
+Parent=ah.Parent,
+})
+
+local bgFrame=ac(radius,"Squircle",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+Parent=canvas,
+ImageTransparency=ah.Color and 0.05 or(not ah.Window.NewElements and 0.93 or nil),
+ThemeTag={
+ImageColor3=not ah.Color and(ah.Window.NewElements and"ElementBackground"or"Text")or nil,
+ImageTransparency=not ah.Color and(ah.Window.NewElements and"ElementBackgroundTransparency"or nil)or nil,
+},
+ImageColor3=ah.Color or nil,
+},{
+ab("UIPadding",{
+PaddingTop=UDim.new(0,padding),
+PaddingLeft=UDim.new(0,padding),
+PaddingRight=UDim.new(0,padding),
+PaddingBottom=UDim.new(0,padding),
+}),
+ac(radius,"SquircleOutline",{
+Size=UDim2.new(1,0,1,0),
+ThemeTag={ImageColor3="Outline"},
+ImageTransparency=0.9,
+}),
+})
+
+local sweepGradient=ab("UIGradient",{
+Color=ColorSequence.new{
+ColorSequenceKeypoint.new(0,Color3.fromRGB(255,255,255)),
+ColorSequenceKeypoint.new(0.5,Color3.fromRGB(255,255,255)),
+ColorSequenceKeypoint.new(1,Color3.fromRGB(255,255,255)),
+},
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,1),
+NumberSequenceKeypoint.new(0.5,0.4),
+NumberSequenceKeypoint.new(1,1),
+},
+Offset=Vector2.new(-1,0),
+Rotation=20,
+Parent=bgFrame,
+})
+
+ab("UIListLayout",{
+FillDirection="Vertical",
+Padding=UDim.new(0,12),
+Parent=bgFrame,
+})
+
+local header=ab("Frame",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=bgFrame,
+},{
+ab("UIListLayout",{
+FillDirection="Horizontal",
+VerticalAlignment="Center",
+Padding=UDim.new(0,12),
+}),
+})
+
+local iconObj
+if card.Icon then
+iconObj=aa.Image(
+card.Icon,
+card.Title..":Icon",
+math.max(radius-4,4),
+ah.Window.Folder,
+"Card",
+true,
+ah.IconThemed,
+"ElementIcon"
+)
+iconObj.Size=UDim2.new(0,card.IconSize,0,card.IconSize)
+iconObj.Parent=header
+end
+
+local textContainer=ab("Frame",{
+Size=UDim2.new(1,card.Icon and(-card.IconSize-12)or 0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=header,
+},{
+ab("UIListLayout",{
+FillDirection="Vertical",
+Padding=UDim.new(0,4),
+}),
+})
+
+local titleLabel=ab("TextLabel",{
+Text=card.Title,
+TextSize=17,
+FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
+TextXAlignment="Left",
+AutomaticSize="Y",
+Size=UDim2.new(1,0,0,0),
+BackgroundTransparency=1,
+TextWrapped=true,
+ThemeTag={
+TextColor3="ElementTitle",
+},
+Parent=textContainer,
+})
+
+local descLabel
+if card.Desc then
+descLabel=ab("TextLabel",{
+Text=card.Desc,
+TextSize=14,
+FontFace=Font.new(aa.Font,Enum.FontWeight.Medium),
+TextXAlignment="Left",
+AutomaticSize="Y",
+Size=UDim2.new(1,0,0,0),
+BackgroundTransparency=1,
+TextTransparency=0.35,
+TextWrapped=true,
+ThemeTag={
+TextColor3="ElementDesc",
+},
+Parent=textContainer,
+})
+end
+
+local btnContainer
+if ah.Buttons and#ah.Buttons>0 then
+btnContainer=ab("Frame",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=bgFrame,
+},{
+ab("UIListLayout",{
+Padding=UDim.new(0,8),
+FillDirection="Vertical",
+}),
+})
+
+for _,bData in next,ah.Buttons do
+local b=ae(
+bData.Title,
+bData.Icon,
+bData.Callback,
+bData.Variant or"White",
+btnContainer,
+nil,
+nil,
+ah.Window.NewElements and 999 or math.max(radius-6,8)
+)
+b.Size=UDim2.new(1,0,0,36)
+end
+end
+
+local function PlayEntranceAnimation()
+canvas.GroupTransparency=1
+canvas.Position=UDim2.new(0,0,0,10)
+sweepGradient.Offset=Vector2.new(-1,0)
+
+ad(canvas,0.38,{
+GroupTransparency=0,
+Position=UDim2.new(0,0,0,0),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+ad(sweepGradient,0.65,{
+Offset=Vector2.new(1,0),
+},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
+end
+
+if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrameCanvas then
+local containerCanvas=ah.Tab.UIElements.ContainerFrameCanvas
+aa.AddSignal(containerCanvas:GetPropertyChangedSignal"Visible",function()
+if containerCanvas.Visible then
+task.defer(PlayEntranceAnimation)
+end
+end)
+if containerCanvas.Visible then
+task.defer(PlayEntranceAnimation)
+end
+else
+task.defer(PlayEntranceAnimation)
+end
+
+function card.SetTitle(self,text)
+card.Title=text
+titleLabel.Text=text
+end
+
+function card.SetDesc(self,text)
+card.Desc=text
+if descLabel then
+descLabel.Text=text or""
+descLabel.Visible=(text~=nil and text~="")
+end
+end
+
+card.ElementFrame=canvas
+card.UIElements={
+Main=canvas,
+Background=bgFrame,
+Title=titleLabel,
+Desc=descLabel,
+}
+
+return card.__type,card
+end function a._()
+
 return al end function a._()
 
 return{
@@ -11691,6 +11929,7 @@ Group=a.load'W',
 HStack=a.load'X',
 VStack=a.load'Y',
 Viewport=a.load'Z',
+Card=a.load'ba',
 
 },
 Load=function(aa,af,ai,ak,al,am,an,ao,ap)
