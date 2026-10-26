@@ -11699,8 +11699,8 @@ local canvas=ab("CanvasGroup",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-GroupTransparency=1,
-Position=UDim2.new(0,0,0,8),
+GroupTransparency=0,
+Position=UDim2.new(0,0,0,0),
 Parent=ah.Parent,
 })
 
@@ -11728,20 +11728,24 @@ ImageTransparency=0.9,
 }),
 })
 
-local sweepGradient=ab("UIGradient",{
-Color=ColorSequence.new{
-ColorSequenceKeypoint.new(0,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(0.5,Color3.fromRGB(255,255,255)),
-ColorSequenceKeypoint.new(1,Color3.fromRGB(255,255,255)),
-},
+local shineFrame=ac(radius,"Squircle",{
+Size=UDim2.new(1,0,1,0),
+ImageColor3=Color3.new(1,1,1),
+ImageTransparency=0.7,
+BackgroundTransparency=1,
+ZIndex=5,
+Parent=canvas,
+},{
+ab("UIGradient",{
+Color=ColorSequence.new(Color3.new(1,1,1)),
 Transparency=NumberSequence.new{
 NumberSequenceKeypoint.new(0,1),
-NumberSequenceKeypoint.new(0.5,0.4),
+NumberSequenceKeypoint.new(0.5,0),
 NumberSequenceKeypoint.new(1,1),
 },
 Offset=Vector2.new(-1,0),
-Rotation=20,
-Parent=bgFrame,
+Rotation=25,
+}),
 })
 
 ab("UIListLayout",{
@@ -11857,14 +11861,14 @@ end
 local function PlayEntranceAnimation()
 canvas.GroupTransparency=1
 canvas.Position=UDim2.new(0,0,0,10)
-sweepGradient.Offset=Vector2.new(-1,0)
+shineFrame.UIGradient.Offset=Vector2.new(-1,0)
 
 ad(canvas,0.38,{
 GroupTransparency=0,
 Position=UDim2.new(0,0,0,0),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-ad(sweepGradient,0.65,{
+ad(shineFrame.UIGradient,0.65,{
 Offset=Vector2.new(1,0),
 },Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
 end
@@ -11896,18 +11900,18 @@ descLabel.Visible=(text~=nil and text~="")
 end
 end
 
-card.ElementFrame=canvas
-card.UIElements={
-Main=canvas,
-Background=bgFrame,
-Title=titleLabel,
-Desc=descLabel,
+card.CardFrame={
+UIElements={Main=canvas},
+Destroy=function()canvas:Destroy()end,
+SetTitle=function(self,text)card:SetTitle(text)end,
+SetDesc=function(self,text)card:SetDesc(text)end,
 }
+card.ElementFrame=canvas
 
 return card.__type,card
-end function a._()
+end
 
-return al end function a._()
+return af end function a._()
 
 return{
 Elements={
