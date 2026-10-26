@@ -11972,10 +11972,18 @@ function ao.MoveHighlight(aq2,tab,animate)
 if not tab or not tab.UIElements or not tab.UIElements.Main then
 return
 end
-local targetY=tab.UIElements.Main.AbsolutePosition.Y-tabHolder.AbsolutePosition.Y
-local targetH=tab.UIElements.Main.AbsoluteSize.Y
-local targetPos=UDim2.new(0,0,0,targetY/WindUI.UIScale)
-local targetSize=UDim2.new(1,-7,0,targetH/WindUI.UIScale)
+
+local main = tab.UIElements.Main
+
+local targetX = main.AbsolutePosition.X - tabHolder.AbsolutePosition.X
+local targetY = main.AbsolutePosition.Y - tabHolder.AbsolutePosition.Y
+local targetW = main.AbsoluteSize.X
+local targetH = main.AbsoluteSize.Y
+
+if targetH <= 0 or targetW <= 0 then return end
+
+local targetPos = UDim2.new(0, targetX / WindUI.UIScale, 0, targetY / WindUI.UIScale)
+local targetSize = UDim2.new(0, targetW / WindUI.UIScale, 0, targetH / WindUI.UIScale)
 
 slideHighlight.Visible=true
 if animate then
