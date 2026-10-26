@@ -11948,6 +11948,60 @@ Window=ap
 WindUI=aq
 ao.ToolTipParent=ar
 ao.TabHighlight=as
+
+local tabHolder=ap.UIElements.SideBar.Frame
+local slideHighlight=ak.NewRoundFrame(
+Window.UICorner-Window.UIPadding/2,
+"Squircle",
+{
+Size=UDim2.new(1,-7,0,40),
+Position=UDim2.new(0,0,0,0),
+ImageTransparency=1,
+Visible=false,
+ZIndex=0,
+LayoutOrder=-9999,
+ThemeTag={
+ImageColor3="TabBackgroundActive",
+},
+}
+)
+slideHighlight.Parent=tabHolder
+ao.SlideHighlight=slideHighlight
+
+function ao.MoveHighlight(aq2,tab,animate)
+if not tab or not tab.UIElements or not tab.UIElements.Main then
+return
+end
+local targetY=tab.UIElements.Main.AbsolutePosition.Y-tabHolder.AbsolutePosition.Y
+local targetH=tab.UIElements.Main.AbsoluteSize.Y
+local targetPos=UDim2.new(0,0,0,targetY/WindUI.UIScale)
+local targetSize=UDim2.new(1,-7,0,targetH/WindUI.UIScale)
+
+slideHighlight.Visible=true
+if animate then
+ak.Tween(slideHighlight,0.28,{
+Position=targetPos,
+Size=targetSize,
+ImageTransparency=0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+else
+slideHighlight.Position=targetPos
+slideHighlight.Size=targetSize
+slideHighlight.ImageTransparency=0
+end
+end
+
+tabHolder:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+if ao.SelectedTab and ao.Tabs[ao.SelectedTab] then
+ao:MoveHighlight(ao.Tabs[ao.SelectedTab],false)
+end
+end)
+tabHolder:GetPropertyChangedSignal("AbsolutePosition"):Connect(function()
+if ao.SelectedTab and ao.Tabs[ao.SelectedTab] then
+ao:MoveHighlight(ao.Tabs[ao.SelectedTab],false)
+end
+end)
+
 return ao
 end
 
@@ -12432,9 +12486,7 @@ ao.SelectedTab=aq
 for ar,as in next,ao.Tabs do
 if not as.Locked and as.UIElements.Main and as.UIElements.Main.Parent then
 pcall(function()
-ak.SetThemeTag(as.UIElements.Main,{
-ImageTransparency="TabBorderTransparency",
-},0.15)
+as.UIElements.Main.ImageTransparency=1
 if as.Border then
 ak.SetThemeTag(as.UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparency",
@@ -12459,10 +12511,7 @@ end
 
 if ao.Tabs[aq].UIElements.Main and ao.Tabs[aq].UIElements.Main.Parent then
 pcall(function()
-ak.SetThemeTag(ao.Tabs[aq].UIElements.Main,{
-ImageColor3="TabBackgroundActive",
-ImageTransparency="TabBackgroundActiveTransparency",
-},0.15)
+ao:MoveHighlight(ao.Tabs[aq],true)
 if ao.Tabs[aq].Border then
 ak.SetThemeTag(ao.Tabs[aq].UIElements.Main.Outline,{
 ImageTransparency="TabBorderTransparencyActive",
@@ -12501,6 +12550,10 @@ end
 end)
 
 ao.OnChangeFunc(aq)
+
+if ao.SlideHighlight and not ao.SlideHighlight.Visible then
+ao:MoveHighlight(ao.Tabs[aq],false)
+end
 end
 end
 
