@@ -11682,32 +11682,24 @@ local af={}
 function af.New(ag,ah)
 ah=ah or{}
 local radius=ah.Radius or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UICorner)or 16
-local padding=ah.Padding or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UIPadding)or 14
+local padding=ah.Padding or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UIPadding)or 12
 
 local card={
 __type="Card",
 Title=ah.Title or"Card",
 Desc=ah.Desc or nil,
 Icon=ah.Icon or nil,
-IconSize=ah.IconSize or 32,
+IconSize=ah.IconSize or 28,
 Radius=radius,
 Buttons=ah.Buttons or{},
 UIElements={},
 }
 
-local canvas=ab("CanvasGroup",{
+local cardFrame=ac(radius,"Squircle",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
-BackgroundTransparency=1,
-GroupTransparency=0,
-Position=UDim2.new(0,0,0,0),
 Parent=ah.Parent,
-})
-
-local bgFrame=ac(radius,"Squircle",{
-Size=UDim2.new(1,0,0,0),
-AutomaticSize="Y",
-Parent=canvas,
+Position=UDim2.new(0,0,0,0),
 ImageTransparency=ah.Color and 0.05 or(not ah.Window.NewElements and 0.93 or nil),
 ThemeTag={
 ImageColor3=not ah.Color and(ah.Window.NewElements and"ElementBackground"or"Text")or nil,
@@ -11721,44 +11713,19 @@ PaddingLeft=UDim.new(0,padding),
 PaddingRight=UDim.new(0,padding),
 PaddingBottom=UDim.new(0,padding),
 }),
-ac(radius,"SquircleOutline",{
-Size=UDim2.new(1,0,1,0),
-ThemeTag={ImageColor3="Outline"},
-ImageTransparency=0.9,
-}),
-})
-
-local shineFrame=ac(radius,"Squircle",{
-Size=UDim2.new(1,0,1,0),
-ImageColor3=Color3.new(1,1,1),
-ImageTransparency=0.7,
-BackgroundTransparency=1,
-ZIndex=5,
-Parent=canvas,
-},{
-ab("UIGradient",{
-Color=ColorSequence.new(Color3.new(1,1,1)),
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0,1),
-NumberSequenceKeypoint.new(0.5,0),
-NumberSequenceKeypoint.new(1,1),
-},
-Offset=Vector2.new(-1,0),
-Rotation=25,
-}),
-})
-
 ab("UIListLayout",{
 FillDirection="Vertical",
-Padding=UDim.new(0,12),
-Parent=bgFrame,
+Padding=UDim.new(0,10),
+SortOrder="LayoutOrder",
+}),
 })
 
-local header=ab("Frame",{
+local topSection=ab("Frame",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-Parent=bgFrame,
+Parent=cardFrame,
+LayoutOrder=1,
 },{
 ab("UIListLayout",{
 FillDirection="Horizontal",
@@ -11780,24 +11747,24 @@ ah.IconThemed,
 "ElementIcon"
 )
 iconObj.Size=UDim2.new(0,card.IconSize,0,card.IconSize)
-iconObj.Parent=header
+iconObj.Parent=topSection
 end
 
 local textContainer=ab("Frame",{
 Size=UDim2.new(1,card.Icon and(-card.IconSize-12)or 0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-Parent=header,
+Parent=topSection,
 },{
 ab("UIListLayout",{
 FillDirection="Vertical",
-Padding=UDim.new(0,4),
+Padding=UDim.new(0,3),
 }),
 })
 
 local titleLabel=ab("TextLabel",{
 Text=card.Title,
-TextSize=17,
+TextSize=16,
 FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
 TextXAlignment="Left",
 AutomaticSize="Y",
@@ -11811,10 +11778,10 @@ Parent=textContainer,
 })
 
 local descLabel
-if card.Desc then
+if card.Desc and card.Desc~=""then
 descLabel=ab("TextLabel",{
 Text=card.Desc,
-TextSize=14,
+TextSize=13,
 FontFace=Font.new(aa.Font,Enum.FontWeight.Medium),
 TextXAlignment="Left",
 AutomaticSize="Y",
@@ -11835,7 +11802,8 @@ btnContainer=ab("Frame",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-Parent=bgFrame,
+Parent=cardFrame,
+LayoutOrder=2,
 },{
 ab("UIListLayout",{
 Padding=UDim.new(0,8),
@@ -11859,18 +11827,55 @@ end
 end
 
 local function PlayEntranceAnimation()
-canvas.GroupTransparency=1
-canvas.Position=UDim2.new(0,0,0,10)
-shineFrame.UIGradient.Offset=Vector2.new(-1,0)
+cardFrame.Position=UDim2.new(0,0,0,8)
+titleLabel.TextTransparency=1
+if descLabel then descLabel.TextTransparency=1 end
 
-ad(canvas,0.38,{
-GroupTransparency=0,
+local targetTrans=ah.Color and 0.05 or(not ah.Window.NewElements and 0.93 or 0)
+cardFrame.ImageTransparency=1
+
+ad(cardFrame,0.32,{
 Position=UDim2.new(0,0,0,0),
+ImageTransparency=targetTrans,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-ad(shineFrame.UIGradient,0.65,{
+ad(titleLabel,0.28,{
+TextTransparency=0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+if descLabel then
+ad(descLabel,0.28,{
+TextTransparency=0.35,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+
+local sweepGrad=ab("UIGradient",{
+Color=ColorSequence.new{
+ColorSequenceKeypoint.new(0,Color3.fromRGB(255,255,255)),
+ColorSequenceKeypoint.new(0.5,Color3.fromRGB(255,255,255)),
+ColorSequenceKeypoint.new(1,Color3.fromRGB(255,255,255)),
+},
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,1),
+NumberSequenceKeypoint.new(0.2,0.8),
+NumberSequenceKeypoint.new(0.5,0.2),
+NumberSequenceKeypoint.new(0.8,0.8),
+NumberSequenceKeypoint.new(1,1),
+},
+Offset=Vector2.new(-1,0),
+Rotation=20,
+Parent=cardFrame,
+})
+
+local sweepTween=ad(sweepGrad,0.65,{
 Offset=Vector2.new(1,0),
-},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
+},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+sweepTween:Play()
+sweepTween.Completed:Connect(function()
+if sweepGrad and sweepGrad.Parent then
+sweepGrad:Destroy()
+end
+end)
 end
 
 if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrameCanvas then
@@ -11901,12 +11906,12 @@ end
 end
 
 card.CardFrame={
-UIElements={Main=canvas},
-Destroy=function()canvas:Destroy()end,
+UIElements={Main=cardFrame},
+Destroy=function()cardFrame:Destroy()end,
 SetTitle=function(self,text)card:SetTitle(text)end,
 SetDesc=function(self,text)card:SetDesc(text)end,
 }
-card.ElementFrame=canvas
+card.ElementFrame=cardFrame
 
 return card.__type,card
 end
