@@ -11679,10 +11679,43 @@ local ae=a.load'm'.New
 
 local af={}
 
+local colorPresets={
+["red"]=Color3.fromHex"#e53935",
+["红"]=Color3.fromHex"#e53935",
+["yellow"]=Color3.fromHex"#eab308",
+["黄"]=Color3.fromHex"#eab308",
+["green"]=Color3.fromHex"#43a047",
+["绿"]=Color3.fromHex"#43a047",
+["blue"]=Color3.fromHex"#039be5",
+["蓝"]=Color3.fromHex"#039be5",
+["orange"]=Color3.fromHex"#f57c00",
+["橙"]=Color3.fromHex"#f57c00",
+["purple"]=Color3.fromHex"#8b5cf6",
+["紫"]=Color3.fromHex"#8b5cf6",
+}
+
 function af.New(ag,ah)
 ah=ah or{}
 local radius=ah.Radius or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UICorner)or 16
 local padding=ah.Padding or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UIPadding)or 12
+
+local customColor
+if ah.Color then
+if typeof(ah.Color)=="Color3"then
+customColor=ah.Color
+elseif typeof(ah.Color)=="string"then
+local cLower=string.lower(ah.Color)
+if cLower~="dark"and cLower~="default"and cLower~="官方dark"then
+if colorPresets[cLower]then
+customColor=colorPresets[cLower]
+elseif string.sub(ah.Color,1,1)=="#"then
+customColor=Color3.fromHex(ah.Color)
+elseif aa.Colors and aa.Colors[ah.Color]then
+customColor=Color3.fromHex(aa.Colors[ah.Color])
+end
+end
+end
+end
 
 local card={
 __type="Card",
@@ -11691,6 +11724,7 @@ Desc=ah.Desc or nil,
 Icon=ah.Icon or nil,
 IconSize=ah.IconSize or 28,
 Radius=radius,
+Color=customColor,
 Buttons=ah.Buttons or{},
 UIElements={},
 }
@@ -11700,12 +11734,12 @@ Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 Parent=ah.Parent,
 Position=UDim2.new(0,0,0,0),
-ImageTransparency=ah.Color and 0.05 or(not ah.Window.NewElements and 0.93 or nil),
-ThemeTag={
-ImageColor3=not ah.Color and(ah.Window.NewElements and"ElementBackground"or"Text")or nil,
-ImageTransparency=not ah.Color and(ah.Window.NewElements and"ElementBackgroundTransparency"or nil)or nil,
-},
-ImageColor3=ah.Color or nil,
+ImageColor3=customColor or nil,
+ImageTransparency=customColor and 0.15 or(not ah.Window.NewElements and 0.93 or nil),
+ThemeTag=not customColor and{
+ImageColor3=(ah.Window.NewElements and"ElementBackground"or"Text"),
+ImageTransparency=(ah.Window.NewElements and"ElementBackgroundTransparency"or nil),
+}or nil,
 },{
 ab("UIPadding",{
 PaddingTop=UDim.new(0,padding),
@@ -11831,7 +11865,7 @@ cardFrame.Position=UDim2.new(0,0,0,8)
 titleLabel.TextTransparency=1
 if descLabel then descLabel.TextTransparency=1 end
 
-local targetTrans=ah.Color and 0.05 or(not ah.Window.NewElements and 0.93 or 0)
+local targetTrans=customColor and 0.15 or(not ah.Window.NewElements and 0.93 or 0)
 cardFrame.ImageTransparency=1
 
 ad(cardFrame,0.32,{
@@ -11905,11 +11939,111 @@ descLabel.Visible=(text~=nil and text~="")
 end
 end
 
+function card.SetColor(self,newColor)
+local col
+local isTheme=false
+
+if not newColor then
+isTheme=true
+elseif typeof(newColor)=="Color3"then
+col=newColor
+elseif typeof(newColor)=="string"then
+local cLower=string.lower(newColor)
+if cLower=="dark"or cLower=="default"or cLower=="官方dark"then
+isTheme=true
+elseif colorPresets[cLower]then
+col=colorPresets[cLower]
+elseif string.sub(newColor,1,1)=="#"then
+col=Color3.fromHex(newColor)
+elseif aa.Colors and aa.Colors[newColor]then
+col=Color3.fromHex(aa.Colors[newColor])
+end
+end
+
+local targetColor
+local targetTrans
+
+if isTheme or not col then
+customColor=nil
+card.Color=nil
+targetColor=aa.GetThemeProperty("ElementBackground",aa.Theme)or Color3.fromHex"#2A2A2C"
+targetTrans=not ah.Window.NewElements and 0.93 or 0
+
+aa.AddThemeObject(cardFrame,{
+ImageColor3=(ah.Window.NewElements and"ElementBackground"or"Text"),
+ImageTransparency=(ah.Window.NewElements and"ElementBackgroundTransparency"or nil),
+})
+aa.UpdateTheme(cardFrame,false)
+else
+customColor=col
+card.Color=col
+targetColor=col
+targetTrans=0.15
+
+aa.Objects[cardFrame]=nil
+end
+
+local currentColor=cardFrame.ImageColor3 or Color3.fromRGB(42,42,44)
+
+local transGrad=ab("UIGradient",{
+Color=ColorSequence.new{
+ColorSequenceKeypoint.new(0,currentColor),
+ColorSequenceKeypoint.new(0.5,targetColor),
+ColorSequenceKeypoint.new(1,targetColor),
+},
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,0),
+NumberSequenceKeypoint.new(0.5,0),
+NumberSequenceKeypoint.new(1,0),
+},
+Offset=Vector2.new(-1,0),
+Rotation=30,
+Parent=cardFrame,
+})
+
+local sweepLight=ab("UIGradient",{
+Color=ColorSequence.new(Color3.fromRGB(255,255,255)),
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,1),
+NumberSequenceKeypoint.new(0.5,0.25),
+NumberSequenceKeypoint.new(1,1),
+},
+Offset=Vector2.new(-1,0),
+Rotation=25,
+Parent=cardFrame,
+})
+
+ad(cardFrame,0.4,{
+ImageColor3=targetColor,
+ImageTransparency=targetTrans,
+},Enum.EasingStyle.Cubic,Enum.EasingDirection.Out):Play()
+
+local tGrad=ad(transGrad,0.55,{
+Offset=Vector2.new(1,0),
+},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+
+local tLight=ad(sweepLight,0.65,{
+Offset=Vector2.new(1,0),
+},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+
+tGrad:Play()
+tLight:Play()
+
+tLight.Completed:Connect(function()
+if transGrad and transGrad.Parent then transGrad:Destroy() end
+if sweepLight and sweepLight.Parent then sweepLight:Destroy() end
+end)
+end
+
+card.setColor=card.SetColor
+
 card.CardFrame={
 UIElements={Main=cardFrame},
 Destroy=function()cardFrame:Destroy()end,
 SetTitle=function(self,text)card:SetTitle(text)end,
 SetDesc=function(self,text)card:SetDesc(text)end,
+SetColor=function(self,color)card:SetColor(color)end,
+setColor=function(self,color)card:SetColor(color)end,
 }
 card.ElementFrame=cardFrame
 
