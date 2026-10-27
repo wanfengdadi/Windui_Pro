@@ -2750,151 +2750,152 @@ return ar
 end
 
 return aa end function a.o()
-    local aa = a.load'd'
-    local ab = aa.New
-    local ac = aa.Tween
+local aa=a.load'd'
+local ab=aa.New
+local ac=aa.Tween
 
-    local ad = {
-        Holder = nil,
-        Parent = nil,
-    }
+local ad={
+Holder=nil,
+Parent=nil,
+}
 
-    function ad.Create(ae, af, ag, ah, ai)
-        local aj = {
-            UICorner = 28,
-            UIPadding = 12,
-            Window = ag,
-            WindUI = ah,
-            UIElements = {},
-            _isClosing = false,
-        }
+function ad.Create(ae,af,ag,ah,ai)
+local aj={
+UICorner=28,
+UIPadding=12,
+Window=ag,
+WindUI=ah,
+UIElements={},
+_isClosing=false,
+}
 
-        if ae then
-            aj.UIPadding = 0
-            aj.UICorner = 26
-        end
+if ae then
+aj.UIPadding=0
+aj.UICorner=26
+end
 
-        af = af or "Dialog"
+af=af or"Dialog"
 
-        if not ae then
-            aj.UIElements.FullScreen = ab("Frame", {
-                ZIndex = 999,
-                BackgroundTransparency = 1,
-                BackgroundColor3 = Color3.fromHex"#000000",
-                Size = UDim2.new(1, 0, 1, 0),
-                Active = true,
-                Visible = false,
-                Parent = ad.Parent or (ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
-            }, {
-                ab("UICorner", {
-                    CornerRadius = UDim.new(0, ag and ag.UICorner or 16),
-                }),
-            })
-        end
+if not ae then
+aj.UIElements.FullScreen=ab("Frame",{
+ZIndex=999,
+BackgroundTransparency=1,
+BackgroundColor3=Color3.fromHex"#000000",
+Size=UDim2.new(1,0,1,0),
+Active=true,
+Visible=false,
+Parent=ad.Parent or(ag and ag.UIElements and ag.UIElements.Main and ag.UIElements.Main.Main),
+},{
+ab("UICorner",{
+CornerRadius=UDim.new(0,ag and ag.UICorner or 16),
+}),
+})
+end
 
-        aj.UIElements.Main = ab("CanvasGroup", {
-            Size = UDim2.new(0, 280, 0, 0),
-            AutomaticSize = "Y",
-            BackgroundTransparency = 1,
-            GroupTransparency = 1,
-            Visible = true,
-            ZIndex = 99999,
-        }, {
-            ab("UIPadding", {
-                PaddingTop = UDim.new(0, aj.UIPadding),
-                PaddingLeft = UDim.new(0, aj.UIPadding),
-                PaddingRight = UDim.new(0, aj.UIPadding),
-                PaddingBottom = UDim.new(0, aj.UIPadding),
-            }),
-        })
+aj.UIElements.Main=ab("CanvasGroup",{
+Size=UDim2.new(0,280,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+GroupTransparency=1,
+Visible=true,
+ZIndex=99999,
+},{
+ab("UIPadding",{
+PaddingTop=UDim.new(0,aj.UIPadding),
+PaddingLeft=UDim.new(0,aj.UIPadding),
+PaddingRight=UDim.new(0,aj.UIPadding),
+PaddingBottom=UDim.new(0,aj.UIPadding),
+}),
+})
 
-        local cardScale = ab("UIScale", {
-            Scale = 0.92,
-        })
+local cardScale=ab("UIScale",{
+Scale=0.92,
+})
 
-        aj.UIElements.MainContainer = aa.NewRoundFrame(aj.UICorner, "Squircle", {
-            Visible = false,
-            ImageTransparency = 1,
-            Parent = ai or aj.UIElements.FullScreen,
-            Position = UDim2.new(0.5, 0, 0.5, 18),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            AutomaticSize = "XY",
-            ThemeTag = {
-                ImageColor3 = af .. "Background",
-                ImageTransparency = af .. "BackgroundTransparency",
-            },
-            ZIndex = 9999,
-        }, {
-            cardScale,
-            aj.UIElements.Main,
-        })
+aj.UIElements.MainContainer=aa.NewRoundFrame(aj.UICorner,"Squircle",{
+Visible=false,
+ImageTransparency=1,
+Parent=ai or aj.UIElements.FullScreen,
+Position=UDim2.new(0.5,0,0.5,18),
+AnchorPoint=Vector2.new(0.5,0.5),
+AutomaticSize="XY",
+ThemeTag={
+ImageColor3=af.."Background",
+ImageTransparency=af.."BackgroundTransparency",
+},
+ZIndex=9999,
+},{
+cardScale,
+aj.UIElements.Main,
+})
 
-        function aj.Open(ak)
-            aj._isClosing = false
+function aj.Open(ak)
+aj._isClosing=false
 
-            if not ae and aj.UIElements.FullScreen then
-                aj.UIElements.FullScreen.Visible = true
-                aj.UIElements.FullScreen.Active = true
-                ac(aj.UIElements.FullScreen, 0.35, { BackgroundTransparency = 0.65 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-            end
+if not ae and aj.UIElements.FullScreen then
+aj.UIElements.FullScreen.Visible=true
+aj.UIElements.FullScreen.Active=true
+ac(aj.UIElements.FullScreen,0.35,{BackgroundTransparency=0.65},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+end
 
-            aj.UIElements.MainContainer.Visible = true
-            aj.UIElements.MainContainer.Position = UDim2.new(0.5, 0, 0.5, 18)
-            aj.UIElements.MainContainer.ImageTransparency = 1
-            aj.UIElements.Main.GroupTransparency = 1
-            cardScale.Scale = 0.92
+aj.UIElements.MainContainer.Visible=true
+aj.UIElements.MainContainer.Position=UDim2.new(0.5,0,0.5,18)
+aj.UIElements.MainContainer.ImageTransparency=1
+aj.UIElements.Main.GroupTransparency=1
+cardScale.Scale=0.92
 
-            ac(aj.UIElements.MainContainer, 0.42, {
-                Position = UDim2.new(0.5, 0, 0.5, 0),
-                ImageTransparency = 0,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+ac(aj.UIElements.MainContainer,0.42,{
+Position=UDim2.new(0.5,0,0.5,0),
+ImageTransparency=0,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
-            ac(aj.UIElements.Main, 0.35, {
-                GroupTransparency = 0,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+ac(aj.UIElements.Main,0.35,{
+GroupTransparency=0,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
-            ac(cardScale, 0.42, {
-                Scale = 1.0,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-        end
+ac(cardScale,0.42,{
+Scale=1.0,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+end
 
-        function aj.Close(ak)
-            if aj._isClosing then return function() end end
-            aj._isClosing = true
+function aj.Close(ak)
+if aj._isClosing then return function()end end
+aj._isClosing=true
 
-            if not ae and aj.UIElements.FullScreen then
-                ac(aj.UIElements.FullScreen, 0.28, { BackgroundTransparency = 1 }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
-                aj.UIElements.FullScreen.Active = false
-            end
+if not ae and aj.UIElements.FullScreen then
+ac(aj.UIElements.FullScreen,0.28,{BackgroundTransparency=1},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
+aj.UIElements.FullScreen.Active=false
+end
 
-            ac(aj.UIElements.MainContainer, 0.28, {
-                Position = UDim2.new(0.5, 0, 0.5, 14),
-                ImageTransparency = 1,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+ac(aj.UIElements.MainContainer,0.28,{
+Position=UDim2.new(0.5,0,0.5,14),
+ImageTransparency=1,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
-            ac(aj.UIElements.Main, 0.25, {
-                GroupTransparency = 1,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+ac(aj.UIElements.Main,0.25,{
+GroupTransparency=1,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
-            ac(cardScale, 0.28, {
-                Scale = 0.92,
-            }, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out):Play()
+ac(cardScale,0.28,{
+Scale=0.92,
+},Enum.EasingStyle.Exponential,Enum.EasingDirection.Out):Play()
 
-            task.delay(0.3, function()
-                if not ae and aj.UIElements.FullScreen then
-                    aj.UIElements.FullScreen:Destroy()
-                else
-                    aj.UIElements.MainContainer:Destroy()
-                end
-            end)
+task.delay(0.3,function()
+if aj.UIElements.MainContainer then
+pcall(function()aj.UIElements.MainContainer:Destroy()end)
+end
+if aj.UIElements.FullScreen then
+pcall(function()aj.UIElements.FullScreen:Destroy()end)
+end
+end)
 
-            return function() end
-        end
+return function()end
+end
 
-        return aj
-    end
+return aj
+end
 
-    return ad end function a.p()
+return ad end function a.p()
 
 local aa={}
 
