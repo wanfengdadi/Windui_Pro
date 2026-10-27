@@ -11681,41 +11681,46 @@ local af={}
 
 local colorPresets={
 ["red"]=Color3.fromHex"#e53935",
-["红"]=Color3.fromHex"#e53935",
 ["yellow"]=Color3.fromHex"#eab308",
-["黄"]=Color3.fromHex"#eab308",
 ["green"]=Color3.fromHex"#43a047",
-["绿"]=Color3.fromHex"#43a047",
 ["blue"]=Color3.fromHex"#039be5",
-["蓝"]=Color3.fromHex"#039be5",
 ["orange"]=Color3.fromHex"#f57c00",
-["橙"]=Color3.fromHex"#f57c00",
 ["purple"]=Color3.fromHex"#8b5cf6",
-["紫"]=Color3.fromHex"#8b5cf6",
+["white"]=Color3.fromHex"#ffffff",
+["black"]=Color3.fromHex"#101010",
+["grey"]=Color3.fromHex"#484848",
+["gray"]=Color3.fromHex"#484848",
 }
+
+local function parseColorInput(input)
+if not input then return nil end
+if typeof(input)=="Color3"then return input end
+if typeof(input)=="string"then
+local lower=string.lower(input)
+if lower=="dark"or lower=="default"then
+return nil
+end
+if colorPresets[lower]then
+return colorPresets[lower]
+end
+if string.sub(input,1,1)=="#"then
+local s,col=pcall(Color3.fromHex,input)
+if s and col then return col end
+end
+if aa.Colors and aa.Colors[input]then
+local s,col=pcall(Color3.fromHex,aa.Colors[input])
+if s and col then return col end
+end
+end
+return nil
+end
 
 function af.New(ag,ah)
 ah=ah or{}
 local radius=ah.Radius or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UICorner)or 16
 local padding=ah.Padding or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UIPadding)or 12
 
-local customColor
-if ah.Color then
-if typeof(ah.Color)=="Color3"then
-customColor=ah.Color
-elseif typeof(ah.Color)=="string"then
-local cLower=string.lower(ah.Color)
-if cLower~="dark"and cLower~="default"and cLower~="官方dark"then
-if colorPresets[cLower]then
-customColor=colorPresets[cLower]
-elseif string.sub(ah.Color,1,1)=="#"then
-customColor=Color3.fromHex(ah.Color)
-elseif aa.Colors and aa.Colors[ah.Color]then
-customColor=Color3.fromHex(aa.Colors[ah.Color])
-end
-end
-end
-end
+local customColor=parseColorInput(ah.Color)
 
 local card={
 __type="Card",
@@ -11729,13 +11734,15 @@ Buttons=ah.Buttons or{},
 UIElements={},
 }
 
+local initialTrans=customColor and 0.08 or(not ah.Window.NewElements and 0.93 or nil)
+
 local cardFrame=ac(radius,"Squircle",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 Parent=ah.Parent,
 Position=UDim2.new(0,0,0,0),
 ImageColor3=customColor or nil,
-ImageTransparency=customColor and 0.15 or(not ah.Window.NewElements and 0.93 or nil),
+ImageTransparency=initialTrans,
 ThemeTag=not customColor and{
 ImageColor3=(ah.Window.NewElements and"ElementBackground"or"Text"),
 ImageTransparency=(ah.Window.NewElements and"ElementBackgroundTransparency"or nil),
@@ -11865,7 +11872,7 @@ cardFrame.Position=UDim2.new(0,0,0,8)
 titleLabel.TextTransparency=1
 if descLabel then descLabel.TextTransparency=1 end
 
-local targetTrans=customColor and 0.15 or(not ah.Window.NewElements and 0.93 or 0)
+local targetTrans=customColor and 0.08 or(not ah.Window.NewElements and 0.93 or 0)
 cardFrame.ImageTransparency=1
 
 ad(cardFrame,0.32,{
@@ -11905,7 +11912,7 @@ local sweepTween=ad(sweepGrad,0.65,{
 Offset=Vector2.new(1,0),
 },Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
 sweepTween:Play()
-sweepTween.Completed:Connect(function()
+task.delay(0.68,function()
 if sweepGrad and sweepGrad.Parent then
 sweepGrad:Destroy()
 end
@@ -11939,31 +11946,14 @@ descLabel.Visible=(text~=nil and text~="")
 end
 end
 
-function card.SetColor(self,newColor)
-local col
-local isTheme=false
-
-if not newColor then
-isTheme=true
-elseif typeof(newColor)=="Color3"then
-col=newColor
-elseif typeof(newColor)=="string"then
-local cLower=string.lower(newColor)
-if cLower=="dark"or cLower=="default"or cLower=="官方dark"then
-isTheme=true
-elseif colorPresets[cLower]then
-col=colorPresets[cLower]
-elseif string.sub(newColor,1,1)=="#"then
-col=Color3.fromHex(newColor)
-elseif aa.Colors and aa.Colors[newColor]then
-col=Color3.fromHex(aa.Colors[newColor])
-end
-end
+function card.SetColor(arg1,arg2)
+local input=(typeof(arg1)=="table"and arg2)or arg1
+local col=parseColorInput(input)
 
 local targetColor
 local targetTrans
 
-if isTheme or not col then
+if not col then
 customColor=nil
 card.Color=nil
 targetColor=aa.GetThemeProperty("ElementBackground",aa.Theme)or Color3.fromHex"#2A2A2C"
@@ -11978,34 +11968,26 @@ else
 customColor=col
 card.Color=col
 targetColor=col
-targetTrans=0.15
+targetTrans=0.08
 
 aa.Objects[cardFrame]=nil
 end
 
-local currentColor=cardFrame.ImageColor3 or Color3.fromRGB(42,42,44)
+local oldGrad=cardFrame:FindFirstChild"CardSweepGrad"
+if oldGrad then oldGrad:Destroy() end
 
-local transGrad=ab("UIGradient",{
+local sweepGrad=ab("UIGradient",{
+Name="CardSweepGrad",
 Color=ColorSequence.new{
-ColorSequenceKeypoint.new(0,currentColor),
+ColorSequenceKeypoint.new(0,Color3.fromRGB(255,255,255)),
 ColorSequenceKeypoint.new(0.5,targetColor),
-ColorSequenceKeypoint.new(1,targetColor),
+ColorSequenceKeypoint.new(1,Color3.fromRGB(255,255,255)),
 },
-Transparency=NumberSequence.new{
-NumberSequenceKeypoint.new(0,0),
-NumberSequenceKeypoint.new(0.5,0),
-NumberSequenceKeypoint.new(1,0),
-},
-Offset=Vector2.new(-1,0),
-Rotation=30,
-Parent=cardFrame,
-})
-
-local sweepLight=ab("UIGradient",{
-Color=ColorSequence.new(Color3.fromRGB(255,255,255)),
 Transparency=NumberSequence.new{
 NumberSequenceKeypoint.new(0,1),
-NumberSequenceKeypoint.new(0.5,0.25),
+NumberSequenceKeypoint.new(0.2,0.6),
+NumberSequenceKeypoint.new(0.5,0.15),
+NumberSequenceKeypoint.new(0.8,0.6),
 NumberSequenceKeypoint.new(1,1),
 },
 Offset=Vector2.new(-1,0),
@@ -12013,25 +11995,20 @@ Rotation=25,
 Parent=cardFrame,
 })
 
-ad(cardFrame,0.4,{
+ad(cardFrame,0.45,{
 ImageColor3=targetColor,
 ImageTransparency=targetTrans,
 },Enum.EasingStyle.Cubic,Enum.EasingDirection.Out):Play()
 
-local tGrad=ad(transGrad,0.55,{
+local tSweep=ad(sweepGrad,0.65,{
 Offset=Vector2.new(1,0),
 },Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+tSweep:Play()
 
-local tLight=ad(sweepLight,0.65,{
-Offset=Vector2.new(1,0),
-},Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
-
-tGrad:Play()
-tLight:Play()
-
-tLight.Completed:Connect(function()
-if transGrad and transGrad.Parent then transGrad:Destroy() end
-if sweepLight and sweepLight.Parent then sweepLight:Destroy() end
+task.delay(0.68,function()
+if sweepGrad and sweepGrad.Parent then
+sweepGrad:Destroy()
+end
 end)
 end
 
@@ -12042,8 +12019,8 @@ UIElements={Main=cardFrame},
 Destroy=function()cardFrame:Destroy()end,
 SetTitle=function(self,text)card:SetTitle(text)end,
 SetDesc=function(self,text)card:SetDesc(text)end,
-SetColor=function(self,color)card:SetColor(color)end,
-setColor=function(self,color)card:SetColor(color)end,
+SetColor=function(self,color)card.SetColor(color)end,
+setColor=function(self,color)card.SetColor(color)end,
 }
 card.ElementFrame=cardFrame
 
