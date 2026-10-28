@@ -12129,31 +12129,23 @@ tabbox.UIElements.TabBar=tabButtonsList
 tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
 
-local function getTabHeight(tab)
-if not tab or not tab.UIElements or not tab.UIElements.ContainerFrame then return 40 end
-local layout=tab.UIElements.ContainerFrame:FindFirstChildOfClass("UIListLayout")
-local h=layout and layout.AbsoluteContentSize.Y or 0
-if h<=0 then
-for _,child in ipairs(tab.UIElements.ContainerFrame:GetChildren()) do
-if child:IsA("GuiObject") and child.Visible then
-h=h+child.AbsoluteSize.Y+6
-end
-end
-end
-return math.max(h,40)
-end
-
-function tabbox.SelectTab(self,targetTab)
+function tabbox.SelectTab(self,targetTab,instant)
 if tabbox.ActiveTab==targetTab then return end
 local prevTab=tabbox.ActiveTab
 tabbox.ActiveTab=targetTab
-local totalTabs=#tabbox.Tabs
+local totalTabs=math.max(#tabbox.Tabs,1)
 
-if indicator then
 indicator.Visible=true
-ad(indicator,0.28,{
-Position=UDim2.new((targetTab.Index-1)/totalTabs,2,0,3),
-Size=UDim2.new(1/totalTabs,-4,1,-6),
+local targetPos=UDim2.new((targetTab.Index-1)/totalTabs,2,0,3)
+local targetSize=UDim2.new(1/totalTabs,-4,1,-6)
+
+if instant then
+indicator.Position=targetPos
+indicator.Size=targetSize
+else
+ad(indicator,0.25,{
+Position=targetPos,
+Size=targetSize,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 
@@ -12164,58 +12156,36 @@ end
 
 for _,subTab in ipairs(tabbox.Tabs) do
 local isCurrent=(subTab==targetTab)
-if isCurrent then
-ad(subTab.UIElements.TitleLabel,0.22,{TextTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local targetTrans=isCurrent and 0 or 0.45
+ad(subTab.UIElements.TitleLabel,0.2,{TextTransparency=targetTrans},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
-if img then ad(img,0.22,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-end
-else
-ad(subTab.UIElements.TitleLabel,0.22,{TextTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-if subTab.UIElements.IconObj then
-local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
-if img then ad(img,0.22,{ImageTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
-end
+if img then ad(img,0.2,{ImageTransparency=targetTrans},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
 end
 end
 
-contentHost.ClipsDescendants=true
-contentHost.AutomaticSize="None"
-local targetH=getTabHeight(targetTab)
-
-ad(contentHost,0.32,{
-Size=UDim2.new(1,0,0,targetH),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-if prevTab and prevTab.UIElements and prevTab.UIElements.PageCanvas then
-local oldPage=prevTab.UIElements.PageCanvas
-ad(oldPage,0.25,{
-Position=UDim2.new(-dir*0.14,0,0,0),
-GroupTransparency=1,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-task.delay(0.25,function()
-if tabbox.ActiveTab~=prevTab then
-oldPage.Visible=false
-end
-end)
+if prevTab and prevTab.UIElements and prevTab.UIElements.PageFrame then
+prevTab.UIElements.PageFrame.Visible=false
 end
 
-local newPage=targetTab.UIElements.PageCanvas
+local newPage=targetTab.UIElements.PageFrame
 newPage.Visible=true
-newPage.Position=UDim2.new(dir*0.14,0,0,0)
-newPage.GroupTransparency=1
 
-ad(newPage,0.32,{
-Position=UDim2.new(0,0,0,0),
-GroupTransparency=0,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-
-task.delay(0.35,function()
-if tabbox.ActiveTab==targetTab then
-contentHost.AutomaticSize="Y"
-contentHost.ClipsDescendants=false
+if instant then
+newPage.Position=UDim2.new(0,0,0,0)
+local scale=newPage:FindFirstChildOfClass("UIScale")
+if scale then scale.Scale=1 end
+else
+newPage.Position=UDim2.new(dir*0.06,0,0,0)
+local scale=newPage:FindFirstChildOfClass("UIScale")
+if not scale then
+scale=Instance.new("UIScale")
+scale.Parent=newPage
 end
-end)
+scale.Scale=0.97
+ad(newPage,0.25,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(scale,0.25,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 
 function tabbox.Tab(self,subCfg)
@@ -12281,21 +12251,13 @@ AutomaticSize="XY",
 Parent=btn,
 })
 
-local pageCanvas=ab("CanvasGroup",{
+local pageFrame=ab("Frame",{
 Size=UDim2.new(1,0,0,0),
 Position=UDim2.new(0,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
-GroupTransparency=1,
 Parent=contentHost,
 Visible=false,
-})
-
-local pageList=ab("Frame",{
-Size=UDim2.new(1,0,0,0),
-AutomaticSize="Y",
-BackgroundTransparency=1,
-Parent=pageCanvas,
 },{
 ab("UIListLayout",{
 FillDirection="Vertical",
@@ -12306,14 +12268,13 @@ SortOrder="LayoutOrder",
 
 subTab.UIElements.Button=btn
 subTab.UIElements.TitleLabel=lbl
-subTab.UIElements.PageCanvas=pageCanvas
-subTab.UIElements.PageFrame=pageCanvas
-subTab.UIElements.ContainerFrame=pageList
+subTab.UIElements.PageFrame=pageFrame
+subTab.UIElements.ContainerFrame=pageFrame
 
 local elementsModule=ah.ElementsModule
 elementsModule.Load(
 subTab,
-pageList,
+pageFrame,
 elementsModule.Elements,
 ah.Window,
 ah.WindUI,
@@ -12323,20 +12284,6 @@ ah.UIScale,
 ah.Tab
 )
 
-local listLayout=pageList:FindFirstChildOfClass("UIListLayout")
-if listLayout then
-aa.AddSignal(listLayout:GetPropertyChangedSignal("AbsoluteContentSize"),function()
-if tabbox.ActiveTab==subTab then
-local h=math.max(listLayout.AbsoluteContentSize.Y,40)
-if contentHost.AutomaticSize=="None" then
-ad(contentHost,0.25,{
-Size=UDim2.new(1,0,0,h),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-end
-end)
-end
-
 table.insert(tabbox.Tabs,subTab)
 
 local totalTabs=#tabbox.Tabs
@@ -12345,13 +12292,11 @@ t.UIElements.Button.Size=UDim2.new(1/totalTabs,-4,1,0)
 end
 
 aa.AddSignal(btn.MouseButton1Click,function()
-tabbox:SelectTab(subTab)
+tabbox:SelectTab(subTab,false)
 end)
 
 if #tabbox.Tabs==1 then
-task.defer(function()
-tabbox:SelectTab(subTab)
-end)
+tabbox:SelectTab(subTab,true)
 end
 
 return subTab
