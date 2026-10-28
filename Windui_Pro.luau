@@ -13333,22 +13333,24 @@ HorizontalAlignment="Right",
 
 
 
-aB.Main.Size=UDim2.new(
-1,
-0,
-0,
-aB.Main.Outline.Frame.Desc.Visible
+local targetH=aB.Main.Outline.Frame.Desc.Visible
 and(((ap.Padding-2)*2)+aB.Main.Outline.Frame.Title.TextBounds.Y+6+aB.Main.Outline.Frame.Desc.TextBounds.Y)
 or(((ap.Padding-2)*2)+aB.Main.Outline.Frame.Title.TextBounds.Y)
-)
+
+aB.Main.ClipsDescendants=true
+aB.Main.Size=UDim2.new(1,0,0,0)
+al(aB.Main,0.3,{
+Size=UDim2.new(1,0,0,targetH),
+},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+
+local itemScale=ak("UIScale",{Scale=0.9,Parent=aB})
+al(itemScale,0.28,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 
 ai.AddSignal(aB.Main.MouseEnter,function()
 al(aB.Main,0.04,{ImageTransparency=0.95}):Play()
-
 end)
 ai.AddSignal(aB.Main.InputEnded,function()
 al(aB.Main,0.08,{ImageTransparency=1}):Play()
-
 end)
 ai.AddSignal(aB.Main.MouseButton1Click,function()
 if aA then
@@ -13414,25 +13416,12 @@ return aw
 end
 
 ai.AddSignal(as.UIListLayout:GetPropertyChangedSignal"AbsoluteContentSize",function()
-
-al(as,0.06,{
-Size=UDim2.new(
-1,
-0,
-0,
-math.clamp(
-as.UIListLayout.AbsoluteContentSize.Y+(ap.Padding*2),
-0,
-ap.MaxHeight
-)
-),
-},Enum.EasingStyle.Quint,Enum.EasingDirection.InOut):Play()
-
-
-
-
-
-
+local targetH=math.clamp(as.UIListLayout.AbsoluteContentSize.Y+(ap.Padding*2),0,ap.MaxHeight)
+if as.UIListLayout.AbsoluteContentSize.Y>0 then
+al(as,0.35,{
+Size=UDim2.new(1,0,0,targetH),
+},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+end
 end)
 
 local isClosing=false
@@ -13543,10 +13532,15 @@ Parent=as,
 Name="NotFound",
 })
 else
-as.Visible=false
-at.Frame.Results.Frame.Visible=false
 topShadow.Visible=false
 bottomShadow.Visible=false
+al(as,0.22,{Size=UDim2.new(1,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+task.delay(0.22,function()
+if aq.Text==""then
+as.Visible=false
+at.Frame.Results.Frame.Visible=false
+end
+end)
 end
 end
 
