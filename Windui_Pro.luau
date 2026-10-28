@@ -12129,6 +12129,28 @@ tabbox.UIElements.TabBar=tabButtonsList
 tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
 
+local function syncParentCanvas(targetTab)
+task.defer(function()
+if not targetTab or not targetTab.UIElements or not targetTab.UIElements.PageFrame then return end
+local pf=targetTab.UIElements.PageFrame
+local layout=pf:FindFirstChildOfClass("UIListLayout")
+local h=layout and layout.AbsoluteContentSize.Y or 0
+if h<=0 then
+for _,child in ipairs(pf:GetChildren()) do
+if child:IsA("GuiObject") and child.Visible then
+h=h+child.AbsoluteSize.Y+6
+end
+end
+end
+local totalH=38+10+(padding*2)+h
+if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrame then
+local cf=ah.Tab.UIElements.ContainerFrame
+cf.CanvasSize=UDim2.new(0,0,0,math.max(totalH+80,cf.AbsoluteWindowSize.Y+10))
+cf.ScrollingEnabled=true
+end
+end)
+end
+
 function tabbox.SelectTab(self,targetTab,instant)
 if tabbox.ActiveTab==targetTab then return end
 local prevTab=tabbox.ActiveTab
@@ -12186,6 +12208,8 @@ scale.Scale=0.97
 ad(newPage,0.25,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 ad(scale,0.25,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
+
+syncParentCanvas(targetTab)
 end
 
 function tabbox.Tab(self,subCfg)
@@ -12283,6 +12307,15 @@ elementsModule,
 ah.UIScale,
 ah.Tab
 )
+
+local listLayout=pageFrame:FindFirstChildOfClass("UIListLayout")
+if listLayout then
+aa.AddSignal(listLayout:GetPropertyChangedSignal("AbsoluteContentSize"),function()
+if tabbox.ActiveTab==subTab then
+syncParentCanvas(subTab)
+end
+end)
+end
 
 table.insert(tabbox.Tabs,subTab)
 
