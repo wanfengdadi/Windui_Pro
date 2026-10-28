@@ -4,7 +4,7 @@
     | |/ |/ / / _ \/ _  / /_/ // /  
     |__/|__/_/_//_/\_,_/\____/___/
     
-    v1.6.65  |  2026-07-01  |  Roblox UI Library for scripts
+    Windui_Pro - c2.3.95  |  2026-11-16  |  Roblox UI Library for scripts
     
     To view the source code, see the `src/` folder on the official GitHub repository.
     
@@ -1551,7 +1551,14 @@ if type(A)~="number"or A~=math.floor(A)then
 return nil,1
 end
 
+
+
+
+
+
 local C=#z
+
+
 if C==0 or A<1 or A>C then
 return nil,2
 end
@@ -1564,17 +1571,7 @@ local G=F.__type
 return G=="Divider"or G=="Space"or G=="Section"
 end
 
-local function isVisible(F)
-if F==nil then
-return false
-end
-if F.ElementFrame and F.ElementFrame.Visible==false then
-return false
-end
-return true
-end
-
-if isDelimiter(z[A])or not isVisible(z[A])then
+if isDelimiter(z[A])then
 return nil,3
 end
 
@@ -1591,37 +1588,26 @@ end
 return"Square"
 end
 
-local currentGroup={}
+local F=1
+local G=0
+
 for H=1,C do
 local J=z[H]
 if isDelimiter(J)then
-local pos=nil
-for idx,el in ipairs(currentGroup)do
-if el==z[A]then
-pos=idx
-break
+if A>=F and A<=H-1 then
+local L=A-F+1
+return calculate(L,G)
 end
-end
-if pos then
-return calculate(pos,#currentGroup)
-end
-currentGroup={}
+F=H+1
+G=0
 else
-if isVisible(J)then
-table.insert(currentGroup,J)
-end
+G=G+1
 end
 end
 
-local pos=nil
-for idx,el in ipairs(currentGroup)do
-if el==z[A]then
-pos=idx
-break
-end
-end
-if pos then
-return calculate(pos,#currentGroup)
+if A>=F and A<=C then
+local H=A-F+1
+return calculate(H,G)
 end
 
 return nil,4
@@ -12127,11 +12113,6 @@ end
 
 if aw then
 av.ElementFrame=aw.UIElements.Main
-av.ElementFrame:GetPropertyChangedSignal("Visible"):Connect(function()
-if ak.NewElements then
-aa:UpdateAllElementShapes(ap or aa)
-end
-end)
 function av.SetTitle(ax,ay)
 return aw.SetTitle and aw:SetTitle(ay)
 end
