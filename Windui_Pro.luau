@@ -13104,6 +13104,57 @@ PaddingRight=UDim.new(0,ap.Padding),
 }),
 }),
 }),
+local topShadow=ak("Frame",{
+Size=UDim2.new(1,0,0,24),
+Position=UDim2.new(0,0,0,1),
+BackgroundTransparency=0,
+BorderSizePixel=0,
+ZIndex=15,
+Visible=false,
+Active=false,
+},{
+ak("UIGradient",{
+Rotation=90,
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,0.15),
+NumberSequenceKeypoint.new(1,1),
+},
+}),
+})
+
+local bottomShadow=ak("Frame",{
+Size=UDim2.new(1,0,0,24),
+Position=UDim2.new(0,0,1,0),
+AnchorPoint=Vector2.new(0,1),
+BackgroundTransparency=0,
+BorderSizePixel=0,
+ZIndex=15,
+Visible=false,
+Active=false,
+},{
+ak("UIGradient",{
+Rotation=-90,
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0,0.15),
+NumberSequenceKeypoint.new(1,1),
+},
+}),
+ak("UICorner",{
+CornerRadius=UDim.new(0,ap.Radius),
+}),
+})
+
+local function updateShadowColor()
+local isLight=ai.Theme and(ai.Theme.Name=="Light"or ai.Theme.Name=="White")
+local col=isLight and Color3.new(1,1,1)or Color3.new(0,0,0)
+topShadow.BackgroundColor3=col
+topShadow.UIGradient.Color=ColorSequence.new(col)
+bottomShadow.BackgroundColor3=col
+bottomShadow.UIGradient.Color=ColorSequence.new(col)
+end
+updateShadowColor()
+ai:OnThemeChange(updateShadowColor)
+
 ak("Frame",{
 BackgroundTransparency=1,
 AutomaticSize="Y",
@@ -13119,6 +13170,8 @@ BackgroundTransparency=0.9,
 Visible=false,
 }),
 as,
+topShadow,
+bottomShadow,
 ak("UISizeConstraint",{
 MaxSize=Vector2.new(ap.Width,ap.MaxHeight),
 }),
@@ -13437,6 +13490,8 @@ local ax=Search(aw)
 
 as.Visible=true
 at.Frame.Results.Frame.Visible=true
+topShadow.Visible=true
+bottomShadow.Visible=true
 for ay,az in next,as:GetChildren()do
 if az.ClassName~="UIListLayout"and az.ClassName~="UIPadding"then
 az:Destroy()
@@ -13491,6 +13546,8 @@ Name="NotFound",
 else
 as.Visible=false
 at.Frame.Results.Frame.Visible=false
+topShadow.Visible=false
+bottomShadow.Visible=false
 end
 end
 
