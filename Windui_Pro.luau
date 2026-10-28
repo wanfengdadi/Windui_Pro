@@ -13056,7 +13056,6 @@ ImageTransparency=0,
 ai.NewRoundFrame(ap.Radius,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
-
 Visible=false,
 ThemeTag={
 ImageColor3="White",
@@ -13068,14 +13067,6 @@ ak("Frame",{
 Size=UDim2.new(1,0,0,46),
 BackgroundTransparency=1,
 },{
-
-
-
-
-
-
-
-
 ak("Frame",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
@@ -13104,7 +13095,35 @@ PaddingRight=UDim.new(0,ap.Padding),
 }),
 }),
 }),
+ak("Frame",{
+BackgroundTransparency=1,
+AutomaticSize="Y",
+Size=UDim2.new(1,0,0,0),
+Name="Results",
+ClipsDescendants=true,
+},{
+ak("Frame",{
+Size=UDim2.new(1,0,0,1),
+ThemeTag={
+BackgroundColor3="Outline",
+},
+BackgroundTransparency=0.9,
+Visible=false,
+}),
+as,
+ak("UISizeConstraint",{
+MaxSize=Vector2.new(ap.Width,ap.MaxHeight),
+}),
+}),
+ak("UIListLayout",{
+Padding=UDim.new(0,0),
+FillDirection="Vertical",
+}),
+}),
+})
+
 local topShadow=ak("Frame",{
+Name="TopShadow",
 Size=UDim2.new(1,0,0,24),
 Position=UDim2.new(0,0,0,1),
 BackgroundTransparency=0,
@@ -13112,6 +13131,7 @@ BorderSizePixel=0,
 ZIndex=15,
 Visible=false,
 Active=false,
+Parent=at.Frame.Results,
 },{
 ak("UIGradient",{
 Rotation=90,
@@ -13123,6 +13143,7 @@ NumberSequenceKeypoint.new(1,1),
 })
 
 local bottomShadow=ak("Frame",{
+Name="BottomShadow",
 Size=UDim2.new(1,0,0,24),
 Position=UDim2.new(0,0,1,0),
 AnchorPoint=Vector2.new(0,1),
@@ -13131,6 +13152,7 @@ BorderSizePixel=0,
 ZIndex=15,
 Visible=false,
 Active=false,
+Parent=at.Frame.Results,
 },{
 ak("UIGradient",{
 Rotation=-90,
@@ -13145,43 +13167,20 @@ CornerRadius=UDim.new(0,ap.Radius),
 })
 
 local function updateShadowColor()
-local isLight=ai.Theme and(ai.Theme.Name=="Light"or ai.Theme.Name=="White")
+local themeName=(ai.Theme and ai.Theme.Name)or""
+local isLight=(themeName=="Light"or themeName=="White")
 local col=isLight and Color3.new(1,1,1)or Color3.new(0,0,0)
 topShadow.BackgroundColor3=col
-topShadow.UIGradient.Color=ColorSequence.new(col)
+if topShadow:FindFirstChildOfClass("UIGradient")then
+topShadow:FindFirstChildOfClass("UIGradient").Color=ColorSequence.new(col,col)
+end
 bottomShadow.BackgroundColor3=col
-bottomShadow.UIGradient.Color=ColorSequence.new(col)
+if bottomShadow:FindFirstChildOfClass("UIGradient")then
+bottomShadow:FindFirstChildOfClass("UIGradient").Color=ColorSequence.new(col,col)
+end
 end
 updateShadowColor()
 ai:OnThemeChange(updateShadowColor)
-
-ak("Frame",{
-BackgroundTransparency=1,
-AutomaticSize="Y",
-Size=UDim2.new(1,0,0,0),
-Name="Results",
-},{
-ak("Frame",{
-Size=UDim2.new(1,0,0,1),
-ThemeTag={
-BackgroundColor3="Outline",
-},
-BackgroundTransparency=0.9,
-Visible=false,
-}),
-as,
-topShadow,
-bottomShadow,
-ak("UISizeConstraint",{
-MaxSize=Vector2.new(ap.Width,ap.MaxHeight),
-}),
-}),
-ak("UIListLayout",{
-Padding=UDim.new(0,0),
-FillDirection="Vertical",
-}),
-}),
-})
 
 local au=ak("CanvasGroup",{
 Size=UDim2.new(0,ap.Width,0,0),
