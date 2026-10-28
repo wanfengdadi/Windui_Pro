@@ -12115,9 +12115,10 @@ PaddingRight=UDim.new(0,4),
 })
 
 local contentHost=ab("Frame",{
-Size=UDim2.new(1,0,0,40),
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
 BackgroundTransparency=1,
-ClipsDescendants=true,
+ClipsDescendants=false,
 Parent=mainFrame,
 LayoutOrder=2,
 })
@@ -12129,7 +12130,7 @@ tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
 
 local function getTabHeight(tab)
-if not tab then return 40 end
+if not tab or not tab.UIElements or not tab.UIElements.ContainerFrame then return 40 end
 local layout=tab.UIElements.ContainerFrame:FindFirstChildOfClass("UIListLayout")
 local h=layout and layout.AbsoluteContentSize.Y or 0
 if h<=0 then
@@ -12178,18 +12179,21 @@ end
 end
 end
 
+contentHost.ClipsDescendants=true
+contentHost.AutomaticSize="None"
 local targetH=getTabHeight(targetTab)
-ad(contentHost,0.35,{
+
+ad(contentHost,0.32,{
 Size=UDim2.new(1,0,0,targetH),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 if prevTab and prevTab.UIElements and prevTab.UIElements.PageCanvas then
 local oldPage=prevTab.UIElements.PageCanvas
-ad(oldPage,0.26,{
+ad(oldPage,0.25,{
 Position=UDim2.new(-dir*0.14,0,0,0),
 GroupTransparency=1,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-task.delay(0.26,function()
+task.delay(0.25,function()
 if tabbox.ActiveTab~=prevTab then
 oldPage.Visible=false
 end
@@ -12205,6 +12209,13 @@ ad(newPage,0.32,{
 Position=UDim2.new(0,0,0,0),
 GroupTransparency=0,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+task.delay(0.35,function()
+if tabbox.ActiveTab==targetTab then
+contentHost.AutomaticSize="Y"
+contentHost.ClipsDescendants=false
+end
+end)
 end
 
 function tabbox.Tab(self,subCfg)
@@ -12317,9 +12328,11 @@ if listLayout then
 aa.AddSignal(listLayout:GetPropertyChangedSignal("AbsoluteContentSize"),function()
 if tabbox.ActiveTab==subTab then
 local h=math.max(listLayout.AbsoluteContentSize.Y,40)
+if contentHost.AutomaticSize=="None" then
 ad(contentHost,0.25,{
 Size=UDim2.new(1,0,0,h),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 end)
 end
