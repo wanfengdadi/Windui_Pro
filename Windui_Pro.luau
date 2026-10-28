@@ -13130,36 +13130,21 @@ FillDirection="Vertical",
 }),
 })
 
-local au=ak("Frame",{
+local au=ak("CanvasGroup",{
 Size=UDim2.new(0,ap.Width,0,0),
 AutomaticSize="Y",
 Parent=an,
 BackgroundTransparency=1,
-Position=UDim2.new(0.5,0,0.5,0),
+GroupTransparency=1,
+Position=UDim2.new(0.5,0,0.5,20),
 AnchorPoint=Vector2.new(0.5,0.5),
 Visible=false,
-
 ZIndex=99999999,
 },{
 ak("UIScale",{
-Scale=0.9,
+Scale=0.88,
 }),
 at,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 })
 
 local function CreateSearchTab(av,aw,ax,ay,az,aA)
@@ -13398,22 +13383,41 @@ ap.MaxHeight
 
 end)
 
+local isClosing=false
+
 function ap.Open(av)
 task.spawn(function()
+isClosing=false
 at.Frame.Visible=true
 au.Visible=true
-al(au.UIScale,0.12,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+au.GroupTransparency=1
+au.UIScale.Scale=0.88
+au.Position=UDim2.new(0.5,0,0.5,20)
+
+al(au.UIScale,0.3,{Scale=1},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+al(au,0.25,{
+Position=UDim2.new(0.5,0,0.5,0),
+GroupTransparency=0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end)
 end
 
 function ap.Close(av,aw)
+if isClosing then return end
+isClosing=true
 task.spawn(function()
-ao()
-at.Frame.Visible=false
-al(au.UIScale,0.12,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+al(au.UIScale,0.2,{Scale=0.88},Enum.EasingStyle.Quint,Enum.EasingDirection.In):Play()
+al(au,0.2,{
+Position=UDim2.new(0.5,0,0.5,15),
+GroupTransparency=1,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-task.wait(0.12)
+task.wait(0.2)
+if ao then
+ao()
+end
 au.Visible=false
+at.Frame.Visible=false
 if aw then
 au:Destroy()
 end
@@ -15760,29 +15764,24 @@ if not aw.HideSearchBar then
 local Q=a.load'ad'
 local R=false
 
+aw.SearchBarRadius=av.SearchBarRadius or(aw.NewElements and 12 or 10)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local S=aq("Search","search",aw.UIElements.SideBarContainer,true)
+local S=aq("Search","search",aw.UIElements.SideBarContainer,true,aw.SearchBarRadius)
 S.Size=UDim2.new(1,-aw.UIPadding/2,0,39)
 S.Position=UDim2.new(0,aw.UIPadding/2,0,0)
+
+function aw.SetSearchBarRadius(self,radius)
+local r=tonumber(radius)or 10
+aw.SearchBarRadius=r
+if S and S:FindFirstChild("Frame")then
+local scale=math.max(r/310,0.0001)
+for _,obj in ipairs(S.Frame:GetChildren())do
+if obj:IsA("ImageLabel")or obj:IsA("ImageButton")then
+obj.SliceScale=scale
+end
+end
+end
+end
 
 an.AddSignal(S.MouseButton1Click,function()
 if R then
@@ -15790,16 +15789,18 @@ return
 end
 
 Q.new(aw.TabModule,aw.UIElements.Main,function()
-
 R=false
 if aw.Resizable then
 aw.CanResize=true
 end
-
-ap(aB,0.1,{ImageTransparency=1}):Play()
+ap(aB,0.22,{ImageTransparency=1}):Play()
+task.delay(0.22,function()
+if not R then
 aB.Active=false
+end
 end)
-ap(aB,0.1,{ImageTransparency=0.65}):Play()
+end)
+ap(aB,0.25,{ImageTransparency=0.65}):Play()
 aB.Active=true
 
 R=true
