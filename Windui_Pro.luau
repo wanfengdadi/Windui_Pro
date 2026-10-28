@@ -12082,9 +12082,22 @@ LayoutOrder=1,
 ClipsDescendants=true,
 })
 
+local indicator=ac(math.max(radius-8,6),"Squircle",{
+Size=UDim2.new(0,0,1,-6),
+Position=UDim2.new(0,2,0,3),
+ThemeTag={
+ImageColor3="Button",
+},
+ImageTransparency=0,
+ZIndex=1,
+Visible=false,
+Parent=tabBarBg,
+})
+
 local tabButtonsList=ab("Frame",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
+ZIndex=2,
 Parent=tabBarBg,
 },{
 ab("UIListLayout",{
@@ -12105,6 +12118,7 @@ local contentHost=ab("Frame",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
+ClipsDescendants=true,
 Parent=mainFrame,
 LayoutOrder=2,
 })
@@ -12112,53 +12126,67 @@ LayoutOrder=2,
 tabbox.ElementFrame=mainFrame
 tabbox.UIElements.Main=mainFrame
 tabbox.UIElements.TabBar=tabButtonsList
+tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
 
 function tabbox.SelectTab(self,targetTab)
 if tabbox.ActiveTab==targetTab then return end
+local prevTab=tabbox.ActiveTab
 tabbox.ActiveTab=targetTab
+local totalTabs=#tabbox.Tabs
+
+if indicator then
+indicator.Visible=true
+ad(indicator,0.28,{
+Position=UDim2.new((targetTab.Index-1)/totalTabs,2,0,3),
+Size=UDim2.new(1/totalTabs,-4,1,-6),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+
+local dir=1
+if prevTab and prevTab.Index then
+dir=(targetTab.Index>prevTab.Index) and 1 or -1
+end
 
 for _,subTab in ipairs(tabbox.Tabs) do
 local isCurrent=(subTab==targetTab)
-
 if isCurrent then
-ad(subTab.UIElements.Button,0.22,{
-ImageTransparency=0,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-ad(subTab.UIElements.TitleLabel,0.22,{
-TextTransparency=0,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(subTab.UIElements.TitleLabel,0.22,{TextTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
-if img then
-ad(img,0.22,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
+if img then ad(img,0.22,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
 end
 else
-ad(subTab.UIElements.Button,0.22,{
-ImageTransparency=1,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-ad(subTab.UIElements.TitleLabel,0.22,{
-TextTransparency=0.45,
-},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(subTab.UIElements.TitleLabel,0.22,{TextTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
-if img then
-ad(img,0.22,{ImageTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if img then ad(img,0.22,{ImageTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
 end
 end
 end
 
-if isCurrent then
-subTab.UIElements.PageFrame.Visible=true
-subTab.UIElements.PageCanvas.GroupTransparency=1
-ad(subTab.UIElements.PageCanvas,0.25,{
+if prevTab and prevTab.UIElements and prevTab.UIElements.PageCanvas then
+local oldPage=prevTab.UIElements.PageCanvas
+ad(oldPage,0.26,{
+Position=UDim2.new(-dir*0.14,0,0,0),
+GroupTransparency=1,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+task.delay(0.26,function()
+if tabbox.ActiveTab~=prevTab then
+oldPage.Visible=false
+end
+end)
+end
+
+local newPage=targetTab.UIElements.PageCanvas
+newPage.Visible=true
+newPage.Position=UDim2.new(dir*0.14,0,0,0)
+newPage.GroupTransparency=1
+
+ad(newPage,0.32,{
+Position=UDim2.new(0,0,0,0),
 GroupTransparency=0,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-else
-subTab.UIElements.PageFrame.Visible=false
-end
-end
 end
 
 function tabbox.Tab(self,subCfg)
@@ -12169,17 +12197,17 @@ local subIcon=subCfg.Icon
 local subTab={
 Title=subTitle,
 Icon=subIcon,
+Index=#tabbox.Tabs+1,
 Elements={},
 UIElements={},
 }
 
-local btn=ac(math.max(radius-8,6),"Squircle",{
+local btn=ab("TextButton",{
 Size=UDim2.new(1,0,1,0),
-ThemeTag={
-ImageColor3="Button",
-},
-ImageTransparency=1,
+BackgroundTransparency=1,
+Text="",
 Active=true,
+ZIndex=2,
 Parent=tabButtonsList,
 },{
 ab("UIListLayout",{
@@ -12192,7 +12220,7 @@ ab("UIPadding",{
 PaddingLeft=UDim.new(0,8),
 PaddingRight=UDim.new(0,8),
 }),
-},true)
+})
 
 local iconObj
 if subIcon then
@@ -12226,6 +12254,7 @@ Parent=btn,
 
 local pageCanvas=ab("CanvasGroup",{
 Size=UDim2.new(1,0,0,0),
+Position=UDim2.new(0,0,0,0),
 AutomaticSize="Y",
 BackgroundTransparency=1,
 GroupTransparency=1,
