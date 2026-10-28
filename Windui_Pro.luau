@@ -12028,6 +12028,268 @@ card.ElementFrame=cardFrame
 return card.__type,card
 end
 
+return af end function a.bb()
+local aa=a.load'd'
+local ab=aa.New
+local ac=aa.NewRoundFrame
+local ad=aa.Tween
+
+local af={}
+
+function af.New(ag,ah)
+ah=ah or{}
+local radius=ah.Radius or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UICorner)or 16
+local padding=ah.Padding or(ah.Window and ah.Window.ElementConfig and ah.Window.ElementConfig.UIPadding)or 12
+
+local tabbox={
+__type="Tabbox",
+Tabs={},
+ActiveTab=nil,
+UIElements={},
+}
+
+local mainFrame=ac(radius,"Squircle",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+Parent=ah.Parent,
+ThemeTag={
+ImageColor3=(ah.Window.NewElements and"ElementBackground"or"Text"),
+ImageTransparency=(ah.Window.NewElements and"ElementBackgroundTransparency"or nil),
+},
+ImageTransparency=not ah.Window.NewElements and 0.93 or nil,
+},{
+ab("UIPadding",{
+PaddingTop=UDim.new(0,padding),
+PaddingLeft=UDim.new(0,padding),
+PaddingRight=UDim.new(0,padding),
+PaddingBottom=UDim.new(0,padding),
+}),
+ab("UIListLayout",{
+FillDirection="Vertical",
+Padding=UDim.new(0,10),
+SortOrder="LayoutOrder",
+}),
+})
+
+local tabBarBg=ac(math.max(radius-4,8),"Squircle",{
+Size=UDim2.new(1,0,0,38),
+ThemeTag={
+ImageColor3="Background",
+},
+ImageTransparency=0.5,
+Parent=mainFrame,
+LayoutOrder=1,
+ClipsDescendants=true,
+})
+
+local tabButtonsList=ab("Frame",{
+Size=UDim2.new(1,0,1,0),
+BackgroundTransparency=1,
+Parent=tabBarBg,
+},{
+ab("UIListLayout",{
+FillDirection="Horizontal",
+HorizontalAlignment="Center",
+VerticalAlignment="Center",
+Padding=UDim.new(0,4),
+}),
+ab("UIPadding",{
+PaddingTop=UDim.new(0,3),
+PaddingBottom=UDim.new(0,3),
+PaddingLeft=UDim.new(0,4),
+PaddingRight=UDim.new(0,4),
+}),
+})
+
+local contentHost=ab("Frame",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=mainFrame,
+LayoutOrder=2,
+})
+
+tabbox.ElementFrame=mainFrame
+tabbox.UIElements.Main=mainFrame
+tabbox.UIElements.TabBar=tabButtonsList
+tabbox.UIElements.ContentHost=contentHost
+
+function tabbox.SelectTab(self,targetTab)
+if tabbox.ActiveTab==targetTab then return end
+tabbox.ActiveTab=targetTab
+
+for _,subTab in ipairs(tabbox.Tabs) do
+local isCurrent=(subTab==targetTab)
+
+if isCurrent then
+ad(subTab.UIElements.Button,0.22,{
+ImageTransparency=0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(subTab.UIElements.TitleLabel,0.22,{
+TextTransparency=0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if subTab.UIElements.IconObj then
+local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then
+ad(img,0.22,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+else
+ad(subTab.UIElements.Button,0.22,{
+ImageTransparency=1,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+ad(subTab.UIElements.TitleLabel,0.22,{
+TextTransparency=0.45,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if subTab.UIElements.IconObj then
+local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then
+ad(img,0.22,{ImageTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+end
+
+if isCurrent then
+subTab.UIElements.PageFrame.Visible=true
+subTab.UIElements.PageCanvas.GroupTransparency=1
+ad(subTab.UIElements.PageCanvas,0.25,{
+GroupTransparency=0,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+else
+subTab.UIElements.PageFrame.Visible=false
+end
+end
+end
+
+function tabbox.Tab(self,subCfg)
+subCfg=subCfg or{}
+local subTitle=subCfg.Title or("Tab "..(#tabbox.Tabs+1))
+local subIcon=subCfg.Icon
+
+local subTab={
+Title=subTitle,
+Icon=subIcon,
+Elements={},
+UIElements={},
+}
+
+local btn=ac(math.max(radius-8,6),"Squircle",{
+Size=UDim2.new(1,0,1,0),
+ThemeTag={
+ImageColor3="Button",
+},
+ImageTransparency=1,
+Active=true,
+Parent=tabButtonsList,
+},{
+ab("UIListLayout",{
+FillDirection="Horizontal",
+HorizontalAlignment="Center",
+VerticalAlignment="Center",
+Padding=UDim.new(0,6),
+}),
+ab("UIPadding",{
+PaddingLeft=UDim.new(0,8),
+PaddingRight=UDim.new(0,8),
+}),
+},true)
+
+local iconObj
+if subIcon then
+iconObj=aa.Image(
+subIcon,
+subIcon..":"..subTitle,
+0,
+ah.Window.Folder,
+"Tabbox",
+true,
+nil,
+"Icon"
+)
+iconObj.Size=UDim2.new(0,15,0,15)
+iconObj.Parent=btn
+local img=iconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then img.ImageTransparency=0.45 end
+subTab.UIElements.IconObj=iconObj
+end
+
+local lbl=ab("TextLabel",{
+Text=subTitle,
+TextSize=14,
+FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
+ThemeTag={TextColor3="Text"},
+TextTransparency=0.45,
+BackgroundTransparency=1,
+AutomaticSize="XY",
+Parent=btn,
+})
+
+local pageCanvas=ab("CanvasGroup",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+GroupTransparency=1,
+Parent=contentHost,
+Visible=false,
+})
+
+local pageList=ab("Frame",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=pageCanvas,
+},{
+ab("UIListLayout",{
+FillDirection="Vertical",
+Padding=UDim.new(0,ah.Tab and ah.Tab.Gap or 6),
+SortOrder="LayoutOrder",
+}),
+})
+
+subTab.UIElements.Button=btn
+subTab.UIElements.TitleLabel=lbl
+subTab.UIElements.PageCanvas=pageCanvas
+subTab.UIElements.PageFrame=pageCanvas
+subTab.UIElements.ContainerFrame=pageList
+
+local elementsModule=ah.ElementsModule
+elementsModule.Load(
+subTab,
+pageList,
+elementsModule.Elements,
+ah.Window,
+ah.WindUI,
+nil,
+elementsModule,
+ah.UIScale,
+ah.Tab
+)
+
+table.insert(tabbox.Tabs,subTab)
+
+local totalTabs=#tabbox.Tabs
+for _,t in ipairs(tabbox.Tabs) do
+t.UIElements.Button.Size=UDim2.new(1/totalTabs,-4,1,0)
+end
+
+aa.AddSignal(btn.MouseButton1Click,function()
+tabbox:SelectTab(subTab)
+end)
+
+if #tabbox.Tabs==1 then
+task.defer(function()
+tabbox:SelectTab(subTab)
+end)
+end
+
+return subTab
+end
+
+tabbox.AddTab=tabbox.Tab
+
+return tabbox.__type,tabbox
+end
+
 return af end function a._()
 
 return{
@@ -12051,6 +12313,7 @@ HStack=a.load'X',
 VStack=a.load'Y',
 Viewport=a.load'Z',
 Card=a.load'ba',
+Tabbox=a.load'bb',
 
 },
 Load=function(aa,af,ai,ak,al,am,an,ao,ap)
