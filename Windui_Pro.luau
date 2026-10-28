@@ -12115,8 +12115,7 @@ PaddingRight=UDim.new(0,4),
 })
 
 local contentHost=ab("Frame",{
-Size=UDim2.new(1,0,0,0),
-AutomaticSize="Y",
+Size=UDim2.new(1,0,0,40),
 BackgroundTransparency=1,
 ClipsDescendants=true,
 Parent=mainFrame,
@@ -12128,6 +12127,20 @@ tabbox.UIElements.Main=mainFrame
 tabbox.UIElements.TabBar=tabButtonsList
 tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
+
+local function getTabHeight(tab)
+if not tab then return 40 end
+local layout=tab.UIElements.ContainerFrame:FindFirstChildOfClass("UIListLayout")
+local h=layout and layout.AbsoluteContentSize.Y or 0
+if h<=0 then
+for _,child in ipairs(tab.UIElements.ContainerFrame:GetChildren()) do
+if child:IsA("GuiObject") and child.Visible then
+h=h+child.AbsoluteSize.Y+6
+end
+end
+end
+return math.max(h,40)
+end
 
 function tabbox.SelectTab(self,targetTab)
 if tabbox.ActiveTab==targetTab then return end
@@ -12164,6 +12177,11 @@ if img then ad(img,0.22,{ImageTransparency=0.45},Enum.EasingStyle.Quint,Enum.Eas
 end
 end
 end
+
+local targetH=getTabHeight(targetTab)
+ad(contentHost,0.35,{
+Size=UDim2.new(1,0,0,targetH),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 if prevTab and prevTab.UIElements and prevTab.UIElements.PageCanvas then
 local oldPage=prevTab.UIElements.PageCanvas
@@ -12293,6 +12311,18 @@ elementsModule,
 ah.UIScale,
 ah.Tab
 )
+
+local listLayout=pageList:FindFirstChildOfClass("UIListLayout")
+if listLayout then
+aa.AddSignal(listLayout:GetPropertyChangedSignal("AbsoluteContentSize"),function()
+if tabbox.ActiveTab==subTab then
+local h=math.max(listLayout.AbsoluteContentSize.Y,40)
+ad(contentHost,0.25,{
+Size=UDim2.new(1,0,0,h),
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end)
+end
 
 table.insert(tabbox.Tabs,subTab)
 
