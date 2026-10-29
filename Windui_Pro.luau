@@ -12066,25 +12066,31 @@ PaddingBottom=UDim.new(0,padding),
 }),
 ab("UIListLayout",{
 FillDirection="Vertical",
-Padding=UDim.new(0,10),
+Padding=UDim.new(0,6),
 SortOrder="LayoutOrder",
 }),
 })
 
 local tabBarBg=ac(math.max(radius-4,8),"Squircle",{
-Size=UDim2.new(1,0,0,38),
+Size=UDim2.new(1,0,0,36),
 ThemeTag={
 ImageColor3="Background",
 },
-ImageTransparency=0.5,
+ImageTransparency=0.6,
 Parent=mainFrame,
 LayoutOrder=1,
 ClipsDescendants=true,
+},{
+ac(math.max(radius-4,8),"SquircleOutline",{
+Size=UDim2.new(1,0,1,0),
+ThemeTag={ImageColor3="Outline"},
+ImageTransparency=0.92,
+}),
 })
 
-local indicator=ac(math.max(radius-8,6),"Squircle",{
+local indicator=ac(math.max(radius-7,6),"Squircle",{
 Size=UDim2.new(0,0,1,-6),
-Position=UDim2.new(0,2,0,3),
+Position=UDim2.new(0,3,0,3),
 ThemeTag={
 ImageColor3="Button",
 },
@@ -12104,13 +12110,7 @@ ab("UIListLayout",{
 FillDirection="Horizontal",
 HorizontalAlignment="Center",
 VerticalAlignment="Center",
-Padding=UDim.new(0,4),
-}),
-ab("UIPadding",{
-PaddingTop=UDim.new(0,3),
-PaddingBottom=UDim.new(0,3),
-PaddingLeft=UDim.new(0,4),
-PaddingRight=UDim.new(0,4),
+Padding=UDim.new(0,0),
 }),
 })
 
@@ -12142,7 +12142,7 @@ h=h+child.AbsoluteSize.Y+6
 end
 end
 end
-local totalH=38+10+(padding*2)+h
+local totalH=36+6+(padding*2)+h
 if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrame then
 local cf=ah.Tab.UIElements.ContainerFrame
 cf.CanvasSize=UDim2.new(0,0,0,math.max(totalH+80,cf.AbsoluteWindowSize.Y+10))
@@ -12158,14 +12158,14 @@ tabbox.ActiveTab=targetTab
 local totalTabs=math.max(#tabbox.Tabs,1)
 
 indicator.Visible=true
-local targetPos=UDim2.new((targetTab.Index-1)/totalTabs,2,0,3)
-local targetSize=UDim2.new(1/totalTabs,-4,1,-6)
+local targetPos=UDim2.new((targetTab.Index-1)/totalTabs,3,0,3)
+local targetSize=UDim2.new(1/totalTabs,-6,1,-6)
 
 if instant then
 indicator.Position=targetPos
 indicator.Size=targetSize
 else
-ad(indicator,0.25,{
+ad(indicator,0.24,{
 Position=targetPos,
 Size=targetSize,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12195,18 +12195,9 @@ newPage.Visible=true
 
 if instant then
 newPage.Position=UDim2.new(0,0,0,0)
-local scale=newPage:FindFirstChildOfClass("UIScale")
-if scale then scale.Scale=1 end
 else
-newPage.Position=UDim2.new(dir*0.06,0,0,0)
-local scale=newPage:FindFirstChildOfClass("UIScale")
-if not scale then
-scale=Instance.new("UIScale")
-scale.Parent=newPage
-end
-scale.Scale=0.97
-ad(newPage,0.25,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-ad(scale,0.25,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+newPage.Position=UDim2.new(dir*0.04,0,0,0)
+ad(newPage,0.22,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 
 syncParentCanvas(targetTab)
@@ -12240,8 +12231,8 @@ VerticalAlignment="Center",
 Padding=UDim.new(0,6),
 }),
 ab("UIPadding",{
-PaddingLeft=UDim.new(0,8),
-PaddingRight=UDim.new(0,8),
+PaddingLeft=UDim.new(0,4),
+PaddingRight=UDim.new(0,4),
 }),
 })
 
@@ -12257,7 +12248,7 @@ true,
 nil,
 "Icon"
 )
-iconObj.Size=UDim2.new(0,15,0,15)
+iconObj.Size=UDim2.new(0,14,0,14)
 iconObj.Parent=btn
 local img=iconObj:FindFirstChildOfClass("ImageLabel",true)
 if img then img.ImageTransparency=0.45 end
@@ -12266,7 +12257,7 @@ end
 
 local lbl=ab("TextLabel",{
 Text=subTitle,
-TextSize=14,
+TextSize=13,
 FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
 ThemeTag={TextColor3="Text"},
 TextTransparency=0.45,
@@ -12321,7 +12312,7 @@ table.insert(tabbox.Tabs,subTab)
 
 local totalTabs=#tabbox.Tabs
 for _,t in ipairs(tabbox.Tabs) do
-t.UIElements.Button.Size=UDim2.new(1/totalTabs,-4,1,0)
+t.UIElements.Button.Size=UDim2.new(1/totalTabs,0,1,0)
 end
 
 aa.AddSignal(btn.MouseButton1Click,function()
