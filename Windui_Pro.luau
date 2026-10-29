@@ -12109,30 +12109,50 @@ Size=UDim2.new(1,0,1,0),
 Parent=tabBarBg,
 })
 
+local tabScroll=ab("ScrollingFrame",{
+Size=UDim2.new(1,0,1,0),
+BackgroundTransparency=1,
+BorderSizePixel=0,
+ScrollBarThickness=0,
+ScrollingDirection=Enum.ScrollingDirection.X,
+AutomaticCanvasSize=Enum.AutomaticSize.X,
+CanvasSize=UDim2.new(0,0,0,0),
+ClipsDescendants=true,
+ZIndex=2,
+Parent=tabBarBg,
+})
+
 local indScale=ab("UIScale",{Scale=1})
 
 local indicator=ac(math.max(radius-7,6),"Squircle",{
-Size=UDim2.new(0,0,1,-6),
+Size=UDim2.new(0,40,1,-6),
 AnchorPoint=Vector2.new(0.5,0.5),
-Position=UDim2.new(0.5,0,0.5,0),
-ZIndex=1,
+Position=UDim2.new(0,20,0.5,0),
+ZIndex=2,
 Visible=false,
-Parent=tabBarBg,
+Parent=tabScroll,
 },{
 indScale,
 })
 
 local tabButtonsList=ab("Frame",{
-Size=UDim2.new(1,0,1,0),
+Size=UDim2.new(0,0,1,0),
+AutomaticSize=Enum.AutomaticSize.X,
 BackgroundTransparency=1,
-ZIndex=2,
-Parent=tabBarBg,
+ZIndex=3,
+Parent=tabScroll,
 },{
 ab("UIListLayout",{
 FillDirection="Horizontal",
-HorizontalAlignment="Center",
+HorizontalAlignment="Left",
 VerticalAlignment="Center",
-Padding=UDim.new(0,0),
+Padding=UDim.new(0,4),
+}),
+ab("UIPadding",{
+PaddingTop=UDim.new(0,3),
+PaddingBottom=UDim.new(0,3),
+PaddingLeft=UDim.new(0,3),
+PaddingRight=UDim.new(0,3),
 }),
 })
 
@@ -12148,6 +12168,7 @@ LayoutOrder=2,
 tabbox.ElementFrame=mainFrame
 tabbox.UIElements.Main=mainFrame
 tabbox.UIElements.TabBar=tabButtonsList
+tabbox.UIElements.TabScroll=tabScroll
 tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
 
@@ -12213,6 +12234,12 @@ end
 end)
 end
 
+local function getButtonCenter(btn)
+if not btn or not tabScroll then return 20 end
+local btnX=btn.AbsolutePosition.X-tabScroll.AbsolutePosition.X+tabScroll.CanvasPosition.X
+return btnX+(btn.AbsoluteSize.X/2)
+end
+
 local isDragging=false
 local activeInput=nil
 local startTouchX=0
@@ -12224,21 +12251,34 @@ if isSame and not forceSnap then return end
 
 local prevTab=tabbox.ActiveTab
 tabbox.ActiveTab=targetTab
-local totalTabs=math.max(#tabbox.Tabs,1)
 
 indicator.Visible=true
-local targetPos=UDim2.new((targetTab.Index-0.5)/totalTabs,0,0.5,0)
-local targetSize=UDim2.new(1/totalTabs,-6,1,-6)
+local targetBtn=targetTab.UIElements.Button
+
+task.defer(function()
+local centerX=getButtonCenter(targetBtn)
+local targetW=math.max(targetBtn.AbsoluteSize.X-6,20)
 
 if instant then
-indicator.Position=targetPos
-indicator.Size=targetSize
+indicator.Position=UDim2.new(0,centerX,0.5,0)
+indicator.Size=UDim2.new(0,targetW,1,-6)
 else
 ad(indicator,0.24,{
-Position=targetPos,
-Size=targetSize,
+Position=UDim2.new(0,centerX,0.5,0),
+Size=UDim2.new(0,targetW,1,-6),
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
+
+local viewW=tabBarBg.AbsoluteSize.X
+if viewW>0 then
+local targetScrollX=math.clamp(centerX-(viewW/2),0,math.max(tabScroll.AbsoluteCanvasSize.X-viewW,0))
+if instant then
+tabScroll.CanvasPosition=Vector2.new(targetScrollX,0)
+else
+ad(tabScroll,0.25,{CanvasPosition=Vector2.new(targetScrollX,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
+end
+end)
 
 local light=isLight()
 local activeCol=light and Color3.fromHex"#09090B"or Color3.fromHex"#FFFFFF"
@@ -12299,7 +12339,7 @@ local isHover=(idx==targetIndex)
 local col=isHover and activeCol or inactiveCol
 local trans=isHover and 0 or 0.45
 
-ad(subTab.UIElements.TitleLabel,0.22,{
+ad(subTab.UIElements.TitleLabel,0.18,{
 TextColor3=col,
 TextTransparency=trans,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12307,13 +12347,27 @@ TextTransparency=trans,
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
 if img then
-ad(img,0.22,{
+ad(img,0.18,{
 ImageColor3=col,
 ImageTransparency=trans,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end
 end
+end
+
+local function getClosestTabIndex(curCenterX)
+local closestIdx=1
+local minDiff=math.huge
+for i,t in ipairs(tabbox.Tabs)do
+local c=getButtonCenter(t.UIElements.Button)
+local diff=math.abs(curCenterX-c)
+if diff<minDiff then
+minDiff=diff
+closestIdx=i
+end
+end
+return closestIdx
 end
 
 local function onDragStart(input)
@@ -12328,28 +12382,25 @@ ad(indScale,0.2,{Scale=1.08},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Pla
 end
 
 local function onDragUpdate(input)
-if not isDragging then return end
-local trackW=tabBarBg.AbsoluteSize.X
-if trackW<=0 then return end
-local trackX=tabBarBg.AbsolutePosition.X
-local N=math.max(#tabbox.Tabs,1)
-if N<=1 then return end
+if not isDragging or #tabbox.Tabs<=1 then return end
 
-local rawProgress=math.clamp((input.Position.X-trackX)/trackW,0,1)
-local minCenter=0.5/N
-local maxCenter=1-(0.5/N)
-local curPos=math.clamp(rawProgress,minCenter,maxCenter)
+local touchXInCanvas=input.Position.X-tabButtonsList.AbsolutePosition.X
+local firstBtn=tabbox.Tabs[1].UIElements.Button
+local lastBtn=tabbox.Tabs[#tabbox.Tabs].UIElements.Button
+
+local minX=firstBtn.AbsoluteSize.X/2
+local maxX=tabButtonsList.AbsoluteSize.X-(lastBtn.AbsoluteSize.X/2)
+local curX=math.clamp(touchXInCanvas,minX,maxX)
 
 if math.abs(input.Position.X-startTouchX)>6 then
 dragMoved=true
 end
 
 ad(indicator,0.07,{
-Position=UDim2.new(curPos,0,0.5,0),
+Position=UDim2.new(0,curX,0.5,0),
 },Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
 
-local range=maxCenter-minCenter
-local targetIndex=(range>0)and math.clamp(math.round(((curPos-minCenter)/range)*(N-1))+1,1,N)or 1
+local targetIndex=getClosestTabIndex(curX)
 previewHighlight(targetIndex)
 end
 
@@ -12364,18 +12415,9 @@ end
 
 ad(indScale,0.22,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-local trackW=tabBarBg.AbsoluteSize.X
-local trackX=tabBarBg.AbsolutePosition.X
-local N=math.max(#tabbox.Tabs,1)
-
-if dragMoved and trackW>0 then
-local rawProgress=math.clamp((input.Position.X-trackX)/trackW,0,1)
-local minCenter=0.5/N
-local maxCenter=1-(0.5/N)
-local curPos=math.clamp(rawProgress,minCenter,maxCenter)
-local range=maxCenter-minCenter
-local targetIndex=(range>0)and math.clamp(math.round(((curPos-minCenter)/range)*(N-1))+1,1,N)or 1
-
+if dragMoved then
+local touchXInCanvas=input.Position.X-tabButtonsList.AbsolutePosition.X
+local targetIndex=getClosestTabIndex(touchXInCanvas)
 if tabbox.Tabs[targetIndex]then
 tabbox:SelectTab(tabbox.Tabs[targetIndex],false,true)
 end
@@ -12386,7 +12428,7 @@ end
 end
 end
 
-aa.AddSignal(tabBarBg.InputBegan,function(input)
+aa.AddSignal(tabScroll.InputBegan,function(input)
 if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
 onDragStart(input)
 end
@@ -12417,14 +12459,20 @@ Elements={},
 UIElements={},
 }
 
+local btnConstraint=ab("UISizeConstraint",{
+MinSize=Vector2.new(50,0),
+})
+
 local btn=ab("TextButton",{
-Size=UDim2.new(1,0,1,0),
+Size=UDim2.new(0,0,1,0),
+AutomaticSize=Enum.AutomaticSize.X,
 BackgroundTransparency=1,
 Text="",
 Active=true,
-ZIndex=2,
+ZIndex=4,
 Parent=tabButtonsList,
 },{
+btnConstraint,
 ab("UIListLayout",{
 FillDirection="Horizontal",
 HorizontalAlignment="Center",
@@ -12432,8 +12480,8 @@ VerticalAlignment="Center",
 Padding=UDim.new(0,6),
 }),
 ab("UIPadding",{
-PaddingLeft=UDim.new(0,4),
-PaddingRight=UDim.new(0,4),
+PaddingLeft=UDim.new(0,10),
+PaddingRight=UDim.new(0,10),
 }),
 })
 
@@ -12467,7 +12515,9 @@ FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
 TextColor3=initialCol,
 TextTransparency=0.45,
 BackgroundTransparency=1,
-AutomaticSize="XY",
+AutomaticSize=Enum.AutomaticSize.XY,
+TextWrapped=false,
+TextTruncate=Enum.TextTruncate.None,
 Parent=btn,
 })
 
@@ -12519,6 +12569,7 @@ SortOrder="LayoutOrder",
 })
 
 subTab.UIElements.Button=btn
+subTab.UIElements.Constraint=btnConstraint
 subTab.UIElements.TitleLabel=lbl
 subTab.UIElements.PageFrame=pageFrame
 subTab.UIElements.ContainerFrame=pageFrame
@@ -12547,10 +12598,19 @@ end
 
 table.insert(tabbox.Tabs,subTab)
 
+local function updateConstraints()
 local totalTabs=#tabbox.Tabs
+local barW=tabBarBg.AbsoluteSize.X
+local targetMin=(barW>0 and totalTabs>0)and math.max((barW-6-(totalTabs*4))/totalTabs,50)or 50
 for _,t in ipairs(tabbox.Tabs)do
-t.UIElements.Button.Size=UDim2.new(1/totalTabs,0,1,0)
+if t.UIElements.Constraint then
+t.UIElements.Constraint.MinSize=Vector2.new(targetMin,0)
 end
+end
+end
+
+aa.AddSignal(tabBarBg:GetPropertyChangedSignal"AbsoluteSize",updateConstraints)
+task.defer(updateConstraints)
 
 updateTabTheme()
 
