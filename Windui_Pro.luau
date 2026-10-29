@@ -950,6 +950,23 @@ r.SetLangForObject(u)
 return x
 end
 
+r.AnimatedGradients=r.AnimatedGradients or{}
+if not r.GradientLoopConnected then
+r.GradientLoopConnected=true
+d.RenderStepped:Connect(function()
+if next(r.AnimatedGradients)then
+local offsetVal=math.sin(tick()*1.5)*0.6
+for grad in pairs(r.AnimatedGradients)do
+if grad and grad.Parent then
+grad.Offset=Vector2.new(offsetVal,0)
+else
+r.AnimatedGradients[grad]=nil
+end
+end
+end
+end)
+end
+
 function r.UpdateTheme(u,v,x,z,A,B)
 local function ApplyTheme(C)
 for F,G in pairs(C.Properties or{})do
@@ -958,6 +975,7 @@ if H~=nil then
 if typeof(H)=="Color3"then
 local J=C.Object:FindFirstChild"LibraryGradient"
 if J then
+r.AnimatedGradients[J]=nil
 J:Destroy()
 end
 
@@ -992,6 +1010,14 @@ if L~="Color"and L~="Transparency"and J[L]~=nil then
 J[L]=M
 end
 end
+
+local isText=C.Object:IsA"TextLabel"or C.Object:IsA"TextBox"or F=="TextColor3"
+if not isText then
+r.AnimatedGradients[J]=true
+else
+r.AnimatedGradients[J]=nil
+J.Offset=Vector2.new(0,0)
+end
 elseif typeof(H)=="number"then
 if x then
 r.Tween(
@@ -1010,6 +1036,7 @@ end
 else
 local J=C.Object:FindFirstChild"LibraryGradient"
 if J then
+r.AnimatedGradients[J]=nil
 J:Destroy()
 end
 end
