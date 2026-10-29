@@ -4741,9 +4741,7 @@ return ak
 end
 
 return aa end function a.y()
-
 local aa={}
-
 local ab=a.load'd'
 local ac=ab.New
 local ad=ab.Tween
@@ -4755,7 +4753,6 @@ Icon=af.Icon,
 Color=af.Color or Color3.fromHex"#315dff",
 Radius=af.Radius or 999,
 Border=af.Border or false,
-
 TagFrame=nil,
 Height=26,
 Padding=10,
@@ -4763,10 +4760,14 @@ TextSize=14,
 IconSize=16,
 }
 
+local folderName="Temp"
+if af.Window and typeof(af.Window)=="table" and af.Window.Folder then
+folderName=af.Window.Folder
+end
+
 local ai
 if ah.Icon then
-ai=ab.Image(ah.Icon,ah.Icon,0,af.Window,"Tag",false)
-
+ai=ab.Image(ah.Icon,ah.Icon,0,folderName,"Tag",false)
 ai.Size=UDim2.new(0,ah.IconSize,0,ah.IconSize)
 ai.ImageLabel.ImageColor3=typeof(ah.Color)=="Color3"
 and ab.GetTextColorForHSB(ah.Color)
@@ -4786,13 +4787,11 @@ ah.Color
 })
 
 local ak
-
 if typeof(ah.Color)=="table"then
 ak=ac"UIGradient"
 for al,am in next,ah.Color do
 ak[al]=am
 end
-
 aj.TextColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))
 if ai then
 ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))
@@ -4807,6 +4806,7 @@ ThemeTag={
 ImageColor3="White",
 },
 ImageTransparency=0.75,
+Visible=ah.Border,
 })
 
 local al,alModule=ab.NewRoundFrame(ah.Radius,"Squircle",{
@@ -4854,18 +4854,12 @@ local dur=(ao==false or ao==0)and 0 or(ao or 0.08)
 local targetScale=math.max(an/310,0.0001)
 local borderScale=math.max((an+1)/310,0.0001)
 
-if alModule then
-alModule.Radius=an
-end
-if borderModule then
-borderModule.Radius=an+1
-end
+if alModule then alModule.Radius=an end
+if borderModule then borderModule.Radius=an+1 end
 
 if dur==0 then
 al.SliceScale=targetScale
-if borderFrame then
-borderFrame.SliceScale=borderScale
-end
+if borderFrame then borderFrame.SliceScale=borderScale end
 else
 ad(al,dur,{SliceScale=targetScale},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
 if borderFrame then
@@ -4878,7 +4872,6 @@ end
 function ah.SetTitle(am,an)
 ah.Title=an
 aj.Text=an
-
 return ah
 end
 
@@ -4893,28 +4886,22 @@ ap[aq]=ar
 end
 ad(al,0.06,{ImageColor3=Color3.new(1,1,1)}):Play()
 else
-if ak then
-ak:Destroy()
-end
+if ak then ak:Destroy() end
 ad(aj,0.06,{TextColor3=ab.GetTextColorForHSB(an)}):Play()
 if ai then
 ad(ai.ImageLabel,0.06,{ImageColor3=ab.GetTextColorForHSB(an)}):Play()
 end
 ad(al,0.06,{ImageColor3=an}):Play()
 end
-
 return ah
 end
 
 function ah.SetIcon(am,an)
 ah.Icon=an
-
 if an then
-ai=ab.Image(an,an,0,af.Window,"Tag",false)
-
+ai=ab.Image(an,an,0,folderName,"Tag",false)
 ai.Size=UDim2.new(0,ah.IconSize,0,ah.IconSize)
 ai.Parent=al
-
 if typeof(ah.Color)=="Color3"then
 ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ah.Color)
 elseif typeof(ah.Color)=="table"then
@@ -4936,8 +4923,9 @@ end
 
 ab:OnThemeChange(function(am,an)
 aj.TextColor3=ab.GetTextColorForHSB(ab.GetThemeProperty(ah.Color,ab.Theme))
-ai.ImageLabel.ImageColor3=
-ab.GetTextColorForHSB(ab.GetThemeProperty(ah.Color,ab.Theme))
+if ai then
+ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ab.GetThemeProperty(ah.Color,ab.Theme))
+end
 end)
 
 return ah
@@ -16221,12 +16209,34 @@ end
 end
 end,(aw.Topbar.ButtonsType=="Default"and 999 or 997),nil,Color3.fromHex"#F4695F")
 
+local function updateTopbarCenter()
+pcall(function()
+local topbar=aw.UIElements.Main.Main.Topbar
+local left=topbar.Left
+local right=topbar.Right
+local center=topbar.Center
+local leftW=left.AbsoluteSize.X/av.WindUI.UIScale
+local rightW=right.AbsoluteSize.X/av.WindUI.UIScale
+local topbarW=topbar.AbsoluteSize.X/av.WindUI.UIScale
+local space=math.max(topbarW-leftW-rightW-(aw.UIPadding*2),0)
+center.Position=UDim2.new(0,leftW+aw.UIPadding,0.5,0)
+center.Size=UDim2.new(0,space,0,30)
+end)
+end
+
+an.AddSignal(aw.UIElements.Main.Main.Topbar.Left:GetPropertyChangedSignal"AbsoluteSize",updateTopbarCenter)
+an.AddSignal(aw.UIElements.Main.Main.Topbar.Right:GetPropertyChangedSignal"AbsoluteSize",updateTopbarCenter)
+an.AddSignal(aw.UIElements.Main.Main.Topbar:GetPropertyChangedSignal"AbsoluteSize",updateTopbarCenter)
+
 function aw.Tag(L,M)
-if aw.UIElements.Main.Main.Topbar.Center.Visible==false then
-aw.UIElements.Main.Main.Topbar.Center.Visible=true
+local center=aw.UIElements.Main.Main.Topbar.Center
+if center.Visible==false then
+center.Visible=true
 end
 M.Window=aw
-return at:New(M,aw.UIElements.Main.Main.Topbar.Center.Holder)
+local createdTag=at:New(M,center.Holder)
+updateTopbarCenter()
+return createdTag
 end
 
 local L=av.WindUI.GenerateGUID()
