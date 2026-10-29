@@ -12239,6 +12239,41 @@ Size=targetSize,
 end
 end
 
+local function getInterpolatedWidth(progress,bgW,bgX)
+local tabs=tabbox.Tabs
+local N=#tabs
+if N<=1 then
+return math.max((tabs[1].UIElements.Button.AbsoluteSize.X-6)/bgW,0.05)
+end
+
+local centers={}
+local widths={}
+for i,t in ipairs(tabs)do
+local btn=t.UIElements.Button
+local btnLeft=btn.AbsolutePosition.X-bgX
+local btnW=btn.AbsoluteSize.X
+centers[i]=(btnLeft+(btnW/2))/bgW
+widths[i]=math.max((btnW-6)/bgW,0.05)
+end
+
+if progress<=centers[1]then
+return widths[1]
+end
+if progress>=centers[N]then
+return widths[N]
+end
+
+for i=1,N-1 do
+if progress>=centers[i]and progress<=centers[i+1]then
+local span=centers[i+1]-centers[i]
+local alpha=(span>0)and math.clamp((progress-centers[i])/span,0,1)or 0
+return widths[i]+(widths[i+1]-widths[i])*alpha
+end
+end
+
+return widths[1]
+end
+
 local function updateButtonSizes()
 local totalBgW=tabBarBg.AbsoluteSize.X
 if totalBgW<=0 then return end
@@ -12384,8 +12419,11 @@ if math.abs(input.Position.X-startTouchX)>6 then
 dragMoved=true
 end
 
-ad(indicator,0.07,{
+local dynamicWidth=getInterpolatedWidth(progress,bgW,bgX)
+
+ad(indicator,0.06,{
 Position=UDim2.new(progress,0,0.5,0),
+Size=UDim2.new(dynamicWidth,0,1,-6),
 },Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
 
 local closestTab=tabbox.Tabs[1]
