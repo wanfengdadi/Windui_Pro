@@ -12111,7 +12111,7 @@ Parent=tabBarBg,
 
 local indScale=ab("UIScale",{Scale=1})
 
-local indicator=ac(math.max(radius-7,6),"Squircle",{
+local indicator=ac(math.max(radius-8,6),"Squircle",{
 Size=UDim2.new(0,40,1,-6),
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
@@ -12133,6 +12133,10 @@ FillDirection="Horizontal",
 HorizontalAlignment="Center",
 VerticalAlignment="Center",
 Padding=UDim.new(0,0),
+}),
+ab("UIPadding",{
+PaddingLeft=UDim.new(0,3),
+PaddingRight=UDim.new(0,3),
 }),
 })
 
@@ -12221,8 +12225,18 @@ if bgW<=0 then return end
 local btnLeft=targetBtn.AbsolutePosition.X-tabBarBg.AbsolutePosition.X
 local btnW=targetBtn.AbsoluteSize.X
 
-local centerScale=(btnLeft+(btnW/2))/bgW
-local widthScale=math.max((btnW-6)/bgW,0.05)
+local indW=math.clamp(btnW-6,20,bgW-8)
+local widthScale=indW/bgW
+
+local halfW=(indW/2)/bgW
+local minCenter=halfW+(3/bgW)
+local maxCenter=1-halfW-(3/bgW)
+if minCenter>maxCenter then
+minCenter,maxCenter=0.5,0.5
+end
+
+local rawCenter=(btnLeft+(btnW/2))/bgW
+local centerScale=math.clamp(rawCenter,minCenter,maxCenter)
 
 indicator.Visible=true
 local targetPos=UDim2.new(centerScale,0,0.5,0)
@@ -12243,7 +12257,8 @@ local function getInterpolatedWidth(progress,bgW,bgX)
 local tabs=tabbox.Tabs
 local N=#tabs
 if N<=1 then
-return math.max((tabs[1].UIElements.Button.AbsoluteSize.X-6)/bgW,0.05)
+local w=tabs[1].UIElements.Button.AbsoluteSize.X
+return math.clamp(w-6,20,bgW-8)/bgW
 end
 
 local centers={}
@@ -12252,8 +12267,9 @@ for i,t in ipairs(tabs)do
 local btn=t.UIElements.Button
 local btnLeft=btn.AbsolutePosition.X-bgX
 local btnW=btn.AbsoluteSize.X
+local indW=math.clamp(btnW-6,20,bgW-8)
 centers[i]=(btnLeft+(btnW/2))/bgW
-widths[i]=math.max((btnW-6)/bgW,0.05)
+widths[i]=indW/bgW
 end
 
 if progress<=centers[1]then
@@ -12287,7 +12303,7 @@ local lbl=t.UIElements.TitleLabel
 local icon=t.UIElements.IconObj
 local textW=(lbl and lbl.TextBounds.X>0 and lbl.TextBounds.X)or(string.len(t.Title)*8)
 local iconW=icon and 20 or 0
-local w=textW+iconW+18
+local w=textW+iconW+16
 weights[i]=w
 totalWeight=totalWeight+w
 end
@@ -12413,16 +12429,24 @@ local bgW=tabBarBg.AbsoluteSize.X
 if bgW<=0 then return end
 local bgX=tabBarBg.AbsolutePosition.X
 
-local progress=math.clamp((input.Position.X-bgX)/bgW,0.05,0.95)
+local rawProgress=(input.Position.X-bgX)/bgW
 
 if math.abs(input.Position.X-startTouchX)>6 then
 dragMoved=true
 end
 
-local dynamicWidth=getInterpolatedWidth(progress,bgW,bgX)
+local dynamicWidth=getInterpolatedWidth(rawProgress,bgW,bgX)
+local halfW=(dynamicWidth/2)
+local minCenter=halfW+(3/bgW)
+local maxCenter=1-halfW-(3/bgW)
+if minCenter>maxCenter then
+minCenter,maxCenter=0.5,0.5
+end
+
+local clampedCenter=math.clamp(rawProgress,minCenter,maxCenter)
 
 ad(indicator,0.06,{
-Position=UDim2.new(progress,0,0.5,0),
+Position=UDim2.new(clampedCenter,0,0.5,0),
 Size=UDim2.new(dynamicWidth,0,1,-6),
 },Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
 
@@ -12431,7 +12455,7 @@ local minDiff=math.huge
 for _,t in ipairs(tabbox.Tabs)do
 local btn=t.UIElements.Button
 local btnCenterScale=((btn.AbsolutePosition.X-bgX)+(btn.AbsoluteSize.X/2))/bgW
-local diff=math.abs(progress-btnCenterScale)
+local diff=math.abs(clampedCenter-btnCenterScale)
 if diff<minDiff then
 minDiff=diff
 closestTab=t
@@ -12454,14 +12478,14 @@ ad(indScale,0.22,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play
 if dragMoved then
 local bgW=tabBarBg.AbsoluteSize.X
 local bgX=tabBarBg.AbsolutePosition.X
-local progress=math.clamp((input.Position.X-bgX)/math.max(bgW,1),0,1)
+local rawProgress=(input.Position.X-bgX)/math.max(bgW,1)
 
 local closestTab=tabbox.Tabs[1]
 local minDiff=math.huge
 for _,t in ipairs(tabbox.Tabs)do
 local btn=t.UIElements.Button
 local btnCenterScale=((btn.AbsolutePosition.X-bgX)+(btn.AbsoluteSize.X/2))/bgW
-local diff=math.abs(progress-btnCenterScale)
+local diff=math.abs(rawProgress-btnCenterScale)
 if diff<minDiff then
 minDiff=diff
 closestTab=t
