@@ -12228,8 +12228,10 @@ end
 local isDragging=false
 local activeInput=nil
 
-function tabbox.SelectTab(self,targetTab,instant)
-if tabbox.ActiveTab==targetTab and not isDragging then return end
+function tabbox.SelectTab(self,targetTab,instant,forceSnap)
+local isSame=(tabbox.ActiveTab==targetTab)
+if isSame and not forceSnap then return end
+
 local prevTab=tabbox.ActiveTab
 tabbox.ActiveTab=targetTab
 local totalTabs=math.max(#tabbox.Tabs,1)
@@ -12242,15 +12244,10 @@ if instant then
 indicator.Position=targetPos
 indicator.Size=targetSize
 else
-ad(indicator,0.24,{
+ad(indicator,0.22,{
 Position=targetPos,
 Size=targetSize,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
-
-local dir=1
-if prevTab and prevTab.Index then
-dir=(targetTab.Index>prevTab.Index)and 1 or-1
 end
 
 local light=isLight()
@@ -12278,7 +12275,14 @@ end
 end
 end
 
-if prevTab and prevTab.UIElements and prevTab.UIElements.PageFrame and prevTab~=targetTab then
+if isSame then return end
+
+local dir=1
+if prevTab and prevTab.Index then
+dir=(targetTab.Index>prevTab.Index)and 1 or-1
+end
+
+if prevTab and prevTab.UIElements and prevTab.UIElements.PageFrame then
 prevTab.UIElements.PageFrame.Visible=false
 end
 
@@ -12288,10 +12292,8 @@ newPage.Visible=true
 if instant then
 newPage.Position=UDim2.new(0,0,0,0)
 else
-if prevTab~=targetTab then
 newPage.Position=UDim2.new(dir*0.04,0,0,0)
 ad(newPage,0.22,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-end
 end
 
 syncParentCanvas(targetTab)
@@ -12323,6 +12325,9 @@ end
 local function onDragStart(input)
 isDragging=true
 activeInput=input
+if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrame then
+ah.Tab.UIElements.ContainerFrame.ScrollingEnabled=false
+end
 ad(indScale,0.18,{Scale=1.08},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 end
 
@@ -12349,6 +12354,10 @@ if not isDragging then return end
 isDragging=false
 activeInput=nil
 
+if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrame then
+ah.Tab.UIElements.ContainerFrame.ScrollingEnabled=true
+end
+
 ad(indScale,0.22,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 local trackW=tabBarBg.AbsoluteSize.X
@@ -12364,7 +12373,7 @@ local progress=math.clamp((curX-minX)/math.max(maxX-minX,1),0,1)
 local targetIndex=math.clamp(math.round(progress*(N-1))+1,1,N)
 
 if tabbox.Tabs[targetIndex]then
-tabbox:SelectTab(tabbox.Tabs[targetIndex],false)
+tabbox:SelectTab(tabbox.Tabs[targetIndex],false,true)
 end
 end
 
@@ -12505,7 +12514,7 @@ end
 updateTabTheme()
 
 if #tabbox.Tabs==1 then
-tabbox:SelectTab(subTab,true)
+tabbox:SelectTab(subTab,true,true)
 end
 
 return subTab
