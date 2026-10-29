@@ -12227,6 +12227,8 @@ end
 
 local isDragging=false
 local activeInput=nil
+local startTouchX=0
+local dragMoved=false
 
 function tabbox.SelectTab(self,targetTab,instant,forceSnap)
 local isSame=(tabbox.ActiveTab==targetTab)
@@ -12325,6 +12327,8 @@ end
 local function onDragStart(input)
 isDragging=true
 activeInput=input
+dragMoved=false
+startTouchX=input.Position.X
 if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrame then
 ah.Tab.UIElements.ContainerFrame.ScrollingEnabled=false
 end
@@ -12336,11 +12340,16 @@ if not isDragging then return end
 local trackW=tabBarBg.AbsoluteSize.X
 local trackX=tabBarBg.AbsolutePosition.X
 local N=math.max(#tabbox.Tabs,1)
-local indW=math.max((trackW/N)-6,10)
+if N<=1 then return end
 
+local indW=(trackW/N)-6
 local minX=indW/2+3
 local maxX=trackW-indW/2-3
 local curX=math.clamp(input.Position.X-trackX,minX,maxX)
+
+if math.abs(input.Position.X-startTouchX)>6 then
+dragMoved=true
+end
 
 indicator.Position=UDim2.new(0,curX,0.5,0)
 
@@ -12363,8 +12372,7 @@ ad(indScale,0.22,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play
 local trackW=tabBarBg.AbsoluteSize.X
 local trackX=tabBarBg.AbsolutePosition.X
 local N=math.max(#tabbox.Tabs,1)
-local indW=math.max((trackW/N)-6,10)
-
+local indW=(trackW/N)-6
 local minX=indW/2+3
 local maxX=trackW-indW/2-3
 local curX=math.clamp(input.Position.X-trackX,minX,maxX)
@@ -12372,8 +12380,14 @@ local curX=math.clamp(input.Position.X-trackX,minX,maxX)
 local progress=math.clamp((curX-minX)/math.max(maxX-minX,1),0,1)
 local targetIndex=math.clamp(math.round(progress*(N-1))+1,1,N)
 
+if dragMoved then
 if tabbox.Tabs[targetIndex]then
 tabbox:SelectTab(tabbox.Tabs[targetIndex],false,true)
+end
+else
+if tabbox.ActiveTab then
+tabbox:SelectTab(tabbox.ActiveTab,false,true)
+end
 end
 end
 
@@ -12412,7 +12426,7 @@ local btn=ab("TextButton",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
 Text="",
-Active=false,
+Active=true,
 ZIndex=2,
 Parent=tabButtonsList,
 },{
@@ -12427,6 +12441,18 @@ PaddingLeft=UDim.new(0,4),
 PaddingRight=UDim.new(0,4),
 }),
 })
+
+aa.AddSignal(btn.MouseButton1Click,function()
+if not dragMoved then
+tabbox:SelectTab(subTab,false,true)
+end
+end)
+
+aa.AddSignal(btn.InputBegan,function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+onDragStart(input)
+end
+end)
 
 local light=isLight()
 local initialCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
@@ -12515,6 +12541,12 @@ updateTabTheme()
 
 if #tabbox.Tabs==1 then
 tabbox:SelectTab(subTab,true,true)
+else
+if tabbox.ActiveTab then
+local curTotal=math.max(#tabbox.Tabs,1)
+indicator.Size=UDim2.new(1/curTotal,-6,1,-6)
+indicator.Position=UDim2.new((tabbox.ActiveTab.Index-0.5)/curTotal,0,0.5,0)
+end
 end
 
 return subTab
