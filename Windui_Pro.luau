@@ -7152,269 +7152,146 @@ end
 
 
 return aa end function a.H()
-local aa=a.load'd'
-local ab=aa.New 
-local ac=aa.Tween
+local aa=a.load'd'local ab=
+aa.New local ac=
+aa.Tween
+
 local ad=a.load'F'.New
 local ae=a.load'G'.New
-local uis=(cloneref or clonereference or function(s) return s end)(game:GetService"UserInputService")
 
 local af={}
 
-local function NormalizeKey(k)
-    if typeof(k)=="EnumItem" then
-        return k.Name
-    elseif type(k)=="string" and k~="" and k~="None" then
-        return k
-    end
-    return nil
+function af.New(ag,ah)
+local ai={
+__type="Toggle",
+Title=ah.Title or"Toggle",
+Desc=ah.Desc or nil,
+Locked=ah.Locked or false,
+LockedTitle=ah.LockedTitle,
+Value=ah.Value,
+Icon=ah.Icon or nil,
+IconSize=ah.IconSize or 23,
+Type=ah.Type or"Toggle",
+Callback=ah.Callback or function()end,
+UIElements={},
+}
+ai.ToggleFrame=a.load'C'{
+Title=ai.Title,
+Desc=ai.Desc,
+
+
+
+
+Window=ah.Window,
+Parent=ah.Parent,
+TextOffset=(52),
+Hover=false,
+Tab=ah.Tab,
+Index=ah.Index,
+ElementTable=ai,
+ParentConfig=ah,
+Tags=ah.Tags,
+}
+
+local aj=true
+
+if ai.Value==nil then
+ai.Value=false
 end
 
-function af.New(ag,ah)
-    local isKeyboardEnabled = (ah.Keyboard ~= false)
-    if ah.Keybind == false then
-        isKeyboardEnabled = false
-    end
+function ai.Lock(ak)
+ai.Locked=true
+aj=false
+return ai.ToggleFrame:Lock(ai.LockedTitle)
+end
+function ai.Unlock(ak)
+ai.Locked=false
+aj=true
+return ai.ToggleFrame:Unlock()
+end
 
-    local defaultKey = NormalizeKey(ah.Keybind or ah.DefaultKeybind)
+if ai.Locked then
+ai:Lock()
+end
 
-    local ai={
-        __type="Toggle",
-        Title=ah.Title or"Toggle",
-        Desc=ah.Desc or nil,
-        Locked=ah.Locked or false,
-        LockedTitle=ah.LockedTitle,
-        Value=ah.Value,
-        Icon=ah.Icon or nil,
-        IconSize=ah.IconSize or 23,
-        Type=ah.Type or"Toggle",
-        Callback=ah.Callback or function()end,
-        
-        Keyboard = isKeyboardEnabled,
-        Keybind = defaultKey,
-        DefaultKeybind = defaultKey,
-        IsPickingKey = false,
-        
-        UIElements={},
-    }
+local ak=ai.Value
 
-    local textOffset = isKeyboardEnabled and 118 or 52
+local al,am
+if ai.Type=="Toggle"then
+al,am=ad(
+ak,
+ai.Icon,
+ai.IconSize,
+ai.ToggleFrame.UIElements.Main,
+ai.Callback,
+ah.Window.NewElements,
+ah
+)
+elseif ai.Type=="Checkbox"then
+al,am=ae(
+ak,
+ai.Icon,
+ai.IconSize,
+ai.ToggleFrame.UIElements.Main,
+ai.Callback,
+ah
+)
+else
+error("Unknown Toggle Type: "..tostring(ai.Type))
+end
 
-    ai.ToggleFrame=a.load'C'{
-        Title=ai.Title,
-        Desc=ai.Desc,
-        Window=ah.Window,
-        Parent=ah.Parent,
-        TextOffset=textOffset,
-        Hover=false,
-        Tab=ah.Tab,
-        Index=ah.Index,
-        ElementTable=ai,
-        ParentConfig=ah,
-        Tags=ah.Tags,
-    }
+al.AnchorPoint=Vector2.new(1,ah.Window.NewElements and 0 or 0.5)
+al.Position=UDim2.new(1,0,ah.Window.NewElements and 0 or 0.5,0)
 
-    local aj=true
+function ai.Set(an,ao,ap,aq)
+if aj then
+am:Set(ao,ap,aq or false)
+ak=ao
+ai.Value=ao
+end
+end
 
-    if ai.Value==nil then
-        ai.Value=false
-    end
+ai:Set(ak,false,ah.Window.NewElements)
 
-    function ai.Lock(ak)
-        ai.Locked=true
-        aj=false
-        return ai.ToggleFrame:Lock(ai.LockedTitle)
-    end
-    function ai.Unlock(ak)
-        ai.Locked=false
-        aj=true
-        return ai.ToggleFrame:Unlock()
-    end
+local an=ah.WindUI.GenerateGUID()
 
-    if ai.Locked then
-        ai:Lock()
-    end
+if ah.Window.NewElements and am.Animate then
+if ai.Type=="Toggle"then
+aa.AddSignal(al.ToggleFrame.Hitbox.InputBegan,function(ao)
+if
+not ah.Window.IsToggleDragging
+and(
+ao.UserInputType==Enum.UserInputType.MouseButton1
+or ao.UserInputType==Enum.UserInputType.Touch
+)
+then
+if ah.WindUI.CurrentInput and ah.WindUI.CurrentInput~=an then
+return
+end
 
-    local ak=ai.Value
+ah.WindUI.CurrentInput=an
+am:Animate(ao,ai)
+end
+end)
+end
 
-    local rightContainer = ab("Frame", {
-        Size = UDim2.new(0, 0, 1, 0),
-        AutomaticSize = "X",
-        BackgroundTransparency = 1,
-        AnchorPoint = Vector2.new(1, 0.5),
-        Position = UDim2.new(1, 0, 0.5, 0),
-        Parent = ai.ToggleFrame.UIElements.Main,
-    }, {
-        ab("UIListLayout", {
-            FillDirection = "Horizontal",
-            VerticalAlignment = "Center",
-            HorizontalAlignment = "Right",
-            Padding = UDim.new(0, 8),
-        }),
-    })
 
-    local keybindBtn, keybindLabel
-    if isKeyboardEnabled then
-        keybindBtn = aa.NewRoundFrame(8, "Squircle", {
-            Size = UDim2.new(0, 38, 0, 24),
-            ThemeTag = {
-                ImageColor3 = "Text",
-            },
-            ImageTransparency = 0.88,
-            Parent = rightContainer,
-            Active = true,
-        }, {
-            ab("UIPadding", {
-                PaddingLeft = UDim.new(0, 6),
-                PaddingRight = UDim.new(0, 6),
-            }),
-            aa.NewRoundFrame(8, "SquircleGlass", {
-                Size = UDim2.new(1, 0, 1, 0),
-                ThemeTag = {
-                    ImageColor3 = "Outline",
-                },
-                ImageTransparency = 0.85,
-            }),
-        }, true)
 
-        keybindLabel = ab("TextLabel", {
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundTransparency = 1,
-            Text = ai.Keybind or "-",
-            TextSize = 13,
-            FontFace = Font.new(aa.Font, Enum.FontWeight.SemiBold),
-            ThemeTag = {
-                TextColor3 = "Text",
-            },
-            TextTransparency = ai.Keybind and 0.15 or 0.6,
-            Parent = keybindBtn,
-        })
 
-        local function updateKeybindSize()
-            local tw = keybindLabel.TextBounds.X
-            local w = math.max(34, tw + 14)
-            ac(keybindBtn, 0.18, { Size = UDim2.new(0, w, 0, 24) }):Play()
-        end
-        aa.AddSignal(keybindLabel:GetPropertyChangedSignal"Text", updateKeybindSize)
-        updateKeybindSize()
 
-        aa.AddSignal(keybindBtn.MouseButton1Click, function()
-            if not aj or ai.Locked or ai.IsPickingKey then return end
-            ai.IsPickingKey = true
-            keybindLabel.Text = "..."
-            ac(keybindBtn, 0.15, { ImageTransparency = 0.7 }):Play()
+else
+if ai.Type=="Toggle"then
+aa.AddSignal(al.ToggleFrame.Hitbox.MouseButton1Click,function()
+ai:Set(not ai.Value,nil,ah.Window.NewElements)
+end)
+elseif ai.Type=="Checkbox"then
+aa.AddSignal(al.MouseButton1Click,function()
+ai:Set(not ai.Value,nil,ah.Window.NewElements)
+end)
+end
+end
 
-            local conn
-            conn = uis.InputBegan:Connect(function(input)
-                local newKey = nil
-                if input.UserInputType == Enum.UserInputType.Keyboard then
-                    if input.KeyCode == Enum.KeyCode.Escape or input.KeyCode == Enum.KeyCode.Backspace then
-                        newKey = nil
-                    else
-                        newKey = input.KeyCode.Name
-                    end
-                elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-                    newKey = "MouseRight"
-                end
-
-                if input.UserInputType == Enum.UserInputType.Keyboard or input.UserInputType == Enum.UserInputType.MouseButton2 then
-                    conn:Disconnect()
-                    ai.IsPickingKey = false
-                    ai:SetKeybind(newKey)
-                    ac(keybindBtn, 0.15, { ImageTransparency = 0.88 }):Play()
-                end
-            end)
-        end)
-    end
-
-    local al, am
-    if ai.Type=="Toggle" then
-        al, am = ad(ak, ai.Icon, ai.IconSize, rightContainer, ai.Callback, ah.Window.NewElements, ah)
-    elseif ai.Type=="Checkbox" then
-        al, am = ae(ak, ai.Icon, ai.IconSize, rightContainer, ai.Callback, ah)
-    end
-
-    function ai.Set(an, ao, ap, aq)
-        if aj then
-            am:Set(ao, ap, aq or false)
-            ak = ao
-            ai.Value = ao
-        end
-    end
-
-    ai:Set(ak, false, ah.Window.NewElements)
-
-    function ai.SetKeybind(an, key)
-        if not ai.Keyboard then return end
-        local nk = NormalizeKey(key)
-        ai.Keybind = nk
-        if keybindLabel then
-            keybindLabel.Text = nk or "-"
-            keybindLabel.TextTransparency = nk and 0.15 or 0.6
-        end
-        if ah.Window and ah.Window.CurrentConfig and ah.Flag then
-            ah.Window.CurrentConfig:Set(ah.Flag .. "_Keybind", nk)
-        end
-    end
-
-    function ai.ResetKeybind(an)
-        ai:SetKeybind(ai.DefaultKeybind)
-    end
-
-    function ai.GetKeybind(an)
-        return ai.Keybind
-    end
-
-    if isKeyboardEnabled and ah.Window and ah.Window.CurrentConfig and ah.Flag then
-        local savedKey = ah.Window.CurrentConfig:Get(ah.Flag .. "_Keybind")
-        if savedKey ~= nil then
-            ai:SetKeybind(savedKey)
-        end
-    end
-
-    if isKeyboardEnabled then
-        aa.AddSignal(uis.InputBegan, function(input, gameProcessed)
-            if gameProcessed or uis:GetFocusedTextBox() then return end
-            if not aj or ai.Locked or ai.IsPickingKey then return end
-            if not ai.Keybind then return end
-
-            local pressed = false
-            if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode.Name == ai.Keybind then
-                pressed = true
-            elseif input.UserInputType == Enum.UserInputType.MouseButton2 and ai.Keybind == "MouseRight" then
-                pressed = true
-            end
-
-            if pressed then
-                ai:Set(not ai.Value, true, ah.Window.NewElements)
-            end
-        end)
-    end
-
-    local an = ah.WindUI.GenerateGUID()
-    if ah.Window.NewElements and am.Animate then
-        if ai.Type=="Toggle" then
-            aa.AddSignal(al.ToggleFrame.Hitbox.InputBegan, function(ao)
-                if not ah.Window.IsToggleDragging and (ao.UserInputType==Enum.UserInputType.MouseButton1 or ao.UserInputType==Enum.UserInputType.Touch) then
-                    if ah.WindUI.CurrentInput and ah.WindUI.CurrentInput~=an then return end
-                    ah.WindUI.CurrentInput=an
-                    am:Animate(ao, ai)
-                end
-            end)
-        end
-    else
-        if ai.Type=="Toggle" then
-            aa.AddSignal(al.ToggleFrame.Hitbox.MouseButton1Click, function()
-                ai:Set(not ai.Value, nil, ah.Window.NewElements)
-            end)
-        elseif ai.Type=="Checkbox" then
-            aa.AddSignal(al.MouseButton1Click, function()
-                ai:Set(not ai.Value, nil, ah.Window.NewElements)
-            end)
-        end
-    end
-
-    return ai.__type, ai
+return ai.__type,ai
 end
 
 return af end function a.I()
