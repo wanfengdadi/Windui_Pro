@@ -12075,6 +12075,14 @@ ActiveTab=nil,
 UIElements={},
 }
 
+local function isLight()
+local t=aa.GetThemeProperty("Text",aa.Theme)
+if typeof(t)=="Color3"then
+return aa.GetPerceivedBrightness(t)<0.5
+end
+return false
+end
+
 local mainFrame=ac(radius,"Squircle",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
@@ -12100,28 +12108,19 @@ SortOrder="LayoutOrder",
 
 local tabBarBg=ac(math.max(radius-4,8),"Squircle",{
 Size=UDim2.new(1,0,0,36),
-ThemeTag={
-ImageColor3="Background",
-},
-ImageTransparency=0.6,
 Parent=mainFrame,
 LayoutOrder=1,
 ClipsDescendants=true,
-},{
-ac(math.max(radius-4,8),"SquircleOutline",{
+})
+
+local tabBarOutline=ac(math.max(radius-4,8),"SquircleOutline",{
 Size=UDim2.new(1,0,1,0),
-ThemeTag={ImageColor3="Outline"},
-ImageTransparency=0.92,
-}),
+Parent=tabBarBg,
 })
 
 local indicator=ac(math.max(radius-7,6),"Squircle",{
 Size=UDim2.new(0,0,1,-6),
 Position=UDim2.new(0,3,0,3),
-ThemeTag={
-ImageColor3="Button",
-},
-ImageTransparency=0,
 ZIndex=1,
 Visible=false,
 Parent=tabBarBg,
@@ -12156,6 +12155,46 @@ tabbox.UIElements.TabBar=tabButtonsList
 tabbox.UIElements.Indicator=indicator
 tabbox.UIElements.ContentHost=contentHost
 
+local function updateTabTheme()
+local light=isLight()
+if light then
+tabBarBg.ImageColor3=Color3.fromHex"#EBECEF"
+tabBarBg.ImageTransparency=0
+tabBarOutline.ImageColor3=Color3.fromHex"#D4D4D8"
+tabBarOutline.ImageTransparency=0.6
+indicator.ImageColor3=Color3.fromHex"#FFFFFF"
+indicator.ImageTransparency=0
+else
+tabBarBg.ImageColor3=Color3.fromHex"#141416"
+tabBarBg.ImageTransparency=0.5
+tabBarOutline.ImageColor3=Color3.fromHex"#FFFFFF"
+tabBarOutline.ImageTransparency=0.94
+indicator.ImageColor3=Color3.fromHex"#2A2A2E"
+indicator.ImageTransparency=0
+end
+
+local activeCol=light and Color3.fromHex"#09090B"or Color3.fromHex"#FFFFFF"
+local inactiveCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
+
+for _,subTab in ipairs(tabbox.Tabs)do
+local isCurrent=(subTab==tabbox.ActiveTab)
+local col=isCurrent and activeCol or inactiveCol
+local trans=isCurrent and 0 or 0.25
+
+if subTab.UIElements.TitleLabel then
+subTab.UIElements.TitleLabel.TextColor3=col
+subTab.UIElements.TitleLabel.TextTransparency=trans
+end
+if subTab.UIElements.IconObj then
+local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then
+img.ImageColor3=col
+img.ImageTransparency=trans
+end
+end
+end
+end
+
 local function syncParentCanvas(targetTab)
 task.defer(function()
 if not targetTab or not targetTab.UIElements or not targetTab.UIElements.PageFrame then return end
@@ -12163,8 +12202,8 @@ local pf=targetTab.UIElements.PageFrame
 local layout=pf:FindFirstChildOfClass("UIListLayout")
 local h=layout and layout.AbsoluteContentSize.Y or 0
 if h<=0 then
-for _,child in ipairs(pf:GetChildren()) do
-if child:IsA("GuiObject") and child.Visible then
+for _,child in ipairs(pf:GetChildren())do
+if child:IsA("GuiObject")and child.Visible then
 h=h+child.AbsoluteSize.Y+6
 end
 end
@@ -12200,16 +12239,31 @@ end
 
 local dir=1
 if prevTab and prevTab.Index then
-dir=(targetTab.Index>prevTab.Index) and 1 or -1
+dir=(targetTab.Index>prevTab.Index)and 1 or-1
 end
 
-for _,subTab in ipairs(tabbox.Tabs) do
+local light=isLight()
+local activeCol=light and Color3.fromHex"#09090B"or Color3.fromHex"#FFFFFF"
+local inactiveCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
+
+for _,subTab in ipairs(tabbox.Tabs)do
 local isCurrent=(subTab==targetTab)
-local targetTrans=isCurrent and 0 or 0.45
-ad(subTab.UIElements.TitleLabel,0.2,{TextTransparency=targetTrans},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local col=isCurrent and activeCol or inactiveCol
+local trans=isCurrent and 0 or 0.25
+
+ad(subTab.UIElements.TitleLabel,0.2,{
+TextColor3=col,
+TextTransparency=trans,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
-if img then ad(img,0.2,{ImageTransparency=targetTrans},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+if img then
+ad(img,0.2,{
+ImageColor3=col,
+ImageTransparency=trans,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 end
 
@@ -12263,6 +12317,9 @@ PaddingRight=UDim.new(0,4),
 }),
 })
 
+local light=isLight()
+local initialCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
+
 local iconObj
 if subIcon then
 iconObj=aa.Image(
@@ -12271,14 +12328,15 @@ subIcon..":"..subTitle,
 0,
 ah.Window.Folder,
 "Tabbox",
-true,
-nil,
-"Icon"
+false
 )
 iconObj.Size=UDim2.new(0,14,0,14)
 iconObj.Parent=btn
 local img=iconObj:FindFirstChildOfClass("ImageLabel",true)
-if img then img.ImageTransparency=0.45 end
+if img then
+img.ImageColor3=initialCol
+img.ImageTransparency=0.25
+end
 subTab.UIElements.IconObj=iconObj
 end
 
@@ -12286,8 +12344,8 @@ local lbl=ab("TextLabel",{
 Text=subTitle,
 TextSize=13,
 FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
-ThemeTag={TextColor3="Text"},
-TextTransparency=0.45,
+TextColor3=initialCol,
+TextTransparency=0.25,
 BackgroundTransparency=1,
 AutomaticSize="XY",
 Parent=btn,
@@ -12338,7 +12396,7 @@ end
 table.insert(tabbox.Tabs,subTab)
 
 local totalTabs=#tabbox.Tabs
-for _,t in ipairs(tabbox.Tabs) do
+for _,t in ipairs(tabbox.Tabs)do
 t.UIElements.Button.Size=UDim2.new(1/totalTabs,0,1,0)
 end
 
@@ -12346,12 +12404,16 @@ aa.AddSignal(btn.MouseButton1Click,function()
 tabbox:SelectTab(subTab,false)
 end)
 
+updateTabTheme()
+
 if #tabbox.Tabs==1 then
 tabbox:SelectTab(subTab,true)
 end
 
 return subTab
 end
+
+aa:OnThemeChange(updateTabTheme)
 
 tabbox.AddTab=tabbox.Tab
 
