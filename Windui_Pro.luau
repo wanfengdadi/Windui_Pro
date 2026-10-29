@@ -12061,6 +12061,8 @@ local ab=aa.New
 local ac=aa.NewRoundFrame
 local ad=aa.Tween
 
+local uis=game:GetService"UserInputService"
+
 local af={}
 
 function af.New(ag,ah)
@@ -12111,6 +12113,7 @@ Size=UDim2.new(1,0,0,36),
 Parent=mainFrame,
 LayoutOrder=1,
 ClipsDescendants=true,
+Active=true,
 })
 
 local tabBarOutline=ac(math.max(radius-4,8),"SquircleOutline",{
@@ -12118,12 +12121,17 @@ Size=UDim2.new(1,0,1,0),
 Parent=tabBarBg,
 })
 
+local indScale=ab("UIScale",{Scale=1})
+
 local indicator=ac(math.max(radius-7,6),"Squircle",{
 Size=UDim2.new(0,0,1,-6),
-Position=UDim2.new(0,3,0,3),
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0.5,0,0.5,0),
 ZIndex=1,
 Visible=false,
 Parent=tabBarBg,
+},{
+indScale,
 })
 
 local tabButtonsList=ab("Frame",{
@@ -12217,14 +12225,17 @@ end
 end)
 end
 
+local isDragging=false
+local activeInput=nil
+
 function tabbox.SelectTab(self,targetTab,instant)
-if tabbox.ActiveTab==targetTab then return end
+if tabbox.ActiveTab==targetTab and not isDragging then return end
 local prevTab=tabbox.ActiveTab
 tabbox.ActiveTab=targetTab
 local totalTabs=math.max(#tabbox.Tabs,1)
 
 indicator.Visible=true
-local targetPos=UDim2.new((targetTab.Index-1)/totalTabs,3,0,3)
+local targetPos=UDim2.new((targetTab.Index-0.5)/totalTabs,0,0.5,0)
 local targetSize=UDim2.new(1/totalTabs,-6,1,-6)
 
 if instant then
@@ -12267,7 +12278,7 @@ end
 end
 end
 
-if prevTab and prevTab.UIElements and prevTab.UIElements.PageFrame then
+if prevTab and prevTab.UIElements and prevTab.UIElements.PageFrame and prevTab~=targetTab then
 prevTab.UIElements.PageFrame.Visible=false
 end
 
@@ -12277,12 +12288,103 @@ newPage.Visible=true
 if instant then
 newPage.Position=UDim2.new(0,0,0,0)
 else
+if prevTab~=targetTab then
 newPage.Position=UDim2.new(dir*0.04,0,0,0)
 ad(newPage,0.22,{Position=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+end
 end
 
 syncParentCanvas(targetTab)
 end
+
+local function previewHighlight(targetIndex)
+local light=isLight()
+local activeCol=light and Color3.fromHex"#09090B"or Color3.fromHex"#FFFFFF"
+local inactiveCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
+
+for idx,subTab in ipairs(tabbox.Tabs)do
+local isHover=(idx==targetIndex)
+local col=isHover and activeCol or inactiveCol
+local trans=isHover and 0 or 0.25
+
+subTab.UIElements.TitleLabel.TextColor3=col
+subTab.UIElements.TitleLabel.TextTransparency=trans
+
+if subTab.UIElements.IconObj then
+local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then
+img.ImageColor3=col
+img.ImageTransparency=trans
+end
+end
+end
+end
+
+local function onDragStart(input)
+isDragging=true
+activeInput=input
+ad(indScale,0.18,{Scale=1.08},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+end
+
+local function onDragUpdate(input)
+if not isDragging then return end
+local trackW=tabBarBg.AbsoluteSize.X
+local trackX=tabBarBg.AbsolutePosition.X
+local N=math.max(#tabbox.Tabs,1)
+local indW=math.max((trackW/N)-6,10)
+
+local minX=indW/2+3
+local maxX=trackW-indW/2-3
+local curX=math.clamp(input.Position.X-trackX,minX,maxX)
+
+indicator.Position=UDim2.new(0,curX,0.5,0)
+
+local progress=math.clamp((curX-minX)/math.max(maxX-minX,1),0,1)
+local targetIndex=math.clamp(math.round(progress*(N-1))+1,1,N)
+previewHighlight(targetIndex)
+end
+
+local function onDragEnd(input)
+if not isDragging then return end
+isDragging=false
+activeInput=nil
+
+ad(indScale,0.22,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+
+local trackW=tabBarBg.AbsoluteSize.X
+local trackX=tabBarBg.AbsolutePosition.X
+local N=math.max(#tabbox.Tabs,1)
+local indW=math.max((trackW/N)-6,10)
+
+local minX=indW/2+3
+local maxX=trackW-indW/2-3
+local curX=math.clamp(input.Position.X-trackX,minX,maxX)
+
+local progress=math.clamp((curX-minX)/math.max(maxX-minX,1),0,1)
+local targetIndex=math.clamp(math.round(progress*(N-1))+1,1,N)
+
+if tabbox.Tabs[targetIndex]then
+tabbox:SelectTab(tabbox.Tabs[targetIndex],false)
+end
+end
+
+aa.AddSignal(tabBarBg.InputBegan,function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+onDragStart(input)
+end
+end)
+
+aa.AddSignal(uis.InputChanged,function(input)
+if isDragging and(input==activeInput or input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch)then
+onDragUpdate(input)
+end
+end)
+
+aa.AddSignal(uis.InputEnded,function(input)
+if isDragging and(input==activeInput or input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch)then
+onDragEnd(input)
+end
+end)
 
 function tabbox.Tab(self,subCfg)
 subCfg=subCfg or{}
@@ -12301,7 +12403,7 @@ local btn=ab("TextButton",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
 Text="",
-Active=true,
+Active=false,
 ZIndex=2,
 Parent=tabButtonsList,
 },{
@@ -12399,10 +12501,6 @@ local totalTabs=#tabbox.Tabs
 for _,t in ipairs(tabbox.Tabs)do
 t.UIElements.Button.Size=UDim2.new(1/totalTabs,0,1,0)
 end
-
-aa.AddSignal(btn.MouseButton1Click,function()
-tabbox:SelectTab(subTab,false)
-end)
 
 updateTabTheme()
 
