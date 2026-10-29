@@ -12187,7 +12187,7 @@ local inactiveCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
 for _,subTab in ipairs(tabbox.Tabs)do
 local isCurrent=(subTab==tabbox.ActiveTab)
 local col=isCurrent and activeCol or inactiveCol
-local trans=isCurrent and 0 or 0.25
+local trans=isCurrent and 0 or 0.45
 
 if subTab.UIElements.TitleLabel then
 subTab.UIElements.TitleLabel.TextColor3=col
@@ -12246,7 +12246,7 @@ if instant then
 indicator.Position=targetPos
 indicator.Size=targetSize
 else
-ad(indicator,0.22,{
+ad(indicator,0.24,{
 Position=targetPos,
 Size=targetSize,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12259,9 +12259,9 @@ local inactiveCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
 for _,subTab in ipairs(tabbox.Tabs)do
 local isCurrent=(subTab==targetTab)
 local col=isCurrent and activeCol or inactiveCol
-local trans=isCurrent and 0 or 0.25
+local trans=isCurrent and 0 or 0.45
 
-ad(subTab.UIElements.TitleLabel,0.2,{
+ad(subTab.UIElements.TitleLabel,0.22,{
 TextColor3=col,
 TextTransparency=trans,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12269,7 +12269,7 @@ TextTransparency=trans,
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
 if img then
-ad(img,0.2,{
+ad(img,0.22,{
 ImageColor3=col,
 ImageTransparency=trans,
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
@@ -12309,16 +12309,20 @@ local inactiveCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
 for idx,subTab in ipairs(tabbox.Tabs)do
 local isHover=(idx==targetIndex)
 local col=isHover and activeCol or inactiveCol
-local trans=isHover and 0 or 0.25
+local trans=isHover and 0 or 0.45
 
-subTab.UIElements.TitleLabel.TextColor3=col
-subTab.UIElements.TitleLabel.TextTransparency=trans
+ad(subTab.UIElements.TitleLabel,0.22,{
+TextColor3=col,
+TextTransparency=trans,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
 if subTab.UIElements.IconObj then
 local img=subTab.UIElements.IconObj:FindFirstChildOfClass("ImageLabel",true)
 if img then
-img.ImageColor3=col
-img.ImageTransparency=trans
+ad(img,0.22,{
+ImageColor3=col,
+ImageTransparency=trans,
+},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end
 end
@@ -12332,7 +12336,7 @@ startTouchX=input.Position.X
 if ah.Tab and ah.Tab.UIElements and ah.Tab.UIElements.ContainerFrame then
 ah.Tab.UIElements.ContainerFrame.ScrollingEnabled=false
 end
-ad(indScale,0.18,{Scale=1.08},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
+ad(indScale,0.2,{Scale=1.08},Enum.EasingStyle.Back,Enum.EasingDirection.Out):Play()
 end
 
 local function onDragUpdate(input)
@@ -12352,7 +12356,9 @@ if math.abs(input.Position.X-startTouchX)>6 then
 dragMoved=true
 end
 
-indicator.Position=UDim2.new(curPos,0,0.5,0)
+ad(indicator,0.07,{
+Position=UDim2.new(curPos,0,0.5,0),
+},Enum.EasingStyle.Quad,Enum.EasingDirection.Out):Play()
 
 local range=maxCenter-minCenter
 local targetIndex=(range>0)and math.clamp(math.round(((curPos-minCenter)/range)*(N-1))+1,1,N)or 1
@@ -12443,18 +12449,6 @@ PaddingRight=UDim.new(0,4),
 }),
 })
 
-aa.AddSignal(btn.MouseButton1Click,function()
-if not dragMoved then
-tabbox:SelectTab(subTab,false,true)
-end
-end)
-
-aa.AddSignal(btn.InputBegan,function(input)
-if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
-onDragStart(input)
-end
-end)
-
 local light=isLight()
 local initialCol=light and Color3.fromHex"#71717A"or Color3.fromHex"#A1A1AA"
 
@@ -12473,7 +12467,7 @@ iconObj.Parent=btn
 local img=iconObj:FindFirstChildOfClass("ImageLabel",true)
 if img then
 img.ImageColor3=initialCol
-img.ImageTransparency=0.25
+img.ImageTransparency=0.45
 end
 subTab.UIElements.IconObj=iconObj
 end
@@ -12483,11 +12477,43 @@ Text=subTitle,
 TextSize=13,
 FontFace=Font.new(aa.Font,Enum.FontWeight.SemiBold),
 TextColor3=initialCol,
-TextTransparency=0.25,
+TextTransparency=0.45,
 BackgroundTransparency=1,
 AutomaticSize="XY",
 Parent=btn,
 })
+
+aa.AddSignal(btn.MouseEnter,function()
+if subTab~=tabbox.ActiveTab then
+ad(lbl,0.2,{TextTransparency=0.15},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if iconObj then
+local img=iconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then ad(img,0.2,{ImageTransparency=0.15},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+end
+end
+end)
+
+aa.AddSignal(btn.MouseLeave,function()
+if subTab~=tabbox.ActiveTab then
+ad(lbl,0.2,{TextTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if iconObj then
+local img=iconObj:FindFirstChildOfClass("ImageLabel",true)
+if img then ad(img,0.2,{ImageTransparency=0.45},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play() end
+end
+end
+end)
+
+aa.AddSignal(btn.MouseButton1Click,function()
+if not dragMoved then
+tabbox:SelectTab(subTab,false,true)
+end
+end)
+
+aa.AddSignal(btn.InputBegan,function(input)
+if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+onDragStart(input)
+end
+end)
 
 local pageFrame=ab("Frame",{
 Size=UDim2.new(1,0,0,0),
