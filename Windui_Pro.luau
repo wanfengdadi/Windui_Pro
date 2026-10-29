@@ -12338,23 +12338,24 @@ end
 local function onDragUpdate(input)
 if not isDragging then return end
 local trackW=tabBarBg.AbsoluteSize.X
+if trackW<=0 then return end
 local trackX=tabBarBg.AbsolutePosition.X
 local N=math.max(#tabbox.Tabs,1)
 if N<=1 then return end
 
-local indW=(trackW/N)-6
-local minX=indW/2+3
-local maxX=trackW-indW/2-3
-local curX=math.clamp(input.Position.X-trackX,minX,maxX)
+local rawProgress=math.clamp((input.Position.X-trackX)/trackW,0,1)
+local minCenter=0.5/N
+local maxCenter=1-(0.5/N)
+local curPos=math.clamp(rawProgress,minCenter,maxCenter)
 
 if math.abs(input.Position.X-startTouchX)>6 then
 dragMoved=true
 end
 
-indicator.Position=UDim2.new(0,curX,0.5,0)
+indicator.Position=UDim2.new(curPos,0,0.5,0)
 
-local progress=math.clamp((curX-minX)/math.max(maxX-minX,1),0,1)
-local targetIndex=math.clamp(math.round(progress*(N-1))+1,1,N)
+local range=maxCenter-minCenter
+local targetIndex=(range>0)and math.clamp(math.round(((curPos-minCenter)/range)*(N-1))+1,1,N)or 1
 previewHighlight(targetIndex)
 end
 
@@ -12372,15 +12373,15 @@ ad(indScale,0.22,{Scale=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play
 local trackW=tabBarBg.AbsoluteSize.X
 local trackX=tabBarBg.AbsolutePosition.X
 local N=math.max(#tabbox.Tabs,1)
-local indW=(trackW/N)-6
-local minX=indW/2+3
-local maxX=trackW-indW/2-3
-local curX=math.clamp(input.Position.X-trackX,minX,maxX)
 
-local progress=math.clamp((curX-minX)/math.max(maxX-minX,1),0,1)
-local targetIndex=math.clamp(math.round(progress*(N-1))+1,1,N)
+if dragMoved and trackW>0 then
+local rawProgress=math.clamp((input.Position.X-trackX)/trackW,0,1)
+local minCenter=0.5/N
+local maxCenter=1-(0.5/N)
+local curPos=math.clamp(rawProgress,minCenter,maxCenter)
+local range=maxCenter-minCenter
+local targetIndex=(range>0)and math.clamp(math.round(((curPos-minCenter)/range)*(N-1))+1,1,N)or 1
 
-if dragMoved then
 if tabbox.Tabs[targetIndex]then
 tabbox:SelectTab(tabbox.Tabs[targetIndex],false,true)
 end
@@ -12539,15 +12540,8 @@ end
 
 updateTabTheme()
 
-if #tabbox.Tabs==1 then
-tabbox:SelectTab(subTab,true,true)
-else
-if tabbox.ActiveTab then
-local curTotal=math.max(#tabbox.Tabs,1)
-indicator.Size=UDim2.new(1/curTotal,-6,1,-6)
-indicator.Position=UDim2.new((tabbox.ActiveTab.Index-0.5)/curTotal,0,0.5,0)
-end
-end
+local curActive=tabbox.ActiveTab or subTab
+tabbox:SelectTab(curActive,true,true)
 
 return subTab
 end
