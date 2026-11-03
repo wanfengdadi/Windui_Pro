@@ -4397,52 +4397,52 @@ NewsTheme3 = {
     ElementBackgroundTransparency = 0,
 },
 
-NewsTheme_WhiteGray = {
-    Name = "NewsTheme-[WhiteGray]",
+NewsTheme 6 = {
+    Name = "NewsTheme-[6]",
 
     Accent = aa:Gradient({
-        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.05 },
-        ["100"] = { Color = Color3.fromHex"#7A7A7A", Transparency = 0.15 },
+        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#000000", Transparency = 0.2 },
     }, { Rotation = 90 }),
 
     Dialog = aa:Gradient({
-        ["0"] = { Color = Color3.fromHex"#F0F0F0", Transparency = 0.2 },
-        ["100"] = { Color = Color3.fromHex"#555555", Transparency = 0.3 },
+        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#000000", Transparency = 0.3 },
     }, { Rotation = 90 }),
 
     Text = aa:Gradient({
-        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0 },
-        ["100"] = { Color = Color3.fromHex"#888888", Transparency = 0 },
+        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#000000", Transparency = 0.2 },
     }, { Rotation = 90 }),
 
     Placeholder = aa:Gradient({
-        ["0"] = { Color = Color3.fromHex"#CCCCCC", Transparency = 0.4 },
-        ["100"] = { Color = Color3.fromHex"#666666", Transparency = 0.4 },
+        ["0"] = { Color = Color3.fromHex"#A0A0A0", Transparency = 0.3 },
+        ["100"] = { Color = Color3.fromHex"#000000", Transparency = 0.3 },
     }, { Rotation = 90 }),
 
-    Background = Color3.fromHex"#121212",
+    Background = Color3.fromHex"#101010",
 
     Button = aa:Gradient({
-        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.08 },
-        ["100"] = { Color = Color3.fromHex"#666666", Transparency = 0.15 },
+        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.1 },
+        ["100"] = { Color = Color3.fromHex"#000000", Transparency = 0.2 },
     }, { Rotation = 90 }),
 
-    Icon = Color3.fromHex"#DCDCDC",
+    Icon = Color3.fromHex"#FFFFFF",
 
-    Outline = Color3.fromHex"#666666",
-    Toggle = Color3.fromHex"#8E8E93",
-    Slider = Color3.fromHex"#8E8E93",
-    SliderIcon = Color3.fromHex"#A0A0A0",
-    Checkbox = Color3.fromHex"#8E8E93",
-    Primary = Color3.fromHex"#8E8E93",
+    Outline = Color3.fromHex"#333333",
+    Toggle = Color3.fromHex"#333333",
+    Slider = Color3.fromHex"#333333",
+    SliderIcon = Color3.fromHex"#666666",
+    Checkbox = Color3.fromHex"#333333",
+    Primary = Color3.fromHex"#333333",
 
-    PanelBackground = Color3.fromHex"#2A2A2A",
-    PanelBackgroundTransparency = 0.85,
+    PanelBackground = Color3.fromHex"#000000",
+    PanelBackgroundTransparency = 0.95,
 
     LabelBackground = Color3.fromHex"#000000",
-    LabelBackgroundTransparency = 0.85,
+    LabelBackgroundTransparency = 0.83,
 
-    ElementBackground = Color3.fromHex"#1E1E1E",
+    ElementBackground = Color3.fromHex"#1C1E2E",
     ElementBackgroundTransparency = 0,
 },
 
