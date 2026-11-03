@@ -4397,7 +4397,7 @@ NewsTheme3 = {
     ElementBackgroundTransparency = 0,
 },
 
-NewsTheme 6 = {
+NewsTheme6 = {
     Name = "NewsTheme-[6]",
 
     Accent = aa:Gradient({
