@@ -4444,7 +4444,7 @@ NewsTheme_WhiteGray = {
 
     ElementBackground = Color3.fromHex"#1E1E1E",
     ElementBackgroundTransparency = 0,
-}
+},
 
 NewsTheme4 = {
     Name = "NewsTheme-[4]",
