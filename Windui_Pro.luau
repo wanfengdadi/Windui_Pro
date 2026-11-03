@@ -4406,9 +4406,9 @@ NewsTheme6 = {
     }, { Rotation = 90 }),
 
     Dialog = aa:Gradient({
-        ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.3 },
-        ["100"] = { Color = Color3.fromHex"#A0A0A0", Transparency = 0.3 },
-    }, { Rotation = 90 }),
+        ["0"] = { Color = Color3.fromHex"#101010", Transparency = 0 },
+        ["100"] = { Color = Color3.fromHex"#101010", Transparency = 0 },
+    }, { Rotation = 0 }),
 
     Text = aa:Gradient({
         ["0"] = { Color = Color3.fromHex"#FFFFFF", Transparency = 0.1 },
